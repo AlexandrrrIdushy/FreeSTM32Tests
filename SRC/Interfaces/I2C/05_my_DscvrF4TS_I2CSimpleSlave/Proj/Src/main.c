@@ -99,7 +99,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t aTxBuffer[8] = {0x22, 0x22, 0x22};//забор, яма, гора
+  uint8_t aTxBuffer[8] = {0x22, 0x22, 0x22};////забор, яма, гора
 //  uint8_t adrDev = 0xD0;
   while (1)
   {
