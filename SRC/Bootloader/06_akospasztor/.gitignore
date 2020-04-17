@@ -1,0 +1,6 @@
+.vscode/
+**/EWARM/*.dep
+**/EWARM/settings/
+**/EWARM/**/Exe/
+**/EWARM/**/List/
+**/EWARM/**/Obj/

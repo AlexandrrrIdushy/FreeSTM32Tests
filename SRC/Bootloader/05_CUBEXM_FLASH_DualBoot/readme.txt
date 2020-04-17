@@ -1,0 +1,157 @@
+/**
+  @page FLASH_DualBoot  FLASH Dual Boot example
+
+  @verbatim
+  ******************************************************************************
+  * @file    FLASH/FLASH_DualBoot/readme.txt
+  * @author  MCD Application Team
+  * @brief   Description of the FLASH Dual boot example.
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 STMicroelectronics. All rights reserved.
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                       opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  @endverbatim
+
+@par Example Description
+
+Guide through the configuration steps to program internal Flash memory bank 1
+and bank 2, and to swap between both of them by mean of the FLASH HAL API.
+
+At the beginning of the main program the HAL_Init() function is called to reset
+all the peripherals, initialize the Flash interface and the systick.
+Then the SystemClock_Config() function is used to configure the system clock (SYSCLK)
+to run at 80 MHz.
+
+Below are the steps to run this example:
+1- Choose the FLASH_DualBoot_Bank2 project and generate its binary (ie: FLASH_DualBoot.bin)
+
+2- Load this binary at the bank2 of the flash(at the address 0x08080000) using 
+   STM32 ST-LINK Utilities(www.st.com) or any similar tool.
+@note:
+ - You can avoid step 1 by directly loading the binary file provided with the example
+ - You have to configure your preferred toolchain in order to generate the binary
+   file after compiling the project.
+ - You can use STM32 ST-LINK Utilities or any similar tool to initially reset the
+   BFB2 bit (disable the dual boot feature).
+
+3- Choose the FLASH_DualBoot_Bank1 project and run it, this project will be loaded
+   in the bank1 of the flash: at the address 0x08000000
+
+4- Click the BUTTON_USER button to swap between the two banks
+
+- If program in bank1 is selected, LED2 will remain toggling.
+
+- If program in bank2 is selected, LED2 is turn on.
+
+- If error occurs LED2 blink (100ms on, 2s off).
+
+@note Care must be taken when using HAL_Delay(), this function provides accurate delay (in milliseconds)
+      based on variable incremented in SysTick ISR. This implies that if HAL_Delay() is called from
+      a peripheral ISR process, then the SysTick interrupt must have higher priority (numerically lower)
+      than the peripheral interrupt. Otherwise the caller ISR process will be blocked.
+      To change the SysTick interrupt priority you have to use HAL_NVIC_SetPriority() function.
+
+@note The application needs to ensure that the SysTick time base is always set to 1 millisecond
+      to have correct HAL operation.
+
+
+@par Directory contents
+
+  - FLASH/FLASH_DualBoot/Inc/stm32l4xx_hal_conf.h        HAL Configuration file
+  - FLASH/FLASH_DualBoot/Inc/stm32l4xx_it.h              Header for stm32l4xx_it.c
+  - FLASH/FLASH_DualBoot/Inc/main.h                      Header for main.c module
+  - FLASH/FLASH_DualBoot/Src/stm32l4xx_it.c              Interrupt handlers
+  - FLASH/FLASH_DualBoot/Src/main.c                      Main program
+  - FLASH/FLASH_DualBoot/Src/system_stm32l4xx.c          STM32L4xx system clock configuration file
+  - FLASH/FLASH_DualBoot/Binary/FLASH_DualBoot.bin       Binary file to load at bank2
+
+@par Hardware and Software environment
+
+  - This example runs on STM32L476xx devices.
+
+  - This example has been tested with NUCLEO-L476RG Rev C board and can be
+    easily tailored to any other supported device and development board.
+
+@par How to use it ?
+
+In order to make the program work, you must do the following:
+ - Open your preferred toolchain
+ - Rebuild all files and load your image into target memory
+ - Run the example
+
+
+ * <h3><center>&copy; COPYRIGHT STMicroelectronics</center></h3>
+ */
+
+@par Пример Описание
+
+Руководство по настройке для программирования внутренней флэш-памяти банка 1
+и банк 2, и поменять их местами с помощью FLASH HAL API.
+
+В начале основной программы вызывается функция HAL_Init () для сброса
+все периферийные устройства, инициализируйте интерфейс Flash и клавиатуру.
+Затем функция SystemClock_Config () используется для настройки системных часов (SYSCLK).
+работать на 80 МГц.
+
+Ниже приведены шаги для запуска этого примера:
+1- Выберите проект FLASH_DualBoot_Bank2 и сгенерируйте его двоичный файл (например, FLASH_DualBoot.bin)
+
+2- Загрузите этот двоичный файл в банк2 флэш-памяти (по адресу 0x08080000), используя
+   STM32 ST-LINK Utilities (www.st.com) или любой аналогичный инструмент.
+@нота:
+ - Вы можете избежать шага 1, непосредственно загрузив двоичный файл, представленный в примере
+ - Вы должны настроить предпочтительный набор инструментов для генерации двоичного файла
+   файл после компиляции проекта.
+ - Вы можете использовать STM32 ST-LINK Utilities или любой аналогичный инструмент для первоначального сброса
+   Бит BFB2 (отключить функцию двойной загрузки).
+
+3- Выберите проект FLASH_DualBoot_Bank1 и запустите его, этот проект будет загружен
+   в банке1 флеш: по адресу 0x08000000
+
+4- Нажмите кнопку BUTTON_USER, чтобы переключиться между двумя банками.
+
+- Если выбрана программа в банке 1, светодиод2 будет продолжать переключаться.
+
+- Если выбрана программа в банке 2, включается светодиод2.
+
+- При возникновении ошибки LED2 мигает (100 мс горит, 2 с гаснет).
+
+@note Необходимо соблюдать осторожность при использовании HAL_Delay (), эта функция обеспечивает точную задержку (в миллисекундах)
+      основанный на переменной, увеличенной в SysTick ISR. Это подразумевает, что если HAL_Delay () вызывается из
+      периферийный процесс ISR, тогда прерывание SysTick должно иметь более высокий приоритет (численно ниже)
+      чем периферийное прерывание. В противном случае процесс вызывающего абонента будет заблокирован.
+      Чтобы изменить приоритет прерывания SysTick, вы должны использовать функцию HAL_NVIC_SetPriority ().
+
+@note Приложение должно убедиться, что база времени SysTick всегда установлена ??в 1 миллисекунду.
+      иметь правильную работу HAL.
+
+
+@par Содержимое каталога
+
+  - FLASH / FLASH_DualBoot / Inc / stm32l4xx_hal_conf.h Файл конфигурации HAL
+  - FLASH / FLASH_DualBoot / Inc / stm32l4xx_it.h Заголовок для stm32l4xx_it.c
+  - FLASH / FLASH_DualBoot / Inc / main.h заголовок для модуля main.c
+  - FLASH / FLASH_DualBoot / Src / stm32l4xx_it.c Обработчики прерываний
+  - FLASH / FLASH_DualBoot / Src / main.c Основная программа
+  - FLASH / FLASH_DualBoot / Src / system_stm32l4xx.c STM32L4xx файл конфигурации системных часов
+  - FLASH / FLASH_DualBoot / Binary / FLASH_DualBoot.bin Двоичный файл для загрузки в bank2
+
+@par Аппаратная и программная среда
+
+  - Этот пример работает на устройствах STM32L476xx.
+
+  - Этот пример был протестирован с платой NUCLEO-L476RG Rev C и может быть
+    легко адаптируется к любому другому поддерживаемому устройству и плате разработки.
+
+@par Как это использовать?
+
+Чтобы программа работала, вы должны сделать следующее:
+ - Откройте ваш любимый набор инструментов
+ - Перестройте все файлы и загрузите изображение в целевую память.
+ - Запустите пример
