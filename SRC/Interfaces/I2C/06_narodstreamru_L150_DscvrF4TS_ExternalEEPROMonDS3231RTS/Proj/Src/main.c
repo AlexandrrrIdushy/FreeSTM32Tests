@@ -43,7 +43,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-#define LED1_ON() LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_12)
+#define LED1_ON() LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_12)//1
 #define LED1_OFF() LL_GPIO_ResetOutputPin(GPIOD, LL_GPIO_PIN_12)
 
 #define LED2_ON() LL_GPIO_SetOutputPin(GPIOD, LL_GPIO_PIN_13)
