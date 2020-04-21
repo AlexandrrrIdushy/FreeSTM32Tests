@@ -499,7 +499,7 @@ int __attribute__((optimize("O0"))) main(void)
   * @param  None
   * @retval None
   */
-static void I2C_Config(void)
+static void __attribute__((optimize("O0"))) I2C_Config(void)
 {
   GPIO_InitTypeDef  GPIO_InitStructure;
     
@@ -524,11 +524,17 @@ static void I2C_Config(void)
   
   /* GPIO Configuration */
   /*Configure I2C SCL pin */
+//  GPIO_InitStructure.GPIO_Pin = I2Cx_SCL_PIN;
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+//  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+
   GPIO_InitStructure.GPIO_Pin = I2Cx_SCL_PIN;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;//*
   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;//*
   GPIO_Init(I2Cx_SCL_GPIO_PORT, &GPIO_InitStructure);
   
   /*Configure I2C SDA pin */
