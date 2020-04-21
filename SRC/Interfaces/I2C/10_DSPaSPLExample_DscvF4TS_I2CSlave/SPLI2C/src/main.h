@@ -51,9 +51,9 @@ typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
   
 /* Exported define ------------------------------------------------------------*/
 /* Uncomment the line below if you will use the I2C peripheral as a Master */
-/*  #define I2C_MASTER */
+#define I2C_MASTER
 /* Uncomment the line below if you will use the I2C peripheral as a Slave */
-#define I2C_SLAVE
+//#define I2C_SLAVE
   
 /* To use the I2C at 400 KHz (in fast mode), the PCLK1 frequency (I2C peripheral
    input clock) must be a multiple of 10 MHz */

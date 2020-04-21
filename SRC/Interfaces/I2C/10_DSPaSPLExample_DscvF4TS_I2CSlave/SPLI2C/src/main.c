@@ -65,7 +65,7 @@ static void Fill_Buffer(uint8_t *pBuffer, uint16_t BufferLength);
   * @param  None
   * @retval None
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /*!< At this stage the microcontroller clock setting is already configured, 
        this is done through SystemInit() function which is called from startup
@@ -334,15 +334,15 @@ int main(void)
   if (Buffercmp(aTxBuffer, aRxBuffer, RXBUFFERSIZE) == PASSED)
   {
     /* LED2, LED3 and LED4 On */
-    STM_EVAL_LEDOn(LED2);
-    STM_EVAL_LEDOn(LED3);
-    STM_EVAL_LEDOn(LED4);
+//    STM_EVAL_LEDOn(LED2);
+//    STM_EVAL_LEDOn(LED3);
+//    STM_EVAL_LEDOn(LED4);
   }
   else 
   {   /* LED2, LED3 and LED4 Off */
-    STM_EVAL_LEDOff(LED2);
-    STM_EVAL_LEDOff(LED3);
-    STM_EVAL_LEDOff(LED4);
+//    STM_EVAL_LEDOff(LED2);
+//    STM_EVAL_LEDOff(LED3);
+//    STM_EVAL_LEDOff(LED4);
   }
   
 #endif /* I2C_MASTER */
