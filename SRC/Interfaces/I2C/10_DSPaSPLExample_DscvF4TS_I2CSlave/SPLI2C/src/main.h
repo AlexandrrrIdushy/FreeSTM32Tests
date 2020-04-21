@@ -58,7 +58,7 @@ typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
 /* To use the I2C at 400 KHz (in fast mode), the PCLK1 frequency (I2C peripheral
    input clock) must be a multiple of 10 MHz */
 /* Uncomment the line below if you will use the I2C peripheral in Fast Mode */
-#define FAST_I2C_MODE
+//#define FAST_I2C_MODE
   
 /* Uncomment the line below if you will use the I2C peripheral in 10-bit addressing
    mode */
@@ -70,7 +70,8 @@ typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
  #define I2C_DUTYCYCLE I2C_DutyCycle_16_9  
 
 #else /* STANDARD_I2C_MODE*/
- #define I2C_SPEED 100000
+// #define I2C_SPEED 100000
+ #define I2C_SPEED 6400
  #define I2C_DUTYCYCLE  I2C_DutyCycle_2
 #endif /* FAST_I2C_MODE*/
   
