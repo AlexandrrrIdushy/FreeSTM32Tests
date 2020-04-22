@@ -148,12 +148,16 @@ void __attribute__((optimize("O0"))) AT24C_WriteBytes (uint16_t addrInMem,uint8_
 void __attribute__((optimize("O0"))) AT24C_SlaveReceiveBytes()
 {
 	uint32_t res = 0;
+	uint8_t rd = 0;
+
+	//совпал адрес?
+	while(res = LL_I2C_IsActiveFlag_ADDR(I2C1)){}
+
 //	res = LL_I2C_IsActiveFlag_STOP(I2C1);
-	res = LL_I2C_IsActiveFlag_ADDR(I2C1);
-	if(res)
-		asm("nop");
-	else
-		asm("nop");
+//	while(!res){}
+
+	rd = LL_I2C_ReceiveData8(I2C1);
+
 //	//#1 зафиксировать старт условие
 //	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
 //	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
