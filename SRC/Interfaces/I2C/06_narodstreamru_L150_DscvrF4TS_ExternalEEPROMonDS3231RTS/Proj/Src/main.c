@@ -149,6 +149,8 @@ void __attribute__((optimize("O0"))) AT24C_SlaveReceiveBytes()
 {
 	uint32_t res = 0;
 	uint8_t rd = 0;
+	//генерировать ACK
+	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);
 
 	//совпал адрес?
 	while(res = LL_I2C_IsActiveFlag_ADDR(I2C1)){}
