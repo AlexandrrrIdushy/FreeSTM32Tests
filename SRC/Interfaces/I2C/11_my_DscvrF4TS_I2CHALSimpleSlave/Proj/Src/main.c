@@ -102,7 +102,7 @@ int main(void)
 //	  HAL_I2C_Master_Transmit(&hi2c1, 51, arrReadData, (uint16_t)3, (uint32_t)100);
 //	  HAL_Delay(300);
 
-	  if(HAL_I2C_Slave_Receive(&hi2c1, (uint8_t *)aRxBuffer, 1, 2000) != HAL_OK)
+	  if(HAL_I2C_Slave_Receive(&hi2c1, (uint8_t *)aRxBuffer, 2, 2000) != HAL_OK)
 	  {
 	    /* Transfer error in reception process */
 	    Error_Handler();
