@@ -144,6 +144,14 @@ void __attribute__((optimize("O0"))) AT24C_WriteBytes (uint16_t addrInMem,uint8_
 	  LL_I2C_GenerateStopCondition(I2C1);
 	  asm("nop");
 }
+
+void __attribute__((optimize("O0"))) AT24C_SlaveReceiveBytes()
+{
+	//#1 зафиксировать старт условие
+	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
+	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
+	asm("nop");
+}
 /* USER CODE END 0 */
 
 /**
@@ -200,24 +208,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  AT24C_WriteBytes (0x004A, wr_value, 20);
+//	  AT24C_WriteBytes (0x004A, wr_value, 20);
 //	  AT24C_ReadBytes (0x004A, rd_value, 20);
-	  LL_mDelay(1000);
-	if (!(LL_GPIO_ReadInputPort(GPIOA)&LL_GPIO_PIN_0))
-	{
-		LED1_ON();
-		LL_mDelay(100);
-		LED1_OFF();
-		LED2_ON();
-		LL_mDelay(100);
-		LED2_OFF();
-		LED3_ON();
-		LL_mDelay(100);
-		LED3_OFF();
-		LED4_ON();
-		LL_mDelay(100);
-		LED4_OFF();
-	}
+	  AT24C_SlaveReceiveBytes();
+//	  LL_mDelay(1000);
+//	if (!(LL_GPIO_ReadInputPort(GPIOA)&LL_GPIO_PIN_0))
+//	{
+//		LED1_ON();
+//		LL_mDelay(100);
+//		LED1_OFF();
+//		LED2_ON();
+//		LL_mDelay(100);
+//		LED2_OFF();
+//		LED3_ON();
+//		LL_mDelay(100);
+//		LED3_OFF();
+//		LED4_ON();
+//		LL_mDelay(100);
+//		LED4_OFF();
+//	}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
