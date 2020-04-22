@@ -80,7 +80,9 @@ typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
  #define SLAVE_ADDRESS (uint16_t)0x0330
 
 #else /* I2C_7BITS_ADDRESS */
- #define SLAVE_ADDRESS 0x30
+// #define SLAVE_ADDRESS 0x30
+// #define SLAVE_ADDRESS 51
+#define SLAVE_ADDRESS 102
 #endif /* I2C_10BITS_ADDRESS */
  
 /* USER_TIMEOUT value for waiting loops. This timeout is just a guarantee that the
