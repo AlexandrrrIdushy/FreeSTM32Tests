@@ -64,7 +64,7 @@ uint8_t aRxBuffer[10];
   * @brief  The application entry point.
   * @retval int
   */
-int __attribute__((optimize("O0"))) main(void)
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -170,7 +170,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 2000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 102;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;

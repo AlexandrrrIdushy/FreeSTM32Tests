@@ -1,6 +1,7 @@
 #MicroXplorer Configuration settings - do not modify
 File.Version=6
-I2C1.IPParameters=OwnAddress
+I2C1.ClockSpeed=2000
+I2C1.IPParameters=OwnAddress,ClockSpeed
 I2C1.OwnAddress=51
 KeepUserPlacement=false
 Mcu.Family=STM32F4
@@ -70,7 +71,7 @@ ProjectManager.StackSize=0x400
 ProjectManager.TargetToolchain=TrueSTUDIO
 ProjectManager.ToolChainLocation=
 ProjectManager.UnderRoot=true
-ProjectManager.functionlistsort=2-SystemClock_Config-RCC-false-HAL-false,1-MX_GPIO_Init-GPIO-false-HAL-true,3-MX_I2C1_Init-I2C1-false-HAL-true
+ProjectManager.functionlistsort=1-SystemClock_Config-RCC-false-HAL-false,2-MX_GPIO_Init-GPIO-false-HAL-true,3-MX_I2C1_Init-I2C1-false-HAL-true
 RCC.AHBFreq_Value=16000000
 RCC.APB1Freq_Value=16000000
 RCC.APB2Freq_Value=16000000
