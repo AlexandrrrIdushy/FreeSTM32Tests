@@ -99,19 +99,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_I2C_Master_Transmit(&hi2c1, 51, arrReadData, (uint16_t)3, (uint32_t)100);
-	  HAL_Delay(300);
+//	  HAL_I2C_Master_Transmit(&hi2c1, 51, arrReadData, (uint16_t)3, (uint32_t)100);
+//	  HAL_Delay(300);
 
-//	  if(HAL_I2C_Slave_Receive(&hi2c1, (uint8_t *)aRxBuffer, 1, 2000) != HAL_OK)
-//	  {
-//	    /* Transfer error in reception process */
-//	    Error_Handler();
-////			  MyInitI2C();
-//	  }
-//	  else
-//	  {
-//		  asm("nop");
-//	  }
+	  if(HAL_I2C_Slave_Receive(&hi2c1, (uint8_t *)aRxBuffer, 1, 2000) != HAL_OK)
+	  {
+	    /* Transfer error in reception process */
+	    Error_Handler();
+//			  MyInitI2C();
+	  }
+	  else
+	  {
+		  asm("nop");
+	  }
 
     /* USER CODE END WHILE */
 
