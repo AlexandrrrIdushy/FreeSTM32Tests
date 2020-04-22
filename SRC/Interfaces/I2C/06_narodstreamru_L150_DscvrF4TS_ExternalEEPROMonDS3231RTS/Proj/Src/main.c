@@ -125,9 +125,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  SLAVETest_SetACK();
+
 //	  AT24C_WriteBytes (0x004A, wr_value, 20);
 //	  AT24C_ReadBytes (0x004A, rd_value, 20);
-	  AT24C_SlaveReceiveBytes();
 //	  LL_mDelay(1000);
 //	if (!(LL_GPIO_ReadInputPort(GPIOA)&LL_GPIO_PIN_0))
 //	{

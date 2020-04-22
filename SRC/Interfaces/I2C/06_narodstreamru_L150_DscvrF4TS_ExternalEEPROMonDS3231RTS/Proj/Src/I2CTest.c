@@ -1,8 +1,52 @@
+#include "I2CTest.h"
+
 #include "stm32f4xx.h"
+#include "stm32f4xx_ll_i2c.h"
+
+
+
+//СЛЕЙВ
+
+void __attribute__((optimize("O0"))) SLAVETest_Any()
+{
+	uint32_t res = 0;
+	uint8_t rd = 0;
+
+
+	//совпал адрес?
+	while(res = LL_I2C_IsActiveFlag_ADDR(I2C1))
+		asm("nop");
+
+	//появились данные в регистре данных
+	while(LL_I2C_IsActiveFlag_RXNE(I2C1))
+		asm("nop");
+//	res = LL_I2C_IsActiveFlag_STOP(I2C1);
+//	while(!res){}
+
+	//генерировать ACK
+	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);
+
+//	rd = LL_I2C_ReceiveData8(I2C1);
+//	LL_I2C_EnableReset(I2C1);
+
+//	//#1 зафиксировать старт условие
+//	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
+//	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
+//	LL_I2C_EnableReset(I2C1);
+	asm("nop");
+}
+
+//создаем какуюто кативность подтверждаем, правда остаемся висеть потом..
+void __attribute__((optimize("O0"))) SLAVETest_SetACK()
+{
+	//генерировать ACK
+	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);
+}
 
 
 
 
+//МАСТЕР
 #define ALL_SEG_OFF() LL_GPIO_SetOutputPin(SEG_PORT,SH|SG|SF|SE|SD|SC|SB|SA);
 #define I2C_REQUEST_WRITE                       0x00
 #define I2C_REQUEST_READ                        0x01
@@ -81,31 +125,3 @@ void __attribute__((optimize("O0"))) AT24C_WriteBytes (uint16_t addrInMem,uint8_
 	  asm("nop");
 }
 
-void __attribute__((optimize("O0"))) AT24C_SlaveReceiveBytes()
-{
-	uint32_t res = 0;
-	uint8_t rd = 0;
-
-
-	//совпал адрес?
-	while(res = LL_I2C_IsActiveFlag_ADDR(I2C1))
-		asm("nop");
-
-	//появились данные в регистре данных
-	while(LL_I2C_IsActiveFlag_RXNE(I2C1))
-		asm("nop");
-//	res = LL_I2C_IsActiveFlag_STOP(I2C1);
-//	while(!res){}
-
-	//генерировать ACK
-	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);
-
-//	rd = LL_I2C_ReceiveData8(I2C1);
-//	LL_I2C_EnableReset(I2C1);
-
-//	//#1 зафиксировать старт условие
-//	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
-//	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
-//	LL_I2C_EnableReset(I2C1);
-	asm("nop");
-}
