@@ -51,7 +51,7 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Uncomment this line to use the board as master, if not it is used as slave */
-#define MASTER_BOARD
+//#define MASTER_BOARD
 #define I2C_ADDRESS        0x30F
 
 /* Private variables ---------------------------------------------------------*/
@@ -71,12 +71,36 @@ static void Error_Handler(void);
 
 /* Private functions ---------------------------------------------------------*/
 
+void MyInitI2C()
+{
+	  /*##-1- Configure the I2C peripheral ######################################*/
+	  I2cHandle.Instance             = I2Cx;
+
+	//  I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_10BIT;
+	  I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+	//  I2cHandle.Init.ClockSpeed      = 400000;
+	  I2cHandle.Init.ClockSpeed      = 2000;
+	  I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	  I2cHandle.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
+	  I2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	  I2cHandle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+	//  I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;
+	  I2cHandle.Init.OwnAddress1     = 0xD0;//0xD0, 0x68
+	  I2cHandle.Init.OwnAddress2     = 0xFE;
+
+	  if(HAL_I2C_Init(&I2cHandle) != HAL_OK)
+	  {
+	    /* Initialization Error */
+	    Error_Handler();
+	  }
+}
+
 /**
   * @brief  Main program
   * @param  None
   * @retval None
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {    
   /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, instruction and Data caches
@@ -94,28 +118,14 @@ int main(void)
   /* Configure the system clock to 168 MHz */
   SystemClock_Config();
 
-  /*##-1- Configure the I2C peripheral ######################################*/
-  I2cHandle.Instance             = I2Cx;
-  
-  I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_10BIT;
-  I2cHandle.Init.ClockSpeed      = 400000;
-  I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  I2cHandle.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
-  I2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  I2cHandle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-  I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;
-  I2cHandle.Init.OwnAddress2     = 0xFE;
-  
-  if(HAL_I2C_Init(&I2cHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();    
-  }
+  MyInitI2C();
+
+  /* Configure USER Button */
+  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
 #ifdef MASTER_BOARD
   
-  /* Configure USER Button */
-  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+
   
   /* Wait for USER Button press before starting the Communication */
   while (BSP_PB_GetState(BUTTON_KEY) != 1)
@@ -174,12 +184,40 @@ int main(void)
   BSP_LED_On(LED6);
   
 #else
+  //my---
+  while (1)
+  {
+	  uint32_t btn = BSP_PB_GetState(BUTTON_KEY);
+	  if(btn == 1)
+	  {
+		  if(HAL_I2C_Slave_Receive(&I2cHandle, (uint8_t *)aRxBuffer, 1, 2000) != HAL_OK)
+		  {
+		    /* Transfer error in reception process */
+		    Error_Handler();
+//			  MyInitI2C();
+		  }
+		  else
+		  {
+			  asm("nop");
+		  }
+	  }
+	  else
+	  {
+		  asm("");
+	  }
+
+  }
+
+  //---my
+
+
+
   
   /* The board receives the message and sends it back */
 
   /*##-2- Put I2C peripheral in reception process ############################*/ 
   /* Timeout is set to 10S  */
-  if(HAL_I2C_Slave_Receive(&I2cHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE, 10000) != HAL_OK)
+  if(HAL_I2C_Slave_Receive(&I2cHandle, (uint8_t *)aRxBuffer, 1, 10000) != HAL_OK)
   {
     /* Transfer error in reception process */
     Error_Handler();       
@@ -192,14 +230,14 @@ int main(void)
   /* While the I2C in reception process, user can transmit data through 
      "aTxBuffer" buffer */
   /* Timeout is set to 10S */
-  if(HAL_I2C_Slave_Transmit(&I2cHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
-  {
-    /* Transfer error in transmission process */
-    Error_Handler();    
-  }
-  
-  /* Turn LED4 on: Transfer in transmission process is correct */
-  BSP_LED_On(LED4);
+//  if(HAL_I2C_Slave_Transmit(&I2cHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
+//  {
+//    /* Transfer error in transmission process */
+//    Error_Handler();
+//  }
+//
+//  /* Turn LED4 on: Transfer in transmission process is correct */
+//  BSP_LED_On(LED4);
   
 #endif /* MASTER_BOARD */
   
