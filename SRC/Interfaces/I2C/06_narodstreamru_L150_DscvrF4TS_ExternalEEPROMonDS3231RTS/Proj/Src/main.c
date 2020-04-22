@@ -70,7 +70,7 @@ static void MX_I2C1_Init(void);
 #define ALL_SEG_OFF() LL_GPIO_SetOutputPin(SEG_PORT,SH|SG|SF|SE|SD|SC|SB|SA);
 #define I2C_REQUEST_WRITE                       0x00
 #define I2C_REQUEST_READ                        0x01
-#define SLAVE_OWN_ADDRESS                       0xD0	//0xD0	//0xA0
+#define SLAVE_OWN_ADDRESS                       0x66	//0x66 это 51 сдвинутая влево
 
 extern uint16_t num_gl;////
 uint8_t rd_value[20] = {0};
@@ -147,9 +147,16 @@ void __attribute__((optimize("O0"))) AT24C_WriteBytes (uint16_t addrInMem,uint8_
 
 void __attribute__((optimize("O0"))) AT24C_SlaveReceiveBytes()
 {
-	//#1 зафиксировать старт условие
-	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
-	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
+	uint32_t res = 0;
+//	res = LL_I2C_IsActiveFlag_STOP(I2C1);
+	res = LL_I2C_IsActiveFlag_ADDR(I2C1);
+	if(res)
+		asm("nop");
+	else
+		asm("nop");
+//	//#1 зафиксировать старт условие
+//	LL_I2C_DisableBitPOS(I2C1);//стандартная схема ACK - у текущего байта
+//	LL_I2C_AcknowledgeNextData(I2C1, LL_I2C_ACK);//включаем генерацию подтверждения ACK
 	asm("nop");
 }
 /* USER CODE END 0 */
@@ -313,7 +320,7 @@ static void MX_I2C1_Init(void)
   I2C_InitStruct.PeripheralMode = LL_I2C_MODE_I2C;
   I2C_InitStruct.ClockSpeed = 2000;
   I2C_InitStruct.DutyCycle = LL_I2C_DUTYCYCLE_2;
-  I2C_InitStruct.OwnAddress1 = 0;
+  I2C_InitStruct.OwnAddress1 = 102;
   I2C_InitStruct.TypeAcknowledge = LL_I2C_ACK;
   I2C_InitStruct.OwnAddrSize = LL_I2C_OWNADDRESS1_7BIT;
   LL_I2C_Init(I2C1, &I2C_InitStruct);
