@@ -113,32 +113,37 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
     switch (Event)
     {
 
-            case I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED :
-            {
-                    printf("Slave Address Matched\n");
-//                    STM_EVAL_LEDOn(LED4);
-                    I2C2 ->SR1;
-                    I2C2 ->SR2;
-                    break;
-            }
-            case I2C_EVENT_SLAVE_BYTE_RECEIVED :
-            {
-                    printf("Slave Byte Received\n");
-                    dataRX = I2C_ReceiveData(I2C2 );
-                    break;
-            }
-            case I2C_EVENT_SLAVE_ACK_FAILURE :
-            {
-//                    STM_EVAL_LEDOn(LED3);
-                    I2C2 ->SR1 &= 0x00FF;
-                    break;
-            }
-            case I2C_EVENT_SLAVE_STOP_DETECTED :
-            {
-                    I2C2 ->SR1;
-                    I2C2 ->CR1 |= 0x1;
-                    break;
-            }
+		//адрес совпал
+		case I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED :
+		{
+			//для сброса флага ADDR
+			I2C2 ->SR1;
+			I2C2 ->SR2;
+			break;
+		}
+
+		//байт принят
+		case I2C_EVENT_SLAVE_BYTE_RECEIVED :
+		{
+			//читаем пришедший байт
+			dataRX = I2C_ReceiveData(I2C2 );
+			break;
+		}
+
+		//ошибка подверждения
+		case I2C_EVENT_SLAVE_ACK_FAILURE :
+		{
+			I2C2 ->SR1 &= 0x00FF;
+			break;
+		}
+
+		//обнаружено СТОП условие
+		case I2C_EVENT_SLAVE_STOP_DETECTED :
+		{
+			I2C2 ->SR1;
+			I2C2 ->CR1 |= 0x1;
+			break;
+		}
     }
 }
 
