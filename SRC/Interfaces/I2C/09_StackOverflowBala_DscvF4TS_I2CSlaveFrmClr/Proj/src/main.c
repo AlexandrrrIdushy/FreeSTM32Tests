@@ -30,6 +30,116 @@ SOFTWARE.
 /* Includes */
 #include "stm32f4xx.h"
 
+
+
+void i2c_init2()
+{
+    GPIO_InitTypeDef gpio_init;
+    I2C_InitTypeDef i2c_init;
+    NVIC_InitTypeDef NVIC_InitStructure, NVIC_InitStructure2;
+
+    I2C_DeInit(I2C2 );       //Deinit and reset the I2C to avoid it locking up
+    I2C_SoftwareResetCmd(I2C2, ENABLE);
+    I2C_SoftwareResetCmd(I2C2, DISABLE);
+
+        /*!< I2C Periph clock enable */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+
+        /* setup SCL and SDA pins
+         * SCL on PB10 and SDA on PB11
+         */
+    gpio_init.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;     // we are going to use PB10 and PB11
+    gpio_init.GPIO_Mode = GPIO_Mode_AF;                                 // set pins to alternate function
+    gpio_init.GPIO_Speed = GPIO_Speed_50MHz;                        // set GPIO speed
+    gpio_init.GPIO_PuPd = GPIO_PuPd_UP;                                 //Pull up resistor
+    gpio_init.GPIO_OType = GPIO_OType_OD;                               //Open Drain
+    GPIO_Init(GPIOB, &gpio_init);
+
+        // Connect I2C2 pins to AF
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_I2C2 ); // SCL
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_I2C2 ); // SDA
+
+        /* Configure the Priority Group to 1 bit */
+        NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+
+    NVIC_InitStructure.NVIC_IRQChannel = I2C2_EV_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+
+    NVIC_InitStructure2.NVIC_IRQChannel = I2C2_ER_IRQn;
+    NVIC_InitStructure2.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStructure2.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStructure2.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure2);
+
+    I2C_ITConfig(I2C2, I2C_IT_EVT, ENABLE);
+    I2C_ITConfig(I2C2, I2C_IT_ERR, ENABLE);
+    I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
+
+
+    i2c_init.I2C_ClockSpeed = 100000;
+    i2c_init.I2C_Mode = I2C_Mode_I2C;
+    i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
+    i2c_init.I2C_OwnAddress1 = 0x30;
+    i2c_init.I2C_Ack = I2C_Ack_Enable;
+    i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+    I2C_Init(I2C2, &i2c_init);
+
+    I2C_StretchClockCmd(I2C2, ENABLE);
+    I2C_Cmd(I2C2, ENABLE);
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+        /* Read SR1 register to get I2C error */
+    if ((I2C_ReadRegister(I2C2, I2C_Register_SR1 ) & 0xFF00) != 0x00)
+    {
+            STM_EVAL_LEDOn(LED6);
+        /* Clears error flags */
+        I2C2 ->SR1 &= 0x00FF;
+    }
+}
+
+void I2C2_EV_IRQHandler(void)
+{
+    uint8_t dataRX;
+    Event = I2C_GetLastEvent(I2C2 );
+    printf("Event: 0x%x\n", Event);
+    switch (Event)
+    {
+
+            case I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED :
+            {
+                    printf("Slave Address Matched\n");
+                    STM_EVAL_LEDOn(LED4);
+                    I2C2 ->SR1;
+                    I2C2 ->SR2;
+                    break;
+            }
+            case I2C_EVENT_SLAVE_BYTE_RECEIVED :
+            {
+                    printf("Slave Byte Received\n");
+                    dataRX = I2C_ReceiveData(I2C2 );
+                    break;
+            }
+            case I2C_EVENT_SLAVE_ACK_FAILURE :
+            {
+                    STM_EVAL_LEDOn(LED3);
+                    I2C2 ->SR1 &= 0x00FF;
+                    break;
+            }
+            case I2C_EVENT_SLAVE_STOP_DETECTED :
+            {
+                    I2C2 ->SR1;
+                    I2C2 ->CR1 |= 0x1;
+                    break;
+            }
+    }
+}
+
 /* Private macro */
 /* Private variables */
 /* Private function prototypes */
