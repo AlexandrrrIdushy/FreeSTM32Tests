@@ -32,7 +32,7 @@ SOFTWARE.
 
 
 
-void i2c_init2()
+void __attribute__((optimize("O0"))) i2c_init2()
 {
     GPIO_InitTypeDef gpio_init;
     I2C_InitTypeDef i2c_init;
@@ -80,10 +80,12 @@ void i2c_init2()
     I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
 
 
-    i2c_init.I2C_ClockSpeed = 100000;
+//    i2c_init.I2C_ClockSpeed = 100000;
+    i2c_init.I2C_ClockSpeed = 2000;
     i2c_init.I2C_Mode = I2C_Mode_I2C;
     i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
-    i2c_init.I2C_OwnAddress1 = 0x30;
+//    i2c_init.I2C_OwnAddress1 = 0x30;
+    i2c_init.I2C_OwnAddress1 = 102;
     i2c_init.I2C_Ack = I2C_Ack_Enable;
     i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
     I2C_Init(I2C2, &i2c_init);
@@ -92,21 +94,21 @@ void i2c_init2()
     I2C_Cmd(I2C2, ENABLE);
 }
 
-void I2C2_ER_IRQHandler(void)
+void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
 {
         /* Read SR1 register to get I2C error */
     if ((I2C_ReadRegister(I2C2, I2C_Register_SR1 ) & 0xFF00) != 0x00)
     {
-            STM_EVAL_LEDOn(LED6);
+//            STM_EVAL_LEDOn(LED6);
         /* Clears error flags */
         I2C2 ->SR1 &= 0x00FF;
     }
 }
 
-void I2C2_EV_IRQHandler(void)
+void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
     uint8_t dataRX;
-    Event = I2C_GetLastEvent(I2C2 );
+    uint32_t Event = I2C_GetLastEvent(I2C2 );
     printf("Event: 0x%x\n", Event);
     switch (Event)
     {
@@ -114,7 +116,7 @@ void I2C2_EV_IRQHandler(void)
             case I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED :
             {
                     printf("Slave Address Matched\n");
-                    STM_EVAL_LEDOn(LED4);
+//                    STM_EVAL_LEDOn(LED4);
                     I2C2 ->SR1;
                     I2C2 ->SR2;
                     break;
@@ -127,7 +129,7 @@ void I2C2_EV_IRQHandler(void)
             }
             case I2C_EVENT_SLAVE_ACK_FAILURE :
             {
-                    STM_EVAL_LEDOn(LED3);
+//                    STM_EVAL_LEDOn(LED3);
                     I2C2 ->SR1 &= 0x00FF;
                     break;
             }
@@ -167,7 +169,7 @@ int main(void)
   */
 
   /* TODO - Add your application code here */
-
+  i2c_init2();
   /* Infinite loop */
   while (1)
   {
