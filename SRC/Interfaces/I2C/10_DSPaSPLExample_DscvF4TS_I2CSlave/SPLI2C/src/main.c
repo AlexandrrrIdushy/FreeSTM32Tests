@@ -370,6 +370,7 @@ int __attribute__((optimize("O0"))) main(void)
   /* I2Cx DMA Enable */
   I2C_DMACmd(I2Cx, ENABLE);
   /* Test on I2C EV1 and clear it */
+//совпал ли адрес меня и к которому обращаются
   while (!I2C_CheckEvent(I2Cx, I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED))
   {}
   /* Enable DMA RX Channel */
@@ -391,7 +392,8 @@ int __attribute__((optimize("O0"))) main(void)
   if(TimeOut == 0)
   {
     TimeOut_UserCallback();
-  }  
+  }
+//если зафиксировано стоп условие - идем дальше
   /* Test on I2Cx EV4 and clear it or time out */
   TimeOut = USER_TIMEOUT;
   while ((!I2C_CheckEvent(I2Cx, I2C_EVENT_SLAVE_STOP_DETECTED))&&(TimeOut != 0x00))
@@ -403,6 +405,7 @@ int __attribute__((optimize("O0"))) main(void)
   /* Disable DMA RX Channel */
   DMA_Cmd(I2Cx_DMA_STREAM_RX, DISABLE);
   
+//
   /* Wait until I2Cx_DMA_STREAM_RX disabled or time out */
   TimeOut = USER_TIMEOUT;
   while ((DMA_GetCmdStatus(I2Cx_DMA_STREAM_RX)!= DISABLE)&&(TimeOut != 0x00))
