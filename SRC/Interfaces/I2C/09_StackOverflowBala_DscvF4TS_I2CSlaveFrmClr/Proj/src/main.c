@@ -92,6 +92,11 @@ void __attribute__((optimize("O0"))) i2c_init2()
 
     I2C_StretchClockCmd(I2C2, ENABLE);
     I2C_Cmd(I2C2, ENABLE);
+
+
+    //дополнительная инициализация
+
+    I2C_GeneralCallCmd(I2C2, ENABLE);//обработка общего вызова = ВКЛ
 }
 
 void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
@@ -144,6 +149,18 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 			I2C2 ->CR1 |= 0x1;
 			break;
 		}
+
+
+
+//		//
+//		case I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED :
+//		{
+//			//для сброса флага ADDR
+////			I2C2 ->SR1;
+////			I2C2 ->SR2;
+//			break;
+//		}
+
     }
 }
 
