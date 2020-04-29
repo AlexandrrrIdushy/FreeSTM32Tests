@@ -97,6 +97,7 @@ void __attribute__((optimize("O0"))) i2c_init2()
     //дополнительная инициализация
 
     I2C_GeneralCallCmd(I2C2, ENABLE);//обработка общего вызова = ВКЛ
+
 }
 
 void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
@@ -114,54 +115,50 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
     uint8_t dataRX;
     uint32_t Event = I2C_GetLastEvent(I2C2 );
-    printf("Event: 0x%x\n", Event);
-    switch (Event)
-    {
+    uint32_t valSR1 = I2C2->SR1;
+    uint32_t valSR2 = I2C2->SR2;
+    asm("nop");
 
-		//адрес совпал
-		case I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED :
-		{
-			//для сброса флага ADDR
-			I2C2 ->SR1;
-			I2C2 ->SR2;
-			break;
-		}
+	//адрес совпал
+	if((I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED)
+	{
+		//для сброса флага ADDR
+		I2C2 ->SR1;
+		I2C2 ->SR2;
+	}
 
-		//байт принят
-		case I2C_EVENT_SLAVE_BYTE_RECEIVED :
-		{
-			//читаем пришедший байт
-			dataRX = I2C_ReceiveData(I2C2 );
-			break;
-		}
+	//байт принят
+	if((I2C_EVENT_SLAVE_BYTE_RECEIVED & Event) == I2C_EVENT_SLAVE_BYTE_RECEIVED)
+	{
+		//читаем пришедший байт
+		dataRX = I2C_ReceiveData(I2C2 );
+	}
 
-		//ошибка подверждения
-		case I2C_EVENT_SLAVE_ACK_FAILURE :
-		{
-			I2C2 ->SR1 &= 0x00FF;
-			break;
-		}
+	//ошибка подверждения
+	if((I2C_EVENT_SLAVE_ACK_FAILURE & Event) == I2C_EVENT_SLAVE_ACK_FAILURE)
+	{
+		I2C2 ->SR1 &= 0x00FF;
+	}
 
-		//обнаружено СТОП условие
-		case I2C_EVENT_SLAVE_STOP_DETECTED :
-		{
-			I2C2 ->SR1;
-			I2C2 ->CR1 |= 0x1;
-			break;
-		}
+	//обнаружено СТОП условие
+	if((I2C_EVENT_SLAVE_STOP_DETECTED & Event) == I2C_EVENT_SLAVE_STOP_DETECTED)
+	{
+		I2C2 ->SR1;
+		I2C2 ->CR1 |= I2C_CR1_PE;//включение шины
+	}
 
+	if(valSR1 == I2C_IT_TIMEOUT)
+		asm("nop");
 
+	//
+	if((I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED)
+	{
+		//для сброса флага ADDR
+	//			I2C2 ->SR1;
+	//			I2C2 ->SR2;
+		dataRX = I2C_ReceiveData(I2C2 );
+	}
 
-//		//
-//		case I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED :
-//		{
-//			//для сброса флага ADDR
-////			I2C2 ->SR1;
-////			I2C2 ->SR2;
-//			break;
-//		}
-
-    }
 }
 
 /* Private macro */
@@ -192,6 +189,7 @@ int main(void)
 
   /* TODO - Add your application code here */
   i2c_init2();
+//  I2C2 ->CR1 |= I2C_CR1_SWRST;//софтовый сброс
   /* Infinite loop */
   while (1)
   {
