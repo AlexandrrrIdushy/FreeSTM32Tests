@@ -1027,7 +1027,7 @@ HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c)
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef __attribute__((optimize("O0"))) HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
   /* Init tickstart for timeout management*/
   uint32_t tickstart = HAL_GetTick();
