@@ -5,4 +5,5 @@
 extern void SetHederI2C(I2C_HandleTypeDef*);
 extern void ReadTimeFromRTC(void);
 extern void Scaning(void);
+extern void Test(void);
 #endif /* __MAIN_H */

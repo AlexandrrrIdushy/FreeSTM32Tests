@@ -117,3 +117,14 @@ void __attribute__((optimize("O0"))) Scaning()
 	}
 	asm("nop");
 }
+
+void __attribute__((optimize("O0"))) Test()
+{
+	if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
+		return;
+
+	HAL_I2C_Master_Transmit(_hi2c1, 0, arrReadData, (uint16_t)1, (uint32_t)100);
+	if(HAL_I2C_Slave_Receive(_hi2c1, arrReadData, (uint16_t)1, (uint32_t)100) == HAL_OK)
+		asm("nop");
+	HAL_Delay(1000);
+}
