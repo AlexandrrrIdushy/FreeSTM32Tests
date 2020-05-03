@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "I2CSlave.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -57,7 +58,7 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t aRxBuffer[10];
+uint8_t _aRxBuffer[10];
 uint8_t arrReadData[3] = {1, 2, 3};
 /* USER CODE END 0 */
 
@@ -97,21 +98,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  I2CInit();
   while (1)
   {
-//	  HAL_I2C_Master_Transmit(&hi2c1, 51, arrReadData, (uint16_t)3, (uint32_t)100);
-//	  HAL_Delay(300);
-
-	  if(HAL_I2C_Slave_Receive(&hi2c1, (uint8_t *)aRxBuffer, 2, 2000) != HAL_OK)
-	  {
-	    /* Transfer error in reception process */
-	    Error_Handler();
-//			  MyInitI2C();
-	  }
-	  else
-	  {
-		  asm("nop");
-	  }
+	  I2CReceive(&hi2c1, 1);
+//	  I2CSend(&hi2c1, 1);
 
     /* USER CODE END WHILE */
 
