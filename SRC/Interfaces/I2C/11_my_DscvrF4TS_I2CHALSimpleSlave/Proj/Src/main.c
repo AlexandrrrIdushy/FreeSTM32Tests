@@ -58,8 +58,8 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t _aRxBuffer[10];
-uint8_t arrReadData[3] = {1, 2, 3};
+//uint8_t _aRxBuffer[10];
+//uint8_t arrReadData[3] = {1, 2, 3};
 /* USER CODE END 0 */
 
 /**
@@ -102,7 +102,7 @@ int main(void)
   while (1)
   {
 	  I2CReceive(&hi2c1, 0);
-//	  I2CSend(&hi2c1, 1);
+//	  I2CSend(&hi2c1, 0);
 	  PrepData();
 
 
