@@ -39,13 +39,14 @@ void I2CInit()
 }
 
 
+
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
 	HAL_I2C_StateTypeDef resGetState;
 	switch (_usrI2CData[nI2C].Receive)
 	{
 		case RECEIVE_YES_ANY_DATA:
-			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), 1) == HAL_OK)
+			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), 2) == HAL_OK)
 				_usrI2CData[nI2C].Receive = RECEIVE_WAIT;
 			break;
 		case RECEIVE_WAIT:
