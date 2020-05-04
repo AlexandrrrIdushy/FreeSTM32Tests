@@ -102,7 +102,7 @@ int main(void)
   while (1)
   {
 	  I2CReceive(&hi2c1, 0);
-//	  I2CSend(&hi2c1, 0);
+	  I2CSend(&hi2c1, 0);
 	  PrepData();
 
 
