@@ -101,8 +101,16 @@ int main(void)
   I2CInit();
   while (1)
   {
-	  I2CReceive(&hi2c1, 1);
+//	  I2CReceive(&hi2c1, 1);
 //	  I2CSend(&hi2c1, 1);
+
+
+	  if(HAL_I2C_Slave_Receive_IT(&hi2c1, (uint8_t *)arrReadData, 2) != HAL_OK)
+	    Error_Handler();
+	  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
+	  {
+	  }
+
 
     /* USER CODE END WHILE */
 
