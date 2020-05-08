@@ -63,14 +63,15 @@ void __attribute__((optimize("O0"))) I2CReceive()
 void __attribute__((optimize("O0"))) I2CSend()
 {
 	HAL_I2C_StateTypeDef resGetState;
-	resGetState = HAL_I2C_GetState(_hi2c1);
-	if(resGetState != HAL_I2C_STATE_READY)
-		return;
+//	resGetState = HAL_I2C_GetState(_hi2c1);
+//	if(resGetState != HAL_I2C_STATE_READY)
+//		return;
 
 	switch (_usrI2CData.PhaseSend)
 	{
 		case SEND_START_NOW:
 			HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
+//			HAL_I2C_Master_Transmit(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), (uint16_t)SIZE_GET_ID_REQUEST, (uint32_t)100);
 			_usrI2CData.PhaseSend = SEND_WAS_START;
 			break;
 
@@ -83,9 +84,10 @@ void __attribute__((optimize("O0"))) I2CSend()
 
 void __attribute__((optimize("O0"))) PrepData()
 {
-	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12))
+	if(!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3))
 		_usrI2CData.PhaseSend = SEND_START_NOW;
-
+//	else
+//		asm("nop");
 //	if(_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
 //		_usrI2CData.PhaseSetAddr = PH1_GET_ID__SEND_ANSW;
 //

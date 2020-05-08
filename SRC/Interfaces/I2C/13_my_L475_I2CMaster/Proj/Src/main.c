@@ -102,6 +102,7 @@ int main(void)
 //	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
 //	  HAL_Delay(300);
 	  I2CSend();
+	  PrepData();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
