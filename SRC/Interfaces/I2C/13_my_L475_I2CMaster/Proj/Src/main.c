@@ -92,11 +92,13 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   SetHederMasterI2C(&hi2c1);
+  I2CInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
+
   while (1)
   {
 //	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);

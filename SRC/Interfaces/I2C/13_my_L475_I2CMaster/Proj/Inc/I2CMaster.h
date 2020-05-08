@@ -20,10 +20,14 @@
 #define	SEND_START_NOW	1	//запустить передачу
 #define	SEND_WAS_START		2	//запущена передача
 
+
+
 //сбор ID ведомых этапы
 #define	PH1_GET_ID__DEFVAL				0
 #define	PH1_GET_ID__SEND_ANSW			1	//получен запрос «дай ID» - послать ответ
 #define	PH1_GET_ID__SEND_ANSW_MADE		2
+
+
 
 #define	SZ_ARR_RX_BUFF		10
 

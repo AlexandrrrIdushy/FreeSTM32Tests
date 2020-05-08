@@ -33,6 +33,7 @@ void I2CInit()
 		_usrI2CData.aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
 		memset(_usrI2CData.aRxBuffer, 0, SZ_ARR_RX_BUFF);
 
+		I2C2 ->CR1 |= I2C_CR1_SWRST;
 }
 
 
@@ -81,11 +82,16 @@ void __attribute__((optimize("O0"))) I2CSend()
 
 }
 
+#define	BTN_PUSH	0
+#define	BTN_RELEASE	1
 
 void __attribute__((optimize("O0"))) PrepData()
 {
-	if(!HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3))
+	static uint8_t btnState, lastBtnState;
+	btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
+	if(btnState == BTN_RELEASE && lastBtnState == BTN_PUSH)
 		_usrI2CData.PhaseSend = SEND_START_NOW;
+	lastBtnState = btnState;
 //	else
 //		asm("nop");
 //	if(_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
