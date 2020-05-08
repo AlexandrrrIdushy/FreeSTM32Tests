@@ -1,5 +1,5 @@
 #include "I2CSlave.h"
-
+#include <string.h>
 
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
 
@@ -49,12 +49,12 @@ void I2CInit()
 		memset(_usrI2CData[nI2C]._aRxBuffer, 0, SZ_ARR_RX_BUFF);
 	}
 
-	//выключаем включаем шину
-	I2C1 ->CR1 &= (~I2C_CR1_PE);
-	HAL_Delay(100);
-	I2C1 ->CR1 |= I2C_CR1_PE;
-
-	I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
+//	//выключаем включаем шину
+//	I2C1 ->CR1 &= (~I2C_CR1_PE);
+//	HAL_Delay(100);
+//	I2C1 ->CR1 |= I2C_CR1_PE;
+//
+//	I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
 }
 
 

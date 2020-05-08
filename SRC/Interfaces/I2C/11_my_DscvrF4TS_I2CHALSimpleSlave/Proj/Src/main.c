@@ -98,14 +98,18 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  I2CInit();
+//  I2CInit();
+  uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
   while (1)
   {
 	  I2CReceive(&hi2c1, 0);
 	  I2CSend(&hi2c1, 0);
 	  PrepData();
 
-
+//	  //тест отправки
+//	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
+//	  HAL_Delay(300);
+	  //тест приема
 //	  if(HAL_I2C_Slave_Receive_IT(&hi2c1, (uint8_t *)arrReadData, 2) != HAL_OK)
 //	    Error_Handler();
 //	  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY)
