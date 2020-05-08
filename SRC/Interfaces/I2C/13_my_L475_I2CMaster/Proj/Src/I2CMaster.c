@@ -33,7 +33,12 @@ void I2CInit()
 		_usrI2CData.aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
 		memset(_usrI2CData.aRxBuffer, 0, SZ_ARR_RX_BUFF);
 
-		I2C2 ->CR1 |= I2C_CR1_SWRST;
+		//выключаем включаем шину
+		I2C1 ->CR1 &= (~I2C_CR1_PE);
+		HAL_Delay(100);
+		I2C1 ->CR1 |= I2C_CR1_PE;
+
+		I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
 }
 
 
