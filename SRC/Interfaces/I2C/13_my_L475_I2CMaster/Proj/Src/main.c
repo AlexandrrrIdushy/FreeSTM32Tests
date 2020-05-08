@@ -91,7 +91,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  SetHederI2C(&hi2c1);
+  SetHederMasterI2C(&hi2c1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -99,8 +99,9 @@ int main(void)
   uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
   while (1)
   {
-	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
-	  HAL_Delay(300);
+//	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
+//	  HAL_Delay(300);
+	  Scaning();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
