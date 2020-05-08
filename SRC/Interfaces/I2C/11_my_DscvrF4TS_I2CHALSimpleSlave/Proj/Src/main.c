@@ -98,7 +98,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-//  I2CInit();
+  I2CInit();
   uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
   while (1)
   {

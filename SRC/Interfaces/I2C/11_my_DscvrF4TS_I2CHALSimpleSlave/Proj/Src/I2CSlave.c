@@ -2,6 +2,9 @@
 #include <string.h>
 
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
+#define	SIZE_GET_ID_REQUEST		3	//число байт в запросе ID
+#define	SIZE_FACTORY_NUM		4	//длина заводского номера
+#define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
 //прием
 //#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
@@ -65,7 +68,7 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
 		case RECEIVE_YES_ANY_DATA:
-			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), 2) == HAL_OK)
+			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST) == HAL_OK)
 				_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT;
 			break;
 		case RECEIVE_WAIT:
@@ -81,16 +84,18 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	}
 
 }
-
+uint8_t	_adrOfMaster;
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-//	if(HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY)
-//		return;
+	if(HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY)
+		return;
 
 	switch (_usrI2CData[nI2C].PhaseSend)
 	{
 		case SEND_START_NOW:
-			if(HAL_I2C_Slave_Transmit_IT(hi2c, (uint8_t*)(_usrI2CData[nI2C]._aTxBuffer), 2) == HAL_OK)
+//			if(HAL_I2C_Slave_Transmit_IT(hi2c, (uint8_t*)(_usrI2CData[nI2C]._aTxBuffer), SIZE_FACTORY_NUM) == HAL_OK)
+//			if(HAL_I2C_Master_Transmit(&hi2c1, 1, arr, (uint16_t)1, (uint32_t)100) == HAL_OK)
+			HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C]._aTxBuffer), SIZE_SEND_ID_REQUEST);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAIT;
 			break;
 
@@ -111,10 +116,16 @@ void PrepData()
 		switch (_usrI2CData[nI2C].PhaseSetAddr)
 		{
 			case PH1_GET_ID__SEND_ANSW:
+				_adrOfMaster = _usrI2CData[nI2C]._aRxBuffer[0];
 				_usrI2CData[nI2C]._aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;//код тот же
-				_usrI2CData[nI2C]._aTxBuffer[1] =  nI2C;//ID слейва
+				//ID слейва
+				_usrI2CData[nI2C]._aTxBuffer[1] =  nI2C;
+				_usrI2CData[nI2C]._aTxBuffer[2] =  0x22;
+				_usrI2CData[nI2C]._aTxBuffer[3] =  0x33;
+				_usrI2CData[nI2C]._aTxBuffer[4] =  0x44;
+				//чистим приемный буфер
 				memset(_usrI2CData[nI2C]._aRxBuffer, 0, SZ_ARR_RX_BUFF);
-//				_usrI2CData[nI2C].PhaseSend = SEND_START_NOW;
+				_usrI2CData[nI2C].PhaseSend = SEND_START_NOW;
 				_usrI2CData[nI2C].PhaseSetAddr = PH1_GET_ID__SEND_ANSW_MADE;
 				break;
 
