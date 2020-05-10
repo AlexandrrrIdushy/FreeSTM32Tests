@@ -1,6 +1,6 @@
 #include "I2CMaster.h"
 #include <stdint.h>
-
+#include <string.h>
 
 
 
@@ -24,6 +24,8 @@ void SetHederMasterI2C(I2C_HandleTypeDef* hi2c1)
 
 }
 
+uint8_t _btnState, _lastBtnState;
+
 void I2CInit()
 {
 		_usrI2CData.PhaseSend = 0;
@@ -31,7 +33,9 @@ void I2CInit()
 		_usrI2CData.PhaseSetAddr = 0;
 		_usrI2CData.aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;	//тип
 		_usrI2CData.aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
-		memset(_usrI2CData.aRxBuffer, 0, SZ_ARR_RX_BUFF);
+		memset((uint8_t*)(_usrI2CData.aRxBuffer), (uint16_t) 0, (uint8_t)(SZ_ARR_RX_BUFF));
+
+//		_lastBtnState = 1;
 
 		//выключаем включаем шину
 		I2C1 ->CR1 &= (~I2C_CR1_PE);
@@ -48,7 +52,7 @@ void __attribute__((optimize("O0"))) I2CReceive()
 	HAL_I2C_StateTypeDef resGetState;
 	switch (_usrI2CData.PhaseReceive)
 	{
-		case RECEIVE_YES_ANY_DATA:
+		case RECEIVE_START:
 			if(HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), 2) == HAL_OK)
 				_usrI2CData.PhaseReceive = RECEIVE_WAIT;
 			break;
@@ -68,7 +72,7 @@ void __attribute__((optimize("O0"))) I2CReceive()
 
 void __attribute__((optimize("O0"))) I2CSend()
 {
-	HAL_I2C_StateTypeDef resGetState;
+//	HAL_I2C_StateTypeDef resGetState;
 //	resGetState = HAL_I2C_GetState(_hi2c1);
 //	if(resGetState != HAL_I2C_STATE_READY)
 //		return;
@@ -92,15 +96,20 @@ void __attribute__((optimize("O0"))) I2CSend()
 
 void __attribute__((optimize("O0"))) PrepData()
 {
-	static uint8_t btnState, lastBtnState;
-	btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
-	if(btnState == BTN_RELEASE && lastBtnState == BTN_PUSH)
+
+
+	//старт после нажатия кнопки
+	_btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
+	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH)
 		_usrI2CData.PhaseSend = SEND_START_NOW;
-	lastBtnState = btnState;
-//	else
-//		asm("nop");
-//	if(_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
-//		_usrI2CData.PhaseSetAddr = PH1_GET_ID__SEND_ANSW;
+	_lastBtnState = _btnState;
+
+	if(_usrI2CData.PhaseSend == SEND_WAS_START)
+		_usrI2CData.PhaseReceive = RECEIVE_START;
+
+	if(_usrI2CData.PhaseReceive == RECEIVE_YES_ANY_DATA &&
+			_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+		_usrI2CData.PhaseSetAddr = PH1_GET_ID__ID_GRANTED;
 //
 //	switch (_usrI2CData.PhaseSetAddr)
 //	{
