@@ -108,7 +108,7 @@ int main(void)
 //	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
 //	  HAL_Delay(300);
 	  I2CSend();
-//	  I2CReceive();
+	  I2CReceive();
 	  if(CntAny > 100000)//задержка для антидребезга кнопки
 		  PrepData();
     /* USER CODE END WHILE */

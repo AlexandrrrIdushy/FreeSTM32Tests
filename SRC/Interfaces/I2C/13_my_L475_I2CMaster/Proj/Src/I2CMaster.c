@@ -24,6 +24,9 @@ void SetHederMasterI2C(I2C_HandleTypeDef* hi2c1)
 
 }
 
+#define	BTN_PUSH	0
+#define	BTN_RELEASE	1
+
 uint8_t _btnState, _lastBtnState;
 
 void I2CInit()
@@ -43,6 +46,8 @@ void I2CInit()
 		I2C1 ->CR1 |= I2C_CR1_PE;
 
 		I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
+
+		_lastBtnState = BTN_RELEASE;
 }
 
 
@@ -96,8 +101,6 @@ void __attribute__((optimize("O0"))) I2CSend()
 
 }
 
-#define	BTN_PUSH	0
-#define	BTN_RELEASE	1
 
 void __attribute__((optimize("O0"))) PrepData()
 {
