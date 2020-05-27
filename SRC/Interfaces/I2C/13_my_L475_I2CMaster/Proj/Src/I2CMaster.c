@@ -59,9 +59,7 @@ void __attribute__((optimize("O0"))) I2CReceive()
 		case RECEIVE_WAIT:
 			resGetState = HAL_I2C_GetState(_hi2c1);
 			if(resGetState == HAL_I2C_STATE_READY)
-			{
 				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
-			}
 			break;
 
 		default:
@@ -72,7 +70,7 @@ void __attribute__((optimize("O0"))) I2CReceive()
 
 void __attribute__((optimize("O0"))) I2CSend()
 {
-//	HAL_I2C_StateTypeDef resGetState;
+	HAL_I2C_StateTypeDef resGetState;
 //	resGetState = HAL_I2C_GetState(_hi2c1);
 //	if(resGetState != HAL_I2C_STATE_READY)
 //		return;
@@ -83,6 +81,13 @@ void __attribute__((optimize("O0"))) I2CSend()
 			HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
 //			HAL_I2C_Master_Transmit(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), (uint16_t)SIZE_GET_ID_REQUEST, (uint32_t)100);
 			_usrI2CData.PhaseSend = SEND_WAS_START;
+			break;
+
+		case SEND_WAS_START:
+			//ожитается что чначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
+			resGetState = HAL_I2C_GetState(_hi2c1);
+			if(resGetState == HAL_I2C_STATE_READY)
+				_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
 			break;
 
 		default:
@@ -104,7 +109,15 @@ void __attribute__((optimize("O0"))) PrepData()
 		_usrI2CData.PhaseSend = SEND_START_NOW;
 	_lastBtnState = _btnState;
 
-	if(_usrI2CData.PhaseSend == SEND_WAS_START)
+
+
+//	if(_usrI2CData.PhaseSend == SEND_WAS_START)
+//	{
+//
+//		_usrI2CData.PhaseSend == SEND_WAS_GOOD_END;
+//	}
+
+	if(_usrI2CData.PhaseSend == SEND_WAS_GOOD_END)
 		_usrI2CData.PhaseReceive = RECEIVE_START;
 
 	if(_usrI2CData.PhaseReceive == RECEIVE_YES_ANY_DATA &&

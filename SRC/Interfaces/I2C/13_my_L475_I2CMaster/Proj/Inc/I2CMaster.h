@@ -21,6 +21,7 @@
 #define	SEND_DEFVAL		0	//
 #define	SEND_START_NOW	1	//запустить передачу
 #define	SEND_WAS_START		2	//запущена передача
+#define	SEND_WAS_GOOD_END	3	//передача успешно завершена
 
 
 
