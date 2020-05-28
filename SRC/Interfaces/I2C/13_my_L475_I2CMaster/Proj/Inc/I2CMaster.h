@@ -10,10 +10,11 @@
 //прием
 //#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
 
-#define	SEND_DEFVAL				0	//
+#define	RECEIVE_DEFVAL			0	//
 #define	RECEIVE_START			1	//запуск приема
 #define	RECEIVE_WAIT			2	//ожидаем запрос
 #define	RECEIVE_YES_ANY_DATA	3	//какието данные приняты
+#define	RECEIVE_TIMOUT			4	//время вышло, данных не было
 
 //предача
 //#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался

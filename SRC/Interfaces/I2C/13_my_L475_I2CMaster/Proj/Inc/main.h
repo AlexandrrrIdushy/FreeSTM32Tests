@@ -54,7 +54,9 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void HAL_SYSTICK_Callback(void);
+extern uint32_t GetSysCounter100MSec(void);
+extern uint64_t GetSysCounter1MSec(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

@@ -114,6 +114,8 @@ int main(void)
 	  I2CReceive();
 	  if(CntAny > 100000)//задержка для антидребезга кнопки
 		  PrepData();
+
+	  HAL_SYSTICK_Callback();//временно
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

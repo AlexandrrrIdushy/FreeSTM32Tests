@@ -51,22 +51,26 @@ void I2CInit()
 }
 
 
-
+#define DELAY_RECEIVE_END	10000	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
 void __attribute__((optimize("O0"))) I2CReceive()
 {
 	HAL_I2C_StateTypeDef resGetState;
+	static uint32_t startLocalCounter = 0;
+
 	switch (_usrI2CData.PhaseReceive)
 	{
 		case RECEIVE_START:
-			if(HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), 2) == HAL_OK)
-				_usrI2CData.PhaseReceive = RECEIVE_WAIT;
+			HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), 2);
+			_usrI2CData.PhaseReceive = RECEIVE_WAIT;
+			startLocalCounter = GetSysCounter100MSec();
 			break;
 		case RECEIVE_WAIT:
 			resGetState = HAL_I2C_GetState(_hi2c1);
 			if(resGetState == HAL_I2C_STATE_READY)
 				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+			else if((GetSysCounter100MSec() - startLocalCounter) < DELAY_RECEIVE_END)
+				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
 			break;
-
 		default:
 			break;
 	}
@@ -122,6 +126,15 @@ void __attribute__((optimize("O0"))) PrepData()
 
 	if(_usrI2CData.PhaseSend == SEND_WAS_GOOD_END)
 		_usrI2CData.PhaseReceive = RECEIVE_START;
+
+	//начнем сначала
+	if(_usrI2CData.PhaseReceive == RECEIVE_TIMOUT)
+	{
+		_usrI2CData.PhaseSend = SEND_DEFVAL;
+		_usrI2CData.PhaseReceive = RECEIVE_DEFVAL;
+	}
+
+
 
 	if(_usrI2CData.PhaseReceive == RECEIVE_YES_ANY_DATA &&
 			_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
