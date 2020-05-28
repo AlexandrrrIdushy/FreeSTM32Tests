@@ -45,7 +45,10 @@
 I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
-
+uint32_t _sysCounter100MSec;//до переполнения пройдет 13 лет ). использовать там где не нужна точность, плюс минус пол локтя..
+uint32_t GetSysCounter100MSec(void){return _sysCounter100MSec;}
+uint64_t _sysCounter1MSec;
+uint64_t GetSysCounter1MSec(void){return _sysCounter1MSec;}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -105,7 +108,7 @@ int main(void)
 	  I2CReceive(&hi2c1, 0);
 	  I2CSend(&hi2c1, 0);
 	  PrepData();
-
+	  HAL_SYSTICK_Callback();//временно
 //	  //тест отправки
 //	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
 //	  HAL_Delay(300);
@@ -210,7 +213,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_SYSTICK_Callback(void)
+{
+	static uint8_t sysTicksCnt4Get100MSec = 0;
+	if((sysTicksCnt4Get100MSec++) >= 100)
+	{
+		sysTicksCnt4Get100MSec = 0;
+		_sysCounter100MSec++;
+	}
+	_sysCounter1MSec++;
+}
 /* USER CODE END 4 */
 
 /**

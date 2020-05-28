@@ -7,18 +7,18 @@
 #define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
 //прием
-//#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
-
-#define	SEND_DEFVAL				0	//
-#define	RECEIVE_WAIT			1	//ожидаем запрос
-#define	RECEIVE_YES_ANY_DATA	2	//какието данные приняты
+#define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
+#define	RECEIVE_START			1	//запуск приема
+#define	RECEIVE_WAIT_DATA		2	//ожидаем запрос
+#define	RECEIVE_YES_ANY_DATA	3	//какието данные приняты
+#define	RECEIVE_TIMOUT			4	//время вышло, данных не было
 
 //предача
-//#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
-//#define	SEND_CLEAN		0	//был запрос на который потребуется очистить - разблокируем возможность передачи
-#define	SEND_DEFVAL		0	//
+#define	SEND_NEUTRAL		0	//по сути состояние ожидания перехода в рабочий режим
 #define	SEND_START_NOW	1	//запустить передачу
-#define	SEND_WAIT		2	//простой
+#define	SEND_WAS_START		2	//запущена передача
+#define	SEND_WAS_GOOD_END	3	//передача успешно завершена
+
 
 //сбор ID ведомых этапы
 #define	PH1_GET_ID__DEFVAL				0
@@ -46,8 +46,8 @@ void I2CInit()
 	// статусы для запуска драйвераобмена
 	for (int nI2C = 0; nI2C < 3; nI2C++)
 	{
-		_usrI2CData[nI2C].PhaseSend = 0;
-		_usrI2CData[nI2C].PhaseReceive = RECEIVE_YES_ANY_DATA;
+		_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
+		_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
 		_usrI2CData[nI2C].PhaseSetAddr = 0;
 		memset(_usrI2CData[nI2C]._aRxBuffer, 0, SZ_ARR_RX_BUFF);
 	}
@@ -61,21 +61,29 @@ void I2CInit()
 }
 
 
-
+#define DELAY_RECEIVE_END	400
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-	HAL_I2C_StateTypeDef resGetState;
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+	static uint32_t startLocalCounter = 0;
+
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
-		case RECEIVE_YES_ANY_DATA:
-			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST) == HAL_OK)
-				_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT;
+		case RECEIVE_START:
+			HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST);
+			_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
+			startLocalCounter = GetSysCounter100MSec();
 			break;
-		case RECEIVE_WAIT:
-			resGetState = HAL_I2C_GetState(hi2c);
+		case RECEIVE_WAIT_DATA:
 			if(resGetState == HAL_I2C_STATE_READY)
-			{
 				_usrI2CData[nI2C].PhaseReceive = RECEIVE_YES_ANY_DATA;
+			//если вышло время выделенное на прием
+			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+			{
+				_usrI2CData[nI2C].PhaseReceive = RECEIVE_TIMOUT;
+
+				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
+				resGetState = HAL_I2C_STATE_READY;
 			}
 			break;
 
@@ -87,16 +95,22 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 uint8_t	_adrOfMaster;
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-	if(HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY)
-		return;
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+
 
 	switch (_usrI2CData[nI2C].PhaseSend)
 	{
 		case SEND_START_NOW:
-//			if(HAL_I2C_Slave_Transmit_IT(hi2c, (uint8_t*)(_usrI2CData[nI2C]._aTxBuffer), SIZE_FACTORY_NUM) == HAL_OK)
-//			if(HAL_I2C_Master_Transmit(&hi2c1, 1, arr, (uint16_t)1, (uint32_t)100) == HAL_OK)
-			HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C]._aTxBuffer), SIZE_SEND_ID_REQUEST);
-				_usrI2CData[nI2C].PhaseSend = SEND_WAIT;
+			if(resGetState == HAL_I2C_STATE_READY)
+				HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C]._aTxBuffer), 2);//SIZE_SEND_ID_REQUEST);
+			_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
+			break;
+
+		case SEND_WAS_START:
+			//ожидается что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
+
+			if(resGetState == HAL_I2C_STATE_READY)
+				_usrI2CData[nI2C].PhaseSend = SEND_WAS_GOOD_END;
 			break;
 
 		default:
@@ -112,6 +126,11 @@ void PrepData()
 	{
 		if(_usrI2CData[nI2C]._aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
 			_usrI2CData[nI2C].PhaseSetAddr = PH1_GET_ID__SEND_ANSW;
+
+		//постоянно перезапускать
+		if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
+			_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+
 
 		switch (_usrI2CData[nI2C].PhaseSetAddr)
 		{
