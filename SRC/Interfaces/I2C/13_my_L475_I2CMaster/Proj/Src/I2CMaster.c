@@ -61,15 +61,28 @@ void __attribute__((optimize("O0"))) I2CReceive()
 	{
 		case RECEIVE_START:
 			HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), 2);
-			_usrI2CData.PhaseReceive = RECEIVE_WAIT;
+			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
 			startLocalCounter = GetSysCounter100MSec();
 			break;
-		case RECEIVE_WAIT:
+		case RECEIVE_WAIT_DATA:
 			resGetState = HAL_I2C_GetState(_hi2c1);
 			if(resGetState == HAL_I2C_STATE_READY)
 				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+
+			//если вышло врем€ выделенное на прием
 			else if((GetSysCounter100MSec() - startLocalCounter) < DELAY_RECEIVE_END)
+			{
 				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
+
+				_hi2c1->State = HAL_I2C_STATE_READY;
+//				//выключаем включаем шину
+//				I2C1 ->CR1 &= (~I2C_CR1_PE);
+//				HAL_Delay(100);
+//				I2C1 ->CR1 |= I2C_CR1_PE;
+//
+//				I2C1 ->CR1 |= I2C_CR1_SWRST;
+			}
+
 			break;
 		default:
 			break;
@@ -84,17 +97,18 @@ void __attribute__((optimize("O0"))) I2CSend()
 //	if(resGetState != HAL_I2C_STATE_READY)
 //		return;
 
+	resGetState = HAL_I2C_GetState(_hi2c1);
 	switch (_usrI2CData.PhaseSend)
 	{
 		case SEND_START_NOW:
-			HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
-//			HAL_I2C_Master_Transmit(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), (uint16_t)SIZE_GET_ID_REQUEST, (uint32_t)100);
+			if(resGetState == HAL_I2C_STATE_READY)
+				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
 			_usrI2CData.PhaseSend = SEND_WAS_START;
 			break;
 
 		case SEND_WAS_START:
-			//ожитаетс€ что чначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
-			resGetState = HAL_I2C_GetState(_hi2c1);
+			//ожидаетс€ что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
+
 			if(resGetState == HAL_I2C_STATE_READY)
 				_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
 			break;
@@ -112,7 +126,8 @@ void __attribute__((optimize("O0"))) PrepData()
 
 	//старт после нажати€ кнопки
 	_btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
-	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH)
+	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH &&
+			_usrI2CData.PhaseSend == SEND_NEUTRAL && _usrI2CData.PhaseReceive == RECEIVE_NEUTRAL)
 		_usrI2CData.PhaseSend = SEND_START_NOW;
 	_lastBtnState = _btnState;
 
@@ -125,20 +140,25 @@ void __attribute__((optimize("O0"))) PrepData()
 //	}
 
 	if(_usrI2CData.PhaseSend == SEND_WAS_GOOD_END)
+	{
+		_usrI2CData.PhaseSend = SEND_NEUTRAL;
 		_usrI2CData.PhaseReceive = RECEIVE_START;
+	}
 
 	//начнем сначала
 	if(_usrI2CData.PhaseReceive == RECEIVE_TIMOUT)
 	{
-		_usrI2CData.PhaseSend = SEND_DEFVAL;
-		_usrI2CData.PhaseReceive = RECEIVE_DEFVAL;
+		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
 	}
 
 
-
+	//какието данные прин€ты » код = "раздача адресов фаза 1 сбор ID"
 	if(_usrI2CData.PhaseReceive == RECEIVE_YES_ANY_DATA &&
 			_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+	{
+		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
 		_usrI2CData.PhaseSetAddr = PH1_GET_ID__ID_GRANTED;
+	}
 //
 //	switch (_usrI2CData.PhaseSetAddr)
 //	{

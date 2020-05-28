@@ -8,18 +8,15 @@
 #define	SIZE_GET_ID_REQUEST		3	//число байт в таком запросе
 
 //прием
-//#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
 
-#define	RECEIVE_DEFVAL			0	//
+#define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
 #define	RECEIVE_START			1	//запуск приема
-#define	RECEIVE_WAIT			2	//ожидаем запрос
+#define	RECEIVE_WAIT_DATA		2	//ожидаем запрос
 #define	RECEIVE_YES_ANY_DATA	3	//какието данные приняты
 #define	RECEIVE_TIMOUT			4	//время вышло, данных не было
 
 //предача
-//#define	PH1_GET_ID__BEFORE_CALL_RCV	0	//пока обмен не запускался
-//#define	SEND_CLEAN		0	//был запрос на который потребуется очистить - разблокируем возможность передачи
-#define	SEND_DEFVAL		0	//
+#define	SEND_NEUTRAL		0	//по сути состояние ожидания перехода в рабочий режим
 #define	SEND_START_NOW	1	//запустить передачу
 #define	SEND_WAS_START		2	//запущена передача
 #define	SEND_WAS_GOOD_END	3	//передача успешно завершена
