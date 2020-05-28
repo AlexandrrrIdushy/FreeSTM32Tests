@@ -51,7 +51,7 @@ void I2CInit()
 }
 
 
-#define DELAY_RECEIVE_END	10000	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
+#define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
 void __attribute__((optimize("O0"))) I2CReceive()
 {
 	HAL_I2C_StateTypeDef resGetState;
@@ -70,17 +70,12 @@ void __attribute__((optimize("O0"))) I2CReceive()
 				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
 
 			//если вышло время выделенное на прием
-			else if((GetSysCounter100MSec() - startLocalCounter) < DELAY_RECEIVE_END)
+			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
 			{
 				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
 
+				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
 				_hi2c1->State = HAL_I2C_STATE_READY;
-//				//выключаем включаем шину
-//				I2C1 ->CR1 &= (~I2C_CR1_PE);
-//				HAL_Delay(100);
-//				I2C1 ->CR1 |= I2C_CR1_PE;
-//
-//				I2C1 ->CR1 |= I2C_CR1_SWRST;
 			}
 
 			break;
