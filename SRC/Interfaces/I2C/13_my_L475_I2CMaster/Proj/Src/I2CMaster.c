@@ -54,7 +54,7 @@ void I2CInit()
 #define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
 void __attribute__((optimize("O0"))) I2CReceive()
 {
-	HAL_I2C_StateTypeDef resGetState;
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
 	static uint32_t startLocalCounter = 0;
 
 	switch (_usrI2CData.PhaseReceive)
@@ -65,7 +65,6 @@ void __attribute__((optimize("O0"))) I2CReceive()
 			startLocalCounter = GetSysCounter100MSec();
 			break;
 		case RECEIVE_WAIT_DATA:
-			resGetState = HAL_I2C_GetState(_hi2c1);
 			if(resGetState == HAL_I2C_STATE_READY)
 				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
 
@@ -87,18 +86,15 @@ void __attribute__((optimize("O0"))) I2CReceive()
 
 void __attribute__((optimize("O0"))) I2CSend()
 {
-	HAL_I2C_StateTypeDef resGetState;
-//	resGetState = HAL_I2C_GetState(_hi2c1);
-//	if(resGetState != HAL_I2C_STATE_READY)
-//		return;
-
-	resGetState = HAL_I2C_GetState(_hi2c1);
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
 	switch (_usrI2CData.PhaseSend)
 	{
 		case SEND_START_NOW:
 			if(resGetState == HAL_I2C_STATE_READY)
+			{
 				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
-			_usrI2CData.PhaseSend = SEND_WAS_START;
+				_usrI2CData.PhaseSend = SEND_WAS_START;
+			}
 			break;
 
 		case SEND_WAS_START:

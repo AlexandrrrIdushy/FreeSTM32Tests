@@ -5,10 +5,11 @@
 
 #define	ADDR_BY_MASTER		1	//адрес мастера
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
-#define	SIZE_GET_ID_REQUEST		3	//число байт в таком запросе
+#define	SIZE_GET_ID_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
+#define	SIZE_FACTORY_NUM		4	//длина заводского номера ведомого
+#define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
 //прием
-
 #define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
 #define	RECEIVE_START			1	//запуск приема
 #define	RECEIVE_WAIT_DATA		2	//ожидаем запрос
