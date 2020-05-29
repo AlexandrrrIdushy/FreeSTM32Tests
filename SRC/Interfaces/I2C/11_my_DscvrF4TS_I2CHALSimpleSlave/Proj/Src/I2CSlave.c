@@ -100,8 +100,8 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 		case SEND_WAS_START:
 			//ожидается что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
 
-			if(resGetState == HAL_I2C_STATE_READY)
-				_usrI2CData[nI2C].PhaseSend = SEND_WAS_GOOD_END;
+//			if(resGetState == HAL_I2C_STATE_READY)
+//				_usrI2CData[nI2C].PhaseSend = SEND_WAS_GOOD_END;
 			break;
 
 		default:
@@ -165,7 +165,7 @@ void PrepData()
 
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	asm("nop");
+	_usrI2CData[0].PhaseSend = SEND_WAS_GOOD_END;
 }
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
