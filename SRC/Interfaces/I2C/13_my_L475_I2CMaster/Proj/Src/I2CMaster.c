@@ -36,6 +36,7 @@ void I2CInit()
 		_usrI2CData.PhaseSetAddr = 0;
 		_usrI2CData.aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;	//тип
 		_usrI2CData.aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
+		_usrI2CData.aTxBuffer[2] = 0xEE;					//адрес
 		memset((uint8_t*)(_usrI2CData.aRxBuffer), (uint16_t) 0, (uint8_t)(SZ_ARR_RX_BUFF));
 
 //		_lastBtnState = 1;

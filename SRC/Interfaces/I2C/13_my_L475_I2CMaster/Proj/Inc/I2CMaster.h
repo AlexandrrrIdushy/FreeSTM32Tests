@@ -9,6 +9,11 @@
 #define	SIZE_FACTORY_NUM		4	//длина заводского номера ведомого
 #define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
+//номера байтов в запросе [Код команды «дай ID» = 0xFA] [Адрес устройства-ведущего] [Зарезервирован]
+#define	GET_ID_REQUEST__I_B_CODCMD		0
+#define	GET_ID_REQUEST__I_B_ADRMAST 	1
+#define	GET_ID_REQUEST__I_B_REZ		 	2
+
 //прием
 #define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
 #define	RECEIVE_START			1	//запуск приема
