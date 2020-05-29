@@ -7,10 +7,14 @@
 
 struct I2CUsrData
 {
-	uint8_t PhaseSend;
 	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
-	uint8_t PhaseReceive;
+	uint16_t sizeTxCmd;
+
 	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
+	uint16_t sizeRxCmd;
+
+	uint8_t PhaseSend;
+	uint8_t PhaseReceive;
 	uint8_t PhaseSetAddr;
 };
 
@@ -61,22 +65,23 @@ void __attribute__((optimize("O0"))) I2CReceive()
 	switch (_usrI2CData.PhaseReceive)
 	{
 		case RECEIVE_START:
-			HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), 2);
+			HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), _usrI2CData.sizeRxCmd);
 			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
 			startLocalCounter = GetSysCounter100MSec();
 			break;
 		case RECEIVE_WAIT_DATA:
-			if(resGetState == HAL_I2C_STATE_READY)
-				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
-
-			//если вышло время выделенное на прием
-			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-			{
-				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
-
-				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
-				_hi2c1->State = HAL_I2C_STATE_READY;
-			}
+			asm("nop");
+//			if(resGetState == HAL_I2C_STATE_READY)
+//				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+//
+//			//если вышло время выделенное на прием
+//			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+//			{
+//				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
+//
+//				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
+//				_hi2c1->State = HAL_I2C_STATE_READY;
+//			}
 
 			break;
 		default:
@@ -93,7 +98,7 @@ void __attribute__((optimize("O0"))) I2CSend()
 		case SEND_START_NOW:
 			if(resGetState == HAL_I2C_STATE_READY)
 			{
-				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), SIZE_GET_ID_REQUEST);
+				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
 				_usrI2CData.PhaseSend = SEND_WAS_START;
 			}
 			break;
@@ -120,7 +125,10 @@ void __attribute__((optimize("O0"))) PrepData()
 	_btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
 	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH &&
 			_usrI2CData.PhaseSend == SEND_NEUTRAL && _usrI2CData.PhaseReceive == RECEIVE_NEUTRAL)
+	{
 		_usrI2CData.PhaseSend = SEND_START_NOW;
+		_usrI2CData.sizeTxCmd = ST1_SIZE_REQUEST;
+	}
 	_lastBtnState = _btnState;
 
 
@@ -149,7 +157,7 @@ void __attribute__((optimize("O0"))) PrepData()
 			_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
 	{
 		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
-		_usrI2CData.PhaseSetAddr = PH1_GET_ID__ID_GRANTED;
+		_usrI2CData.PhaseSetAddr = ST1__ID_GRANTED;
 	}
 //
 //	switch (_usrI2CData.PhaseSetAddr)
@@ -167,4 +175,24 @@ void __attribute__((optimize("O0"))) PrepData()
 //	}
 
 
+}
+
+
+
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+}
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+//	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
+	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
 }

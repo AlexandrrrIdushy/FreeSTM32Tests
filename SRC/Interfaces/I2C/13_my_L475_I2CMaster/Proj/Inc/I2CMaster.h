@@ -3,16 +3,19 @@
 #include "stm32l4xx_hal.h"
 
 
+//фаза1 шаг1. сбор ID с слейвов. запрос мастера
+//фаза1 шаг2. сбор ID с слейвов. ответ слейва
+
 #define	ADDR_BY_MASTER		1	//адрес мастера
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
-#define	SIZE_GET_ID_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
+#define	ST1_SIZE_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
 #define	SIZE_FACTORY_NUM		4	//длина заводского номера ведомого
 #define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
 //номера байтов в запросе [Код команды «дай ID» = 0xFA] [Адрес устройства-ведущего] [Зарезервирован]
-#define	GET_ID_REQUEST__I_B_CODCMD		0
-#define	GET_ID_REQUEST__I_B_ADRMAST 	1
-#define	GET_ID_REQUEST__I_B_REZ		 	2
+#define	P1S1__I_B_CODCMD	0
+#define	P1S1__I_B_ADRMAST 	1
+#define	P1S1__I_B_REZ		2
 
 //прием
 #define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
@@ -30,9 +33,9 @@
 
 
 //сбор ID ведомых этапы
-#define	PH1_GET_ID__DEFVAL				0
-#define	PH1_GET_ID__CMD_GET_ID_SENT		1	//запрос «дай ID» послан
-#define	PH1_GET_ID__ID_GRANTED		2	//пришел ответ на «дай ID»
+#define	ST1__DEFVAL				0
+#define	ST1__CMD_GET_ID_SENT		1	//запрос «дай ID» послан
+#define	ST1__ID_GRANTED		2	//пришел ответ на «дай ID»
 
 
 
