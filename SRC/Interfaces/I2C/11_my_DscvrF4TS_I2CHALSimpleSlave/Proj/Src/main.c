@@ -215,22 +215,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
-}
+
 
 void HAL_SYSTICK_Callback(void)
 {
