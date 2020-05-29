@@ -70,9 +70,12 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
 		case RECEIVE_START:
-			HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST);
-			_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
-			startLocalCounter = GetSysCounter100MSec();
+			while(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST)!= HAL_OK){}
+//			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST) == HAL_OK)
+//			{
+				_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
+				startLocalCounter = GetSysCounter100MSec();
+//			}
 			break;
 		case RECEIVE_WAIT_DATA:
 			if(resGetState == HAL_I2C_STATE_READY)
@@ -103,7 +106,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 		case SEND_START_NOW:
 			if(resGetState == HAL_I2C_STATE_READY)
 			{
-				HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C]._aTxBuffer), 2);//SIZE_SEND_ID_REQUEST);
+				HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C]._aTxBuffer), 3);//SIZE_SEND_ID_REQUEST);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
 			}
 			break;
@@ -150,6 +153,8 @@ void PrepData()
 				_usrI2CData[nI2C].PhaseSend = SEND_START_NOW;
 				_usrI2CData[nI2C].PhaseSetAddr = PH1_GET_ID__SEND_ANSW_MADE;
 				break;
+
+
 
 			default:
 				break;
