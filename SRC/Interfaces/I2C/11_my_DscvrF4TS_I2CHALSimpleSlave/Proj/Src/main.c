@@ -20,11 +20,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "I2CSlave.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "I2CSlave.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +105,7 @@ int main(void)
   uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
   while (1)
   {
+
 	  I2CReceive(&hi2c1, 0);
 	  I2CSend(&hi2c1, 0);
 	  PrepData();
@@ -213,6 +214,24 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
+}
+
 void HAL_SYSTICK_Callback(void)
 {
 	static uint8_t sysTicksCnt4Get100MSec = 0;
