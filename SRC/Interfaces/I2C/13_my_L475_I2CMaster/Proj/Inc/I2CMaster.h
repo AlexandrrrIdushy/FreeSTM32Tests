@@ -10,7 +10,7 @@
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
 #define	ST1_SIZE_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
 #define	SIZE_FACTORY_NUM		4	//длина заводского номера ведомого
-#define	SIZE_SEND_ID_REQUEST		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
+#define	P1S2_SIZE_ANSW		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
 //номера байтов в запросе [Код команды «дай ID» = 0xFA] [Адрес устройства-ведущего] [Зарезервирован]
 #define	P1S1__I_B_CODCMD	0

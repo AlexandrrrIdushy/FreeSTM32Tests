@@ -143,6 +143,7 @@ void __attribute__((optimize("O0"))) PrepData()
 	{
 		_usrI2CData.PhaseSend = SEND_NEUTRAL;
 		_usrI2CData.PhaseReceive = RECEIVE_START;
+		_usrI2CData.sizeRxCmd = P1S2_SIZE_ANSW;
 	}
 
 	//начнем сначала
@@ -179,23 +180,23 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 
-//void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-//{
-//	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
-//}
-//void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-//{
-//	asm("nop");
-//}
-//void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
-//{
-//	asm("nop");
-//}
-//void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
-//{
-////	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
-//	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
-//}
+void  __attribute__((optimize("O0"))) HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+}
+void  __attribute__((optimize("O0"))) HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void  __attribute__((optimize("O0"))) HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+	asm("nop");
+}
+void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+{
+//	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
+	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+}
 
 
 
