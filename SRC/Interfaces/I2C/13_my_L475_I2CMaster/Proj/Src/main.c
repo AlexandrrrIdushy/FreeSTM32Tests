@@ -111,7 +111,7 @@ int main(void)
 //	  HAL_Delay(300);
 	  I2CSend();
 	  I2CReceive();
-	  if(CntAny > 100000)//задержка для антидребезга кнопки
+//	  if(CntAny > 100000)//задержка для антидребезга кнопки
 		  PrepData();
 
 	  HAL_SYSTICK_Callback();//временно

@@ -70,18 +70,9 @@ void __attribute__((optimize("O0"))) I2CReceive()
 			startLocalCounter = GetSysCounter100MSec();
 			break;
 		case RECEIVE_WAIT_DATA:
-			asm("nop");
-//			if(resGetState == HAL_I2C_STATE_READY)
-//				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
-//
 			//если вышло время выделенное на прием
 			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-			{
 				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
-
-				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
-				_hi2c1->State = HAL_I2C_STATE_READY;
-			}
 
 			break;
 		default:
@@ -93,6 +84,8 @@ void __attribute__((optimize("O0"))) I2CReceive()
 void __attribute__((optimize("O0"))) I2CSend()
 {
 	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
+	static uint32_t startLocalCounter = 0;
+
 	switch (_usrI2CData.PhaseSend)
 	{
 		case SEND_START_NOW:
@@ -100,14 +93,13 @@ void __attribute__((optimize("O0"))) I2CSend()
 //			{
 				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
 				_usrI2CData.PhaseSend = SEND_WAS_START;
+				startLocalCounter = GetSysCounter100MSec();
 //			}
 			break;
 
 		case SEND_WAS_START:
-			//ожидается что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
-
-//			if(resGetState == HAL_I2C_STATE_READY)
-//				_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+				_usrI2CData.PhaseSend = SEND_TIMOUT;
 			break;
 
 		default:
@@ -148,9 +140,10 @@ void __attribute__((optimize("O0"))) PrepData()
 
 	//начнем сначала
 	if(_usrI2CData.PhaseReceive == RECEIVE_TIMOUT)
-	{
 		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
-	}
+
+	if(_usrI2CData.PhaseSend == SEND_TIMOUT)
+		_usrI2CData.PhaseSend = SEND_NEUTRAL;
 
 
 	//какието данные приняты И код = "раздача адресов фаза 1 сбор ID"

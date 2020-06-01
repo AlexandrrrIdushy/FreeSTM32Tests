@@ -26,9 +26,10 @@
 
 //предача
 #define	SEND_NEUTRAL		0	//по сути состояние ожидания перехода в рабочий режим
-#define	SEND_START_NOW	1	//запустить передачу
+#define	SEND_START_NOW		1	//запустить передачу
 #define	SEND_WAS_START		2	//запущена передача
 #define	SEND_WAS_GOOD_END	3	//передача успешно завершена
+#define	SEND_TIMOUT			4	//время вышло, данные не переданы
 
 
 
