@@ -1,7 +1,7 @@
 #include "I2CSlave.h"
 #include <string.h>
 
-#define	DEBUG_1//просто подтверждает запрос на запись не отвеча€
+//#define	DEBUG_1//просто подтверждает запрос на запись не отвеча€
 
 struct I2CUsrData
 {
@@ -55,25 +55,18 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
 		case RECEIVE_START:
-			while(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd)!= HAL_OK){}
+//			while(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd)!= HAL_OK){}
 //			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST) == HAL_OK)
 //			{
-				_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
-				startLocalCounter = GetSysCounter100MSec();
+			HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd);
+			_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
+			startLocalCounter = GetSysCounter100MSec();
 //			}
 			break;
 		case RECEIVE_WAIT_DATA:
-			asm("nop");
-//			if(resGetState == HAL_I2C_STATE_READY)
-//				_usrI2CData[nI2C].PhaseReceive = RECEIVE_YES_ANY_DATA;
 			//если вышло врем€ выделенное на прием
-//			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-//			{
-//				_usrI2CData[nI2C].PhaseReceive = RECEIVE_TIMOUT;
-//
-//				//!!! костыль? дл€ сброс линии » флагов I2C HAL в начальное состо€ние. может потребоватьс€ более всеобъемлещий сброс
-////				resGetState = HAL_I2C_STATE_READY;
-//			}
+			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+				_usrI2CData[nI2C].PhaseReceive = RECEIVE_TIMOUT;
 			break;
 
 		default:
@@ -82,26 +75,34 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 
 }
 uint8_t	_adrOfMaster;
+#define	DELAY_SEND_START 5
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
 	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
-
+	static uint32_t locCntWaitStart = 0;
+	static uint32_t startLocalCounter = 0;
 
 	switch (_usrI2CData[nI2C].PhaseSend)
 	{
+		case SEND_START_CAN:
+			locCntWaitStart = GetSysCounter100MSec();
+			_usrI2CData[nI2C].PhaseSend = SEND_START_WAIT;
+			break;
+
+		case SEND_START_WAIT:
+			if((GetSysCounter100MSec() - locCntWaitStart) > DELAY_SEND_START)
+				_usrI2CData[nI2C].PhaseSend = SEND_START_NOW;
+			break;
+
 		case SEND_START_NOW:
-//			if(resGetState == HAL_I2C_STATE_READY)
-//			{
 				HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
-//			}
+				startLocalCounter = GetSysCounter100MSec();
 			break;
 
 		case SEND_WAS_START:
-			//ожидаетс€ что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
-
-//			if(resGetState == HAL_I2C_STATE_READY)
-//				_usrI2CData[nI2C].PhaseSend = SEND_WAS_GOOD_END;
+//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+//				_usrI2CData[nI2C].PhaseSend = SEND_TIMOUT;
 			break;
 
 		default:
@@ -150,7 +151,7 @@ void PrepData()
 				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 				_usrI2CData[nI2C].sizeTxCmd = P1S2_SZ_RESPN;
 
-				_usrI2CData[nI2C].PhaseSend = SEND_START_NOW;
+				_usrI2CData[nI2C].PhaseSend = SEND_START_CAN;
 				_usrI2CData[nI2C].PhaseSetAddr = PH1_GET_ID__SEND_ANSW_MADE;
 				break;
 
