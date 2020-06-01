@@ -75,7 +75,7 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 
 }
 uint8_t	_adrOfMaster;
-#define	DELAY_SEND_START 5
+#define	DELAY_SEND_START 2
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
 	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
@@ -95,7 +95,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 			break;
 
 		case SEND_START_NOW:
-				HAL_I2C_Master_Transmit_IT(hi2c, _adrOfMaster, (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
+				HAL_I2C_Master_Transmit_IT(hi2c, (_adrOfMaster << 1), (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
 				startLocalCounter = GetSysCounter100MSec();
 			break;
