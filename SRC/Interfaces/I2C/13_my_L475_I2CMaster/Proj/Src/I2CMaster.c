@@ -74,14 +74,14 @@ void __attribute__((optimize("O0"))) I2CReceive()
 //			if(resGetState == HAL_I2C_STATE_READY)
 //				_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
 //
-//			//если вышло время выделенное на прием
-//			else if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-//			{
-//				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
-//
-//				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
-//				_hi2c1->State = HAL_I2C_STATE_READY;
-//			}
+			//если вышло время выделенное на прием
+			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+			{
+				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
+
+				//!!! костыль? для сброс линии И флагов I2C HAL в начальное состояние. может потребоваться более всеобъемлещий сброс
+				_hi2c1->State = HAL_I2C_STATE_READY;
+			}
 
 			break;
 		default:
@@ -177,6 +177,25 @@ void __attribute__((optimize("O0"))) PrepData()
 
 }
 
+
+
+//void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+//{
+//	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+//}
+//void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+//{
+//	asm("nop");
+//}
+//void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+//{
+//	asm("nop");
+//}
+//void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+//{
+////	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
+//	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+//}
 
 
 
