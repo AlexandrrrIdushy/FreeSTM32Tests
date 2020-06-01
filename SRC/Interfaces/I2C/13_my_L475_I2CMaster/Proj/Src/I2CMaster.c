@@ -65,7 +65,7 @@ void __attribute__((optimize("O0"))) I2CReceive()
 	switch (_usrI2CData.PhaseReceive)
 	{
 		case RECEIVE_START:
-			HAL_I2C_Slave_Receive_IT(_hi2c1, (uint8_t *)(_usrI2CData.aRxBuffer), _usrI2CData.sizeRxCmd);
+			HAL_I2C_Slave_Receive_IT(_hi2c1, _usrI2CData.aRxBuffer, _usrI2CData.sizeRxCmd);
 			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
 			startLocalCounter = GetSysCounter100MSec();
 			break;
@@ -96,18 +96,18 @@ void __attribute__((optimize("O0"))) I2CSend()
 	switch (_usrI2CData.PhaseSend)
 	{
 		case SEND_START_NOW:
-			if(resGetState == HAL_I2C_STATE_READY)
-			{
+//			if(resGetState == HAL_I2C_STATE_READY)
+//			{
 				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
 				_usrI2CData.PhaseSend = SEND_WAS_START;
-			}
+//			}
 			break;
 
 		case SEND_WAS_START:
 			//ожидается что сначала будет HAL_I2C_STATE_BUSY_TX а потом перейдет на HAL_I2C_STATE_READY
 
-			if(resGetState == HAL_I2C_STATE_READY)
-				_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+//			if(resGetState == HAL_I2C_STATE_READY)
+//				_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
 			break;
 
 		default:
@@ -179,20 +179,5 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
-}
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-//	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
-	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
-}
+
+
