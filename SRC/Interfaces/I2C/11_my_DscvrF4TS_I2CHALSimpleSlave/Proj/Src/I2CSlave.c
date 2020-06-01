@@ -1,7 +1,7 @@
 #include "I2CSlave.h"
 #include <string.h>
 
-
+#define	DEBUG_1//просто подтверждает запрос на запись не отвечая
 
 struct I2CUsrData
 {
@@ -115,6 +115,13 @@ void PrepData()
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)
 	{
+#ifdef	DEBUG_1
+		if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_YES_ANY_DATA ||
+				_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT ||
+				_usrI2CData[nI2C].PhaseReceive == RECEIVE_NEUTRAL)
+			_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+#endif
+
 		//распознали входящий запрос "дай ID"
 		if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_YES_ANY_DATA &&
 				_usrI2CData[nI2C].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST &&
