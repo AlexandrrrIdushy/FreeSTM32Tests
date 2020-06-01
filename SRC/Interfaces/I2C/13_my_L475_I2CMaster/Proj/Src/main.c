@@ -249,20 +249,20 @@ void HAL_SYSTICK_Callback(void)
 }
 
 
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+void  __attribute__((optimize("O0"))) HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	//_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
 	asm("nop");
 }
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+void  __attribute__((optimize("O0"))) HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	asm("nop");
 }
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+void  __attribute__((optimize("O0"))) HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	asm("nop");
 }
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 //	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
 //	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
