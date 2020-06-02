@@ -142,6 +142,18 @@
 							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.264772145" name="Resource Custom Build Step Output Type"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.atollic.truestudio.exe.debug.1518366166.1866019547" name="I2CDrvCmm.c" rcbsApplicability="disable" resourcePath="Src/I2CDrvCmm.c" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.962812857">
+						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.962812857" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
+							<option id="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level.536154314" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.optimization.level" useByScannerDiscovery="false" value="com.atollic.truestudio.gcc.optimization.level.00" valueType="enumerated"/>
+							<inputType id="com.atollic.truestudio.gcc.input.539172460" superClass="com.atollic.truestudio.gcc.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.410330669" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2019165779" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.577561471" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<fileInfo id="com.atollic.truestudio.exe.debug.311825581.983937533" name="" rcbsApplicability="disable" resourcePath="nofile" toolsToInvoke="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455">
 						<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447.1976695455" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc.1836874447">
 							<inputType id="com.atollic.truestudio.gcc.input.1274347818" superClass="com.atollic.truestudio.gcc.input"/>
