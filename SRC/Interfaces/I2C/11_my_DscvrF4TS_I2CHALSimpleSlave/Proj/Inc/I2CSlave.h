@@ -19,7 +19,7 @@
 //прием
 #define	RECEIVE_NEUTRAL			0	//по сути состояние ожидания перехода в рабочий режим
 #define	RECEIVE_START			1	//запуск приема
-#define	RECEIVE_WAIT_DATA		2	//ожидаем запрос
+#define	RECEIVE_WAIT_DATA		2	//ждем входящий пакет
 #define	RECEIVE_YES_ANY_DATA	3	//какието данные приняты
 #define	RECEIVE_TIMOUT			4	//время вышло, данных не было
 
