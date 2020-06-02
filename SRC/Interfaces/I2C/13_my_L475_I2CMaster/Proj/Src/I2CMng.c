@@ -1,10 +1,13 @@
 #include "I2CMng.h"
 #include "I2CDrvCmm.h"
+#include "my_type.h"
 
 
 uint8_t _btnState, _lastBtnState;
 #define	BTN_PUSH	0
 #define	BTN_RELEASE	1
+
+struct I2CDataFromGM i2cDataFromGM[MAX_N_GAS_MTR];
 
 void I2CInit()
 {
@@ -95,7 +98,7 @@ void __attribute__((optimize("O0"))) PrepData()
 
 }
 
-
+#ifdef	GIVE_OUT_ADR_V1
 void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 {
 
@@ -120,6 +123,12 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			break;
 
 		case P1S2__SEND_WAIT_END_SENDING://ожидаем завершени€ отправки
+//			if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
+//			{
+//				//отправка не удалась
+//				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+//				_usrI2CData[0].PhaseSetAddr = P0S0__DEFVAL;
+//			}
 			if(_usrI2CData[0].PhaseSend == SEND_WAS_GOOD_END)
 			{
 				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
@@ -134,16 +143,16 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_TIMOUT)
 				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
 
-			if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
-				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
-
-
-			//какието данные прин€ты » код = "раздача адресов фаза 1 сбор ID"
-			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA &&
-					_usrI2CData[0].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+			//какието данные прин€ты
+			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA)
 			{
-				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
-				_usrI2CData[0].PhaseSetAddr = ST1__ID_GRANTED;
+				//провер€ем - записалс€ ли адрес
+				if(_usrI2CData[0].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+
+				{
+					_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+					_usrI2CData[0].PhaseSetAddr = P1S2__WAIT_CONFIRM;
+				}
 			}
 			break;
 
@@ -153,3 +162,4 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 
 
 }
+#endif//#ifdef	GIVE_OUT_ADR_V1

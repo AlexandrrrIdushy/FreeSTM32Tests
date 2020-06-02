@@ -2,6 +2,11 @@
 #define __MYDEFINE_H
 
 
+#define GIVE_OUT_ADR_V1	//простая раздача адресов
+
+#ifdef	GIVE_OUT_ADR_V1
+#endif//#ifdef	GIVE_OUT_ADR_V1
+
 #define ITS_MASTER
 
 #ifdef	ITS_MASTER
