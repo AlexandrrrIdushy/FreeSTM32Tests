@@ -1,32 +1,32 @@
-#include "I2CMaster.h"
+#include "I2CDrvCmm.h"
 #include <stdint.h>
-#include <string.h>
+#include "MyDefine.h"
 
 
 
 
-struct I2CUsrData
-{
-	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
-	uint16_t sizeTxCmd;
+//struct I2CUsrData
+//{
+//	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
+//	uint16_t sizeTxCmd;
+//
+//	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
+//	uint16_t sizeRxCmd;
+//
+//	uint8_t PhaseSend;
+//	uint8_t PhaseReceive;
+//	uint8_t PhaseSetAddr;
+//};
 
-	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
-	uint16_t sizeRxCmd;
-
-	uint8_t PhaseSend;
-	uint8_t PhaseReceive;
-	uint8_t PhaseSetAddr;
-};
-
-struct I2CUsrData _usrI2CData;
+//struct I2CUsrData _usrI2CData;
 
 I2C_HandleTypeDef* _hi2c1;
 
-void SetHederMasterI2C(I2C_HandleTypeDef* hi2c1)
-{
-	_hi2c1 = hi2c1;
-
-}
+//void SetHederMasterI2C(I2C_HandleTypeDef* hi2c1)
+//{
+//	_hi2c1 = hi2c1;
+//
+//}
 
 #define	BTN_PUSH	0
 #define	BTN_RELEASE	1
@@ -56,58 +56,60 @@ void I2CInit()
 }
 
 
-#define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
-void __attribute__((optimize("O0"))) I2CReceive()
-{
-	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
-	static uint32_t startLocalCounter = 0;
+//#define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
+//void __attribute__((optimize("O0"))) I2CReceive()
+//{
+//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
+//	static uint32_t startLocalCounter = 0;
+//
+//	switch (_usrI2CData.PhaseReceive)
+//	{
+//		case RECEIVE_START:
+//			HAL_I2C_Slave_Receive_IT(_hi2c1, _usrI2CData.aRxBuffer, _usrI2CData.sizeRxCmd);
+//			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
+//			startLocalCounter = GetSysCounter100MSec();
+//			break;
+//		case RECEIVE_WAIT_DATA:
+//			//если вышло время выделенное на прием
+//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+//				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
+//
+//			break;
+//		default:
+//			break;
+//	}
+//
+//}
 
-	switch (_usrI2CData.PhaseReceive)
-	{
-		case RECEIVE_START:
-			HAL_I2C_Slave_Receive_IT(_hi2c1, _usrI2CData.aRxBuffer, _usrI2CData.sizeRxCmd);
-			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
-			startLocalCounter = GetSysCounter100MSec();
-			break;
-		case RECEIVE_WAIT_DATA:
-			//если вышло время выделенное на прием
-			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
+//void __attribute__((optimize("O0"))) I2CSend()
+//{
+//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
+//	static uint32_t startLocalCounter = 0;
+//
+//	switch (_usrI2CData.PhaseSend)
+//	{
+//		case SEND_START_NOW:
+////			if(resGetState == HAL_I2C_STATE_READY)
+////			{
+//				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
+//				_usrI2CData.PhaseSend = SEND_WAS_START;
+//				startLocalCounter = GetSysCounter100MSec();
+////			}
+//			break;
+//
+//		case SEND_WAS_START:
+//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+//				_usrI2CData.PhaseSend = SEND_TIMOUT;
+//			break;
+//
+//		default:
+//			break;
+//	}
+//
+//}
 
-			break;
-		default:
-			break;
-	}
 
-}
-
-void __attribute__((optimize("O0"))) I2CSend()
-{
-	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
-	static uint32_t startLocalCounter = 0;
-
-	switch (_usrI2CData.PhaseSend)
-	{
-		case SEND_START_NOW:
-//			if(resGetState == HAL_I2C_STATE_READY)
-//			{
-				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
-				_usrI2CData.PhaseSend = SEND_WAS_START;
-				startLocalCounter = GetSysCounter100MSec();
-//			}
-			break;
-
-		case SEND_WAS_START:
-			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-				_usrI2CData.PhaseSend = SEND_TIMOUT;
-			break;
-
-		default:
-			break;
-	}
-
-}
-
+#ifdef	ITS_MASTER
 
 void __attribute__((optimize("O0"))) PrepData()
 {
@@ -170,12 +172,14 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 }
+#endif//#ifdef	ITS_MASTER
+
 
 
 
 void  __attribute__((optimize("O0"))) HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-	_usrI2CData.PhaseSend = SEND_WAS_GOOD_END;
+	_usrI2CData[0].PhaseSend = SEND_WAS_GOOD_END;
 }
 void  __attribute__((optimize("O0"))) HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
@@ -187,8 +191,7 @@ void  __attribute__((optimize("O0"))) HAL_I2C_SlaveTxCpltCallback(I2C_HandleType
 }
 void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-//	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
-	_usrI2CData.PhaseReceive = RECEIVE_YES_ANY_DATA;
+	_usrI2CData[0].PhaseReceive = RECEIVE_YES_ANY_DATA;
 }
 
 
@@ -212,24 +215,7 @@ void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleType
 
 
 
-
-#include "I2CSlave.h"
-#include <string.h>
-
-//#define	DEBUG_1//просто подтверждает запрос на запись не отвечая
-
-struct I2CUsrData
-{
-	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
-	uint16_t sizeTxCmd;
-
-	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
-	uint16_t sizeRxCmd;
-
-	uint8_t PhaseSend;
-	uint8_t PhaseReceive;
-	uint8_t PhaseSetAddr;
-};
+//SLAVE
 
 struct I2CUsrData _usrI2CData[3];
 
@@ -270,9 +256,6 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
 		case RECEIVE_START:
-//			while(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd)!= HAL_OK){}
-//			if(HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C]._aRxBuffer), SIZE_GET_ID_REQUEST) == HAL_OK)
-//			{
 			HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd);
 			_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
 			startLocalCounter = GetSysCounter100MSec();
@@ -295,7 +278,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 {
 	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
 	static uint32_t locCntWaitStart = 0;
-	static uint32_t startLocalCounter = 0;
+	static uint32_t locCntWaitEndSend = 0;
 
 	switch (_usrI2CData[nI2C].PhaseSend)
 	{
@@ -316,8 +299,8 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 			break;
 
 		case SEND_WAS_START:
-//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-//				_usrI2CData[nI2C].PhaseSend = SEND_TIMOUT;
+			if((GetSysCounter100MSec() - locCntWaitEndSend) > DELAY_RECEIVE_END)
+				_usrI2CData.PhaseSend = SEND_TIMOUT;
 			break;
 
 		default:
@@ -326,7 +309,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 
 }
 
-
+#ifdef	ITS_SLAVE
 void PrepData()
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)
@@ -383,23 +366,7 @@ void PrepData()
 
 
 }
+#endif//#ifdef	ITS_SLAVE
 
 
 
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	_usrI2CData[0].PhaseSend = SEND_WAS_GOOD_END;
-}
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-	asm("nop");
-}
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
-//	SetPhaseReceive(0, RECEIVE_YES_ANY_DATA);
-	_usrI2CData[0].PhaseReceive = RECEIVE_YES_ANY_DATA;
-}

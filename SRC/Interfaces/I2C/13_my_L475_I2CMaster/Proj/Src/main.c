@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "I2CMaster.h"
+#include "I2CDrvCmm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,25 +94,17 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  SetHederMasterI2C(&hi2c1);
   I2CInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint8_t arr[] = {0x11, 0x12, 0x13, 0x14, 0x15, 0x16};
-  uint32_t CntAny = 0;
   while (1)
   {
-	  if(CntAny < 10000000)
-		  CntAny++;
-	  //тест отправки
-//	  HAL_I2C_Master_Transmit(&hi2c1, 102, arr, (uint16_t)1, (uint32_t)100);
-//	  HAL_Delay(300);
-	  I2CSend();
-	  I2CReceive();
-//	  if(CntAny > 100000)//задержка для антидребезга кнопки
-		  PrepData();
+	  I2CReceive(&hi2c1, 0);
+	  I2CSend(&hi2c1, 0);
+
+	  PrepData();
 
 	  HAL_SYSTICK_Callback();//временно
     /* USER CODE END WHILE */

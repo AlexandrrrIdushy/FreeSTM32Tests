@@ -72,14 +72,14 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Inc/I2CMasterCmm.h</name>
+			<name>Inc/I2CDrvCmm.h</name>
 			<type>1</type>
-			<location>D:/PROJECTS/AtollicDif/FreeSTM32TestGIT/SRC/Interfaces/I2C/Common/Inc/I2CMasterCmm.h</location>
+			<location>D:/PROJECTS/AtollicDif/FreeSTM32TestGIT/SRC/Interfaces/I2C/Common/Inc/I2CDrvCmm.h</location>
 		</link>
 		<link>
-			<name>Src/I2CMasterCmm.c</name>
+			<name>Src/I2CDrvCmm.c</name>
 			<type>1</type>
-			<location>D:/PROJECTS/AtollicDif/FreeSTM32TestGIT/SRC/Interfaces/I2C/Common/Src/I2CMasterCmm.c</location>
+			<location>D:/PROJECTS/AtollicDif/FreeSTM32TestGIT/SRC/Interfaces/I2C/Common/Src/I2CDrvCmm.c</location>
 		</link>
 	</linkedResources>
 </projectDescription>
