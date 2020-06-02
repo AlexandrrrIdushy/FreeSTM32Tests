@@ -111,19 +111,6 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 
 
 
-//	if(_usrI2CData.PhaseSend == SEND_WAS_START)
-//	{
-//
-//		_usrI2CData.PhaseSend == SEND_WAS_GOOD_END;
-//	}
-
-
-
-
-
-
-
-
 	switch (_usrI2CData[0].PhaseSetAddr)
 	{
 		case P1S1__SEND_ADR_SLV_BEGIN://пробуем отправить адрес
