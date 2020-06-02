@@ -19,7 +19,7 @@ I2C_HandleTypeDef* _hi2c1;
 
 #define	BTN_PUSH	0
 #define	BTN_RELEASE	1
-
+uint8_t	_adrOfReceiver;
 uint8_t _btnState, _lastBtnState;
 
 
@@ -83,7 +83,7 @@ uint8_t _btnState, _lastBtnState;
 
 void I2CInit()
 {
-
+	_adrOfReceiver = 51;
 	_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
 	_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
 	_usrI2CData[0].PhaseSetAddr = 0;
@@ -264,7 +264,7 @@ void PrepData()
 		switch (_usrI2CData[nI2C].PhaseSetAddr)
 		{
 			case PH1_GET_ID__SEND_ANSW:
-				_adrOfMaster = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADRMAST];
+				_adrOfReceiver = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADRMAST];
 				_usrI2CData[nI2C].aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;//код тот же
 				//ID слейва
 				_usrI2CData[nI2C].aTxBuffer[1] =  nI2C;
@@ -328,7 +328,7 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	}
 
 }
-uint8_t	_adrOfMaster;
+
 #define	DELAY_SEND_START 2
 #define	DELAY_SEND_END 200
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
@@ -350,7 +350,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 			break;
 
 		case SEND_START_NOW:
-				HAL_I2C_Master_Transmit_IT(hi2c, (_adrOfMaster << 1), (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
+				HAL_I2C_Master_Transmit_IT(hi2c, (_adrOfReceiver << 1), (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
 				locCntWaitEndSend = GetSysCounter100MSec();
 			break;
