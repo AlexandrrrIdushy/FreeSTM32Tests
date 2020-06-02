@@ -162,8 +162,8 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA)
 			{
 				//проверяем - записался ли адрес
-				if(_usrI2CData[0].aRxBuffer[P1S1__I_B_CODCMD] == P1_CODE_SEND_ADR &&
-						_usrI2CData[0].aRxBuffer[P1S1__I_B_ADR4WR] == _curAdr4TryWrite2GM)
+				if(_usrI2CData[0].aRxBuffer[P1S2__I_B_CODCMD] == P1_CODE_SEND_ADR &&
+						_usrI2CData[0].aRxBuffer[P1S2__I_B_ADR4WR] == _curAdr4TryWrite2GM)
 
 				{
 					_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
