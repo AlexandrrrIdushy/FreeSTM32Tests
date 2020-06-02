@@ -3,60 +3,12 @@
 #include <stdint.h>
 
 
-
-
-
-
 struct I2CUsrData _usrI2CData[3];
 //struct I2CUsrData _usrI2CData;
 
 I2C_HandleTypeDef* _hi2c1;
 
-//void SetHederMasterI2C(I2C_HandleTypeDef* hi2c1)
-//{
-//	_hi2c1 = hi2c1;
-//
-//}
-
-
 uint8_t	_adrOfReceiver;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//SLAVE
-
-
-
 
 
 
@@ -65,14 +17,6 @@ uint8_t	_adrOfReceiver;
 //	_usrI2CData[nI2CUsrData].PhaseReceive = phase;
 //	return;
 //}
-
-
-
-
-
-
-
-
 
 
 
@@ -104,6 +48,7 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 	}
 
 }
+
 
 #define	DELAY_SEND_START 2
 #define	DELAY_SEND_END 200
