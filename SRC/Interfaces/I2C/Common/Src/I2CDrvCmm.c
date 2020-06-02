@@ -9,6 +9,7 @@ struct I2CUsrData _usrI2CData[3];
 I2C_HandleTypeDef* _hi2c1;
 
 uint8_t	_adrOfReceiver;
+uint8_t	_adr4Update2Me;
 
 
 

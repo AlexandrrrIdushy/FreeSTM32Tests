@@ -20,10 +20,11 @@ void I2CInit()
 	_usrI2CData[0].sizeRxCmd = P1S1_SZ_REQUEST;
 	memset(_usrI2CData[0].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 
-
+#ifdef	GIVE_OUT_ADR_V2
 	_usrI2CData[0].aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;	//тип
 	_usrI2CData[0].aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
 	_usrI2CData[0].aTxBuffer[2] = 0xEE;					//адрес
+#endif
 	memset((uint8_t*)(_usrI2CData[0].aRxBuffer), (uint16_t) 0, (uint8_t)(SZ_ARR_RX_BUFF));
 
 	//		_lastBtnState = 1;
@@ -122,6 +123,10 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 	switch (_usrI2CData[0].PhaseSetAddr)
 	{
 		case P1S1__SEND_ADR_SLV_BEGIN://пробуем отправить адрес
+			_usrI2CData[0].aTxBuffer[P1S1__I_B_CODCMD] = P1_CODE_SEND_ADR;
+			_usrI2CData[0].aTxBuffer[P1S1__I_B_ADRMAST] = ADDR_BY_MASTER;
+			_usrI2CData[0].aTxBuffer[P1S1__I_B_ADR4WR] = _curAdr4TryWrite2GM;
+
 			_usrI2CData[0].PhaseSend = SEND_START_NOW;
 			_usrI2CData[0].sizeTxCmd = P1S1_SZ_REQUEST;
 			_usrI2CData[0].PhaseSetAddr = P1S2__SEND_WAIT_END_SENDING;
@@ -157,7 +162,7 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA)
 			{
 				//проверяем - записался ли адрес
-				if(_usrI2CData[0].aRxBuffer[P1S1__I_B_CODCMD] == I2CCODE_GET_ID_REQUEST &&
+				if(_usrI2CData[0].aRxBuffer[P1S1__I_B_CODCMD] == P1_CODE_SEND_ADR &&
 						_usrI2CData[0].aRxBuffer[P1S1__I_B_ADR4WR] == _curAdr4TryWrite2GM)
 
 				{
