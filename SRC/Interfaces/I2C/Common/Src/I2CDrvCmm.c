@@ -184,7 +184,7 @@ void I2CInit()
 
 
 
-void PrepData()
+void   __attribute__((optimize("O0"))) PrepData()
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)
 	{
