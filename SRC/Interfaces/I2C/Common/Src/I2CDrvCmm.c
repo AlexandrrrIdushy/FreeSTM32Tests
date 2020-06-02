@@ -5,19 +5,8 @@
 
 
 
-//struct I2CUsrData
-//{
-//	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
-//	uint16_t sizeTxCmd;
-//
-//	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
-//	uint16_t sizeRxCmd;
-//
-//	uint8_t PhaseSend;
-//	uint8_t PhaseReceive;
-//	uint8_t PhaseSetAddr;
-//};
 
+struct I2CUsrData _usrI2CData[3];
 //struct I2CUsrData _usrI2CData;
 
 I2C_HandleTypeDef* _hi2c1;
@@ -33,27 +22,7 @@ I2C_HandleTypeDef* _hi2c1;
 
 uint8_t _btnState, _lastBtnState;
 
-void I2CInit()
-{
-		_usrI2CData.PhaseSend = 0;
-		_usrI2CData.PhaseReceive = 0;
-		_usrI2CData.PhaseSetAddr = 0;
-		_usrI2CData.aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;	//тип
-		_usrI2CData.aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
-		_usrI2CData.aTxBuffer[2] = 0xEE;					//адрес
-		memset((uint8_t*)(_usrI2CData.aRxBuffer), (uint16_t) 0, (uint8_t)(SZ_ARR_RX_BUFF));
 
-//		_lastBtnState = 1;
-
-		//выключаем включаем шину
-		I2C1 ->CR1 &= (~I2C_CR1_PE);
-		HAL_Delay(100);
-		I2C1 ->CR1 |= I2C_CR1_PE;
-
-		I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
-
-		_lastBtnState = BTN_RELEASE;
-}
 
 
 //#define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
@@ -111,6 +80,34 @@ void I2CInit()
 
 #ifdef	ITS_MASTER
 
+
+void I2CInit()
+{
+
+	_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+	_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+	_usrI2CData[0].PhaseSetAddr = 0;
+	_usrI2CData[0].sizeRxCmd = P1S1_SZ_REQUEST;
+	memset(_usrI2CData[0].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+
+
+	_usrI2CData[0].aTxBuffer[0] = I2CCODE_GET_ID_REQUEST;	//тип
+	_usrI2CData[0].aTxBuffer[1] = ADDR_BY_MASTER;			//адрес
+	_usrI2CData[0].aTxBuffer[2] = 0xEE;					//адрес
+	memset((uint8_t*)(_usrI2CData[0].aRxBuffer), (uint16_t) 0, (uint8_t)(SZ_ARR_RX_BUFF));
+
+	//		_lastBtnState = 1;
+
+	//выключаем включаем шину
+	I2C1 ->CR1 &= (~I2C_CR1_PE);
+	HAL_Delay(100);
+	I2C1 ->CR1 |= I2C_CR1_PE;
+
+	I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
+
+	_lastBtnState = BTN_RELEASE;
+}
+
 void __attribute__((optimize("O0"))) PrepData()
 {
 
@@ -118,10 +115,10 @@ void __attribute__((optimize("O0"))) PrepData()
 	//старт после нажатия кнопки
 	_btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
 	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH &&
-			_usrI2CData.PhaseSend == SEND_NEUTRAL && _usrI2CData.PhaseReceive == RECEIVE_NEUTRAL)
+			_usrI2CData[0].PhaseSend == SEND_NEUTRAL && _usrI2CData[0].PhaseReceive == RECEIVE_NEUTRAL)
 	{
-		_usrI2CData.PhaseSend = SEND_START_NOW;
-		_usrI2CData.sizeTxCmd = ST1_SIZE_REQUEST;
+		_usrI2CData[0].PhaseSend = SEND_START_NOW;
+		_usrI2CData[0].sizeTxCmd = P1S1_SZ_REQUEST;
 	}
 	_lastBtnState = _btnState;
 
@@ -133,27 +130,27 @@ void __attribute__((optimize("O0"))) PrepData()
 //		_usrI2CData.PhaseSend == SEND_WAS_GOOD_END;
 //	}
 
-	if(_usrI2CData.PhaseSend == SEND_WAS_GOOD_END)
+	if(_usrI2CData[0].PhaseSend == SEND_WAS_GOOD_END)
 	{
-		_usrI2CData.PhaseSend = SEND_NEUTRAL;
-		_usrI2CData.PhaseReceive = RECEIVE_START;
-		_usrI2CData.sizeRxCmd = P1S2_SIZE_ANSW;
+		_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+		_usrI2CData[0].PhaseReceive = RECEIVE_START;
+		_usrI2CData[0].sizeRxCmd = P1S2_SIZE_ANSW;
 	}
 
 	//начнем сначала
-	if(_usrI2CData.PhaseReceive == RECEIVE_TIMOUT)
-		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
+	if(_usrI2CData[0].PhaseReceive == RECEIVE_TIMOUT)
+		_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
 
-	if(_usrI2CData.PhaseSend == SEND_TIMOUT)
-		_usrI2CData.PhaseSend = SEND_NEUTRAL;
+	if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
+		_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
 
 
 	//какието данные приняты И код = "раздача адресов фаза 1 сбор ID"
-	if(_usrI2CData.PhaseReceive == RECEIVE_YES_ANY_DATA &&
-			_usrI2CData.aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+	if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA &&
+			_usrI2CData[0].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
 	{
-		_usrI2CData.PhaseReceive = RECEIVE_NEUTRAL;
-		_usrI2CData.PhaseSetAddr = ST1__ID_GRANTED;
+		_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+		_usrI2CData[0].PhaseSetAddr = ST1__ID_GRANTED;
 	}
 //
 //	switch (_usrI2CData.PhaseSetAddr)
@@ -217,28 +214,9 @@ void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleType
 
 //SLAVE
 
-struct I2CUsrData _usrI2CData[3];
-
-void I2CInit()
-{
-	// статусы для запуска драйвераобмена
-	for (int nI2C = 0; nI2C < 3; nI2C++)
-	{
-		_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
-		_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
-		_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
-		_usrI2CData[nI2C].PhaseSetAddr = 0;
-		memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
-	}
 
 
-//	//выключаем включаем шину
-//	I2C1 ->CR1 &= (~I2C_CR1_PE);
-//	HAL_Delay(100);
-//	I2C1 ->CR1 |= I2C_CR1_PE;
-//
-//	I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
-}
+
 
 
 void SetPhaseReceive(uint8_t nI2CUsrData, uint8_t phase)
@@ -250,7 +228,7 @@ void SetPhaseReceive(uint8_t nI2CUsrData, uint8_t phase)
 #define DELAY_RECEIVE_END	2000
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
 	static uint32_t startLocalCounter = 0;
 
 	switch (_usrI2CData[nI2C].PhaseReceive)
@@ -276,7 +254,7 @@ uint8_t	_adrOfMaster;
 #define	DELAY_SEND_START 2
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
 	static uint32_t locCntWaitStart = 0;
 	static uint32_t locCntWaitEndSend = 0;
 
@@ -295,12 +273,12 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 		case SEND_START_NOW:
 				HAL_I2C_Master_Transmit_IT(hi2c, (_adrOfMaster << 1), (uint8_t *)(_usrI2CData[nI2C].aTxBuffer), _usrI2CData[nI2C].sizeTxCmd);
 				_usrI2CData[nI2C].PhaseSend = SEND_WAS_START;
-				startLocalCounter = GetSysCounter100MSec();
+				locCntWaitEndSend = GetSysCounter100MSec();
 			break;
 
 		case SEND_WAS_START:
 			if((GetSysCounter100MSec() - locCntWaitEndSend) > DELAY_RECEIVE_END)
-				_usrI2CData.PhaseSend = SEND_TIMOUT;
+				_usrI2CData[nI2C].PhaseSend = SEND_TIMOUT;
 			break;
 
 		default:
@@ -310,6 +288,29 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 }
 
 #ifdef	ITS_SLAVE
+void I2CInit()
+{
+	// статусы для запуска драйвераобмена
+	for (int nI2C = 0; nI2C < 3; nI2C++)
+	{
+		_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
+		_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+		_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
+		_usrI2CData[nI2C].PhaseSetAddr = 0;
+		memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+	}
+
+
+//	//выключаем включаем шину
+//	I2C1 ->CR1 &= (~I2C_CR1_PE);
+//	HAL_Delay(100);
+//	I2C1 ->CR1 |= I2C_CR1_PE;
+//
+//	I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
+}
+
+
+
 void PrepData()
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)

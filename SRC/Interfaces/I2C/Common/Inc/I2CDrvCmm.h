@@ -12,7 +12,7 @@
 
 #define	ADDR_BY_MASTER		1	//адрес мастера
 #define	I2CCODE_GET_ID_REQUEST		0xFA	//код - раздача адресов фаза 1 сбор ID
-#define	ST1_SIZE_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
+#define	P1S1_SZ_REQUEST		3	//число байт в запросе "дай ID" устройства ведущего
 #define	SIZE_FACTORY_NUM		4	//длина заводского номера ведомого
 #define	P1S2_SIZE_ANSW		(SIZE_FACTORY_NUM + 1)//ответ - ведомый предьявляет ID
 
@@ -58,6 +58,20 @@
 
 
 
+struct I2CUsrData
+{
+	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
+	uint16_t sizeTxCmd;
+
+	uint8_t	aRxBuffer[SZ_ARR_RX_BUFF];
+	uint16_t sizeRxCmd;
+
+	uint8_t PhaseSend;
+	uint8_t PhaseReceive;
+	uint8_t PhaseSetAddr;
+};
+
+
 
 
 extern void I2CInit(void);
@@ -65,5 +79,7 @@ extern void I2CReceive(I2C_HandleTypeDef*, uint8_t);
 extern void I2CSend(I2C_HandleTypeDef*, uint8_t);
 extern void PrepData(void);
 extern void SetPhaseReceive(uint8_t, uint8_t);
+
+extern uint32_t GetSysCounter100MSec(void);
 
 #endif//#define __DRVCMMI2C_H
