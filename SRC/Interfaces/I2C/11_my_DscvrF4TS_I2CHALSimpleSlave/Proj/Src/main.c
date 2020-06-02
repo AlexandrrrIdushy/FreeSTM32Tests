@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "I2CSlave.h"
+#include "I2CDrvCmm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

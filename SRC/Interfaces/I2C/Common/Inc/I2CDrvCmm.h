@@ -1,7 +1,15 @@
 #ifndef __DRVCMMI2C_H
 #define __DRVCMMI2C_H
-#include "stm32l4xx_hal.h"
 
+#include "MyDefine.h"
+
+#ifdef	ITS_MASTER
+#include "stm32l4xx_hal.h"
+#endif//#ifdef	ITS_MASTER
+
+#ifdef	ITS_SLAVE
+#include "stm32f4xx_hal.h"
+#endif//#ifdef	ITS_SLAVE
 
 
 #define	SZ_ARR_RX_BUFF		10
@@ -58,6 +66,7 @@
 
 
 
+
 struct I2CUsrData
 {
 	uint8_t	aTxBuffer[SZ_ARR_TX_BUFF];
@@ -78,7 +87,7 @@ extern void I2CInit(void);
 extern void I2CReceive(I2C_HandleTypeDef*, uint8_t);
 extern void I2CSend(I2C_HandleTypeDef*, uint8_t);
 extern void PrepData(void);
-extern void SetPhaseReceive(uint8_t, uint8_t);
+//extern void SetPhaseReceive(uint8_t, uint8_t);
 
 extern uint32_t GetSysCounter100MSec(void);
 

@@ -1,6 +1,7 @@
+
 #include "I2CDrvCmm.h"
 #include <stdint.h>
-#include "MyDefine.h"
+
 
 
 
@@ -23,59 +24,6 @@ uint8_t	_adrOfReceiver;
 uint8_t _btnState, _lastBtnState;
 
 
-
-
-//#define DELAY_RECEIVE_END	400	//(10 * 50/*sec*/) //задержка вызова. при значении в скобках 10 = 1 секунде
-//void __attribute__((optimize("O0"))) I2CReceive()
-//{
-//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
-//	static uint32_t startLocalCounter = 0;
-//
-//	switch (_usrI2CData.PhaseReceive)
-//	{
-//		case RECEIVE_START:
-//			HAL_I2C_Slave_Receive_IT(_hi2c1, _usrI2CData.aRxBuffer, _usrI2CData.sizeRxCmd);
-//			_usrI2CData.PhaseReceive = RECEIVE_WAIT_DATA;
-//			startLocalCounter = GetSysCounter100MSec();
-//			break;
-//		case RECEIVE_WAIT_DATA:
-//			//если вышло время выделенное на прием
-//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-//				_usrI2CData.PhaseReceive = RECEIVE_TIMOUT;
-//
-//			break;
-//		default:
-//			break;
-//	}
-//
-//}
-
-//void __attribute__((optimize("O0"))) I2CSend()
-//{
-//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(_hi2c1);
-//	static uint32_t startLocalCounter = 0;
-//
-//	switch (_usrI2CData.PhaseSend)
-//	{
-//		case SEND_START_NOW:
-////			if(resGetState == HAL_I2C_STATE_READY)
-////			{
-//				HAL_I2C_Master_Transmit_IT(_hi2c1, 102, (uint8_t*)(_usrI2CData.aTxBuffer), _usrI2CData.sizeTxCmd);
-//				_usrI2CData.PhaseSend = SEND_WAS_START;
-//				startLocalCounter = GetSysCounter100MSec();
-////			}
-//			break;
-//
-//		case SEND_WAS_START:
-//			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
-//				_usrI2CData.PhaseSend = SEND_TIMOUT;
-//			break;
-//
-//		default:
-//			break;
-//	}
-//
-//}
 
 
 #ifdef	ITS_MASTER
@@ -204,11 +152,11 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 
-void SetPhaseReceive(uint8_t nI2CUsrData, uint8_t phase)
-{
-	_usrI2CData[nI2CUsrData].PhaseReceive = phase;
-	return;
-}
+//void SetPhaseReceive(uint8_t nI2CUsrData, uint8_t phase)
+//{
+//	_usrI2CData[nI2CUsrData].PhaseReceive = phase;
+//	return;
+//}
 
 
 
@@ -273,7 +221,7 @@ void PrepData()
 				_usrI2CData[nI2C].aTxBuffer[4] =  0x44;
 				//чистим приемный буфер
 				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
-				_usrI2CData[nI2C].sizeTxCmd = P1S2_SZ_RESPN;
+				_usrI2CData[nI2C].sizeTxCmd = P1S2_SIZE_ANSW;
 
 				_usrI2CData[nI2C].PhaseSend = SEND_START_CAN;
 				_usrI2CData[nI2C].PhaseSetAddr = PH1_GET_ID__SEND_ANSW_MADE;
@@ -301,7 +249,7 @@ void PrepData()
 
 
 
-
+//ДРАЙВЕР
 
 #define DELAY_RECEIVE_END	2000
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
