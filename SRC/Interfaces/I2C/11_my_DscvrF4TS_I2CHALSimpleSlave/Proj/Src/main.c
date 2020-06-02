@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "I2CDrvCmm.h"
+#include "I2CMng.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

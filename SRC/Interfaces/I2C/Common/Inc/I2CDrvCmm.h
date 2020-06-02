@@ -80,7 +80,8 @@ struct I2CUsrData
 	uint8_t PhaseSetAddr;
 };
 
-
+extern struct I2CUsrData _usrI2CData[3];
+extern uint8_t	_adrOfReceiver;
 
 
 extern void I2CInit(void);
