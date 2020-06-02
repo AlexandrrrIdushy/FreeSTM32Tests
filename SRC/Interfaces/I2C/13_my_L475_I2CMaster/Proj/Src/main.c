@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "MyDefine.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -104,7 +105,12 @@ int main(void)
 	  I2CReceive(&hi2c1, 0);
 	  I2CSend(&hi2c1, 0);
 
+#ifdef	GIVE_OUT_ADR_V2
 	  PrepData();
+#endif
+#ifdef	GIVE_OUT_ADR_V1
+	  PrepDataGetAdrV1Simple();
+#endif
 
 	  HAL_SYSTICK_Callback();//временно
     /* USER CODE END WHILE */

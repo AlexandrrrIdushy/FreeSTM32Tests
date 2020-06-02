@@ -8,9 +8,11 @@ uint8_t _btnState, _lastBtnState;
 #define	BTN_RELEASE	1
 
 struct I2CDataFromGM i2cDataFromGM[MAX_N_GAS_MTR];
+uint8_t _curAdr4TryWrite2GM;
 
 void I2CInit()
 {
+	_curAdr4TryWrite2GM = 2;
 	_adrOfReceiver = 51;
 	_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
 	_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
@@ -36,6 +38,8 @@ void I2CInit()
 	_lastBtnState = BTN_RELEASE;
 }
 
+
+#ifdef	GIVE_OUT_ADR_V2
 void __attribute__((optimize("O0"))) PrepData()
 {
 
@@ -97,6 +101,7 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 }
+#endif//#ifdef	GIVE_OUT_ADR_V2
 
 #ifdef	GIVE_OUT_ADR_V1
 void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
@@ -119,7 +124,8 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 		case P1S1__SEND_ADR_SLV_BEGIN://пробуем отправить адрес
 			_usrI2CData[0].PhaseSend = SEND_START_NOW;
 			_usrI2CData[0].sizeTxCmd = P1S1_SZ_REQUEST;
-			_usrI2CData[0].PhaseSetAddr = P1S2__WAIT_CONFIRM;
+			_usrI2CData[0].PhaseSetAddr = P1S2__SEND_WAIT_END_SENDING;
+			memset(_usrI2CData[0].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 			break;
 
 		case P1S2__SEND_WAIT_END_SENDING://ожидаем завершения отправки
@@ -139,19 +145,25 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			break;
 
 		case P1S3__RCV_WAIT_RCV_DATA://пробуем принять какие нибудь данные
-			//начнем сначала
+			//если прием не удался. все фазы откатываем к началу
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_TIMOUT)
+			{
 				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+				_usrI2CData[0].PhaseSetAddr = P0S0__DEFVAL;
+			}
 
 			//какието данные приняты
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA)
 			{
 				//проверяем - записался ли адрес
-				if(_usrI2CData[0].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+				if(_usrI2CData[0].aRxBuffer[P1S1__I_B_CODCMD] == I2CCODE_GET_ID_REQUEST &&
+						_usrI2CData[0].aRxBuffer[P1S1__I_B_ADR4WR] == _curAdr4TryWrite2GM)
 
 				{
 					_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
 					_usrI2CData[0].PhaseSetAddr = P1S2__WAIT_CONFIRM;
+					_curAdr4TryWrite2GM++;
 				}
 			}
 			break;
