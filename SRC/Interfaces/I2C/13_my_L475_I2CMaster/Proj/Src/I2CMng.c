@@ -94,3 +94,75 @@ void __attribute__((optimize("O0"))) PrepData()
 
 
 }
+
+
+void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
+{
+
+
+	//старт после нажати€ кнопки
+	_btnState = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
+	if(_btnState == BTN_RELEASE && _lastBtnState == BTN_PUSH &&
+			_usrI2CData[0].PhaseSend == SEND_NEUTRAL && _usrI2CData[0].PhaseReceive == RECEIVE_NEUTRAL)
+	{
+		_usrI2CData[0].PhaseSetAddr = P1S1__SEND_ADR_SLV_BEGIN;
+	}
+	_lastBtnState = _btnState;
+
+
+
+//	if(_usrI2CData.PhaseSend == SEND_WAS_START)
+//	{
+//
+//		_usrI2CData.PhaseSend == SEND_WAS_GOOD_END;
+//	}
+
+
+
+
+
+
+
+
+	switch (_usrI2CData[0].PhaseSetAddr)
+	{
+		case P1S1__SEND_ADR_SLV_BEGIN://пробуем отправить адрес
+			_usrI2CData[0].PhaseSend = SEND_START_NOW;
+			_usrI2CData[0].sizeTxCmd = P1S1_SZ_REQUEST;
+			_usrI2CData[0].PhaseSetAddr = P1S2__WAIT_CONFIRM;
+			break;
+
+		case P1S2__SEND_WAIT_END_SENDING://ожидаем завершени€ отправки
+			if(_usrI2CData[0].PhaseSend == SEND_WAS_GOOD_END)
+			{
+				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+				_usrI2CData[0].PhaseReceive = RECEIVE_START;
+				_usrI2CData[0].sizeRxCmd = P1S2_SIZE_ANSW;
+				_usrI2CData[0].PhaseSetAddr = P1S3__RCV_WAIT_RCV_DATA;
+			}
+			break;
+
+		case P1S3__RCV_WAIT_RCV_DATA://пробуем прин€ть какие нибудь данные
+			//начнем сначала
+			if(_usrI2CData[0].PhaseReceive == RECEIVE_TIMOUT)
+				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+
+			if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
+				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
+
+
+			//какието данные прин€ты » код = "раздача адресов фаза 1 сбор ID"
+			if(_usrI2CData[0].PhaseReceive == RECEIVE_YES_ANY_DATA &&
+					_usrI2CData[0].aRxBuffer[0] == I2CCODE_GET_ID_REQUEST)
+			{
+				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
+				_usrI2CData[0].PhaseSetAddr = ST1__ID_GRANTED;
+			}
+			break;
+
+		default:
+			break;
+	}
+
+
+}

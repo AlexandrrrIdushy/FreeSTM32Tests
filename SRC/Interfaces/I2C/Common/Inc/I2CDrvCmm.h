@@ -54,6 +54,13 @@
 #define	ST1__CMD_GET_ID_SENT		1	//запрос «дай ID» послан
 #define	ST1__ID_GRANTED		2	//пришел ответ на «дай ID»
 
+//присвоение адреса. вариант 1 простой подтыкаем один ГС пихаем в него адрес
+#define	P0S0__DEFVAL				0
+#define	P1S1__SEND_ADR_SLV_BEGIN	1	//
+#define	P1S2__SEND_WAIT_END_SENDING	2
+#define	P1S3__RCV_WAIT_RCV_DATA		3
+#define	P1S2__WAIT_CONFIRM			4	//
+
 
 
 
