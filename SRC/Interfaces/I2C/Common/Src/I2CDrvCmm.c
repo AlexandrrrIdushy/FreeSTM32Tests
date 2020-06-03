@@ -45,6 +45,9 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 			{
 //				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 				_usrI2CData[nI2C].PhaseReceive = RECEIVE_TIMOUT;
+#ifdef	DEBUG_TRY_TESET_I2C
+				HAL_I2C_Init(hi2c);
+#endif
 			}
 			break;
 
@@ -68,6 +71,7 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 		case SEND_START_CAN:
 			locCntWaitStart = GetSysCounter100MSec();
 			_usrI2CData[nI2C].PhaseSend = SEND_START_WAIT;
+//			hi2c->State = 20;//!костыль
 			break;
 
 		case SEND_START_WAIT:
@@ -83,7 +87,12 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 
 		case SEND_WAS_START:
 			if((GetSysCounter100MSec() - locCntWaitEndSend) > DELAY_SEND_END)
+			{
+#ifdef	DEBUG_TRY_TESET_I2C
+				HAL_I2C_Init(hi2c);
+#endif
 				_usrI2CData[nI2C].PhaseSend = SEND_TIMOUT;
+			}
 			break;
 
 		default:
@@ -99,6 +108,9 @@ void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI
 void  __attribute__((optimize("O0"))) HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	_usrI2CData[0].PhaseSend = SEND_WAS_GOOD_END;
+#ifdef	DEBUG_TRY_TESET_I2C
+	HAL_I2C_Init(hi2c);
+#endif
 }
 void  __attribute__((optimize("O0"))) HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
@@ -111,4 +123,7 @@ void  __attribute__((optimize("O0"))) HAL_I2C_SlaveTxCpltCallback(I2C_HandleType
 void  __attribute__((optimize("O0"))) HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 	_usrI2CData[0].PhaseReceive = RECEIVE_YES_ANY_DATA;
+#ifdef	DEBUG_TRY_TESET_I2C
+	HAL_I2C_Init(hi2c);
+#endif
 }
