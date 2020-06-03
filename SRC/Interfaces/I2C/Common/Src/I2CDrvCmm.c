@@ -24,7 +24,7 @@ uint8_t	_adr4Update2Me;
 
 //ÄÐÀÉÂÅÐ
 
-#define DELAY_RECEIVE_END	2000
+#define DELAY_RECEIVE_END	400
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
 	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
