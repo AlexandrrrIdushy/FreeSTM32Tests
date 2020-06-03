@@ -81,7 +81,7 @@
 #define	P1S1__SEND_ADR_SLV_BEGIN	1	//
 #define	P1S2__SEND_WAIT_END_SENDING	2
 #define	P1S3__RCV_WAIT_RCV_DATA		3
-#define	P1S2__WAIT_CONFIRM			4	//
+//#define	P1S2__WAIT_CONFIRM			4	//
 
 
 
@@ -97,9 +97,11 @@
 
 #ifdef	GIVE_OUT_ADR_V1
 //сбор ID ведомых этапы
-#define	P1S0_S__DEFVAL				0
-#define	P1S1_S__CH_ADR_CMD_DETECT			1	//получен запрос сменить адрес
-#define	P1S2_S__SEND_ANSW_WAIT			2	//ожидаем завершения отправки подтверждения
+#define	P1S0_S__DEFVAL						0
+#define	P1S1_S__START_RECEIVE_DATA			1	//запускаем прием данных
+#define	P1S1_S__WAIT_RECEIVE_DATA			2
+#define	P1S1_S__CH_ADR_CMD_DETECT			3	//получен запрос сменить адрес
+#define	P1S2_S__SEND_ANSW_WAIT				4	//ожидаем завершения отправки подтверждения
 #endif
 
 
@@ -122,12 +124,11 @@ extern uint8_t	_adrOfReceiver;
 extern uint8_t	_adr4Update2Me;
 
 
-extern void I2CInit(void);
+
 extern void I2CReceive(I2C_HandleTypeDef*, uint8_t);
 extern void I2CSend(I2C_HandleTypeDef*, uint8_t);
-extern void PrepData(void);
+//extern void PrepData(void);
 //extern void SetPhaseReceive(uint8_t, uint8_t);
 
 extern uint32_t GetSysCounter100MSec(void);
-extern void PrepDataGetAdrV1Simple();
 #endif//#define __DRVCMMI2C_H

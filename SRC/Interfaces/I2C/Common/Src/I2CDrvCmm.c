@@ -27,12 +27,13 @@ uint8_t	_adr4Update2Me;
 #define DELAY_RECEIVE_END	2000
 void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
 	static uint32_t startLocalCounter = 0;
 
 	switch (_usrI2CData[nI2C].PhaseReceive)
 	{
 		case RECEIVE_START:
+
 			HAL_I2C_Slave_Receive_IT(hi2c, (uint8_t *)(_usrI2CData[nI2C].aRxBuffer), _usrI2CData[nI2C].sizeRxCmd);
 			_usrI2CData[nI2C].PhaseReceive = RECEIVE_WAIT_DATA;
 			startLocalCounter = GetSysCounter100MSec();
@@ -41,7 +42,10 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 		case RECEIVE_WAIT_DATA:
 			//если вышло время выделенное на прием
 			if((GetSysCounter100MSec() - startLocalCounter) > DELAY_RECEIVE_END)
+			{
+//				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 				_usrI2CData[nI2C].PhaseReceive = RECEIVE_TIMOUT;
+			}
 			break;
 
 		default:
@@ -55,7 +59,7 @@ void __attribute__((optimize("O0"))) I2CReceive(I2C_HandleTypeDef* hi2c, uint8_t
 #define	DELAY_SEND_END 200
 void __attribute__((optimize("O0"))) I2CSend(I2C_HandleTypeDef* hi2c, uint8_t nI2C)
 {
-//	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
+	HAL_I2C_StateTypeDef resGetState = HAL_I2C_GetState(hi2c);
 	static uint32_t locCntWaitStart = 0;
 	static uint32_t locCntWaitEndSend = 0;
 
