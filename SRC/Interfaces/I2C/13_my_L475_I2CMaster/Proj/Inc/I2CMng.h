@@ -17,4 +17,6 @@ extern struct I2CDataFromGM i2cDataFromGM[];
 
 #define mem_anin_alarm                  i2cDataFromGM[adrGasMtr].flags[0].str.Bit10
 
+
+void SetPhases(uint8_t, uint8_t, uint8_t, uint8_t);
 #endif//#define __DRVCMMI2C_H

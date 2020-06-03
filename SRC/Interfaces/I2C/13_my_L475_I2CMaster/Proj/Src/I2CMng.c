@@ -14,9 +14,7 @@ void I2CInit()
 {
 	_curAdr4TryWrite2GM = 2;
 	_adrOfReceiver = 51;
-	_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
-	_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
-	_usrI2CData[0].PhaseSetAddr = 0;
+	SetPhases(0, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
 	_usrI2CData[0].sizeRxCmd = P1S1_SZ_REQUEST;
 	memset(_usrI2CData[0].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 
@@ -123,29 +121,25 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 	switch (_usrI2CData[0].PhaseSetAddr)
 	{
 		case P1S1__SEND_ADR_SLV_BEGIN://пробуем отправить адрес
+			//готовим посылку
 			_usrI2CData[0].aTxBuffer[P1S1__I_B_CODCMD] = P1_CODE_SEND_ADR;
 			_usrI2CData[0].aTxBuffer[P1S1__I_B_ADRMAST] = ADDR_BY_MASTER;
 			_usrI2CData[0].aTxBuffer[P1S1__I_B_ADR4WR] = _curAdr4TryWrite2GM;
-
-			_usrI2CData[0].PhaseSend = SEND_START_NOW;
 			_usrI2CData[0].sizeTxCmd = P1S1_SZ_REQUEST;
-			_usrI2CData[0].PhaseSetAddr = P1S2__SEND_WAIT_END_SENDING;
 			memset(_usrI2CData[0].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+			SetPhases(0, SEND_START_CAN, RECEIVE_NEUTRAL, P1S2__SEND_WAIT_END_SENDING);
 			break;
 
 		case P1S2__SEND_WAIT_END_SENDING://ожидаем завершени€ отправки
-//			if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
-//			{
-//				//отправка не удалась
-//				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
-//				_usrI2CData[0].PhaseSetAddr = P0S0__DEFVAL;
-//			}
+			if(_usrI2CData[0].PhaseSend == SEND_TIMOUT)
+			{
+				//отправка не удалась
+				SetPhases(0, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
+			}
 			if(_usrI2CData[0].PhaseSend == SEND_WAS_GOOD_END)
 			{
-				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
-				_usrI2CData[0].PhaseReceive = RECEIVE_START;
 				_usrI2CData[0].sizeRxCmd = P1S2_SIZE_ANSW;
-				_usrI2CData[0].PhaseSetAddr = P1S3__RCV_WAIT_RCV_DATA;
+				SetPhases(0, SEND_NEUTRAL, RECEIVE_START, P1S3__RCV_WAIT_RCV_DATA);
 			}
 			break;
 
@@ -153,9 +147,7 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 			//если прием не удалс€. все фазы откатываем к началу
 			if(_usrI2CData[0].PhaseReceive == RECEIVE_TIMOUT)
 			{
-				_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
-				_usrI2CData[0].PhaseSend = SEND_NEUTRAL;
-				_usrI2CData[0].PhaseSetAddr = P0S0__DEFVAL;
+				SetPhases(0, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
 			}
 
 			//какието данные прин€ты
@@ -166,12 +158,12 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 						_usrI2CData[0].aRxBuffer[P1S2__I_B_ADR4WR] == _curAdr4TryWrite2GM)
 
 				{
-					_usrI2CData[0].PhaseReceive = RECEIVE_NEUTRAL;
-					_usrI2CData[0].PhaseSetAddr = P1S2__WAIT_CONFIRM;
+					SetPhases(0, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
 					_curAdr4TryWrite2GM++;
 				}
 			}
 			break;
+
 
 		default:
 			break;
@@ -180,3 +172,11 @@ void __attribute__((optimize("O0"))) PrepDataGetAdrV1Simple()
 
 }
 #endif//#ifdef	GIVE_OUT_ADR_V1
+
+
+void SetPhases(uint8_t nI2C, uint8_t phaseSend, uint8_t phaseReceive, uint8_t phaseSetAddr)
+{
+	_usrI2CData[nI2C].PhaseSend = phaseSend;
+	_usrI2CData[nI2C].PhaseReceive = phaseReceive;
+	_usrI2CData[nI2C].PhaseSetAddr = phaseSetAddr;
+}
