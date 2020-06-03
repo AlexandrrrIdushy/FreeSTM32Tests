@@ -1,6 +1,6 @@
-#include "I2CDrvCmm.h"
-
-
+#include "I2CMng.h"
+#include "MyDefine.h"
+#include <string.h>
 
 void I2CInit()
 {
@@ -96,7 +96,7 @@ void   __attribute__((optimize("O0"))) PrepData()
 			case P1S0_S__DEFVAL:
 				//распознали входящий запрос "дай ID"
 				if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_YES_ANY_DATA &&
-						_usrI2CData[nI2C].aRxBuffer[P1S1__I_B_CODCMD] == I2CCODE_GET_ID_REQUEST)
+						_usrI2CData[nI2C].aRxBuffer[P1S1__I_B_CODCMD] == P1_CODE_SEND_ADR)
 					_usrI2CData[nI2C].PhaseSetAddr = P1S1_S__CH_ADR_CMD_DETECT;
 				break;
 
@@ -105,7 +105,7 @@ void   __attribute__((optimize("O0"))) PrepData()
 				_adrOfReceiver = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADRMAST];
 				_adr4Update2Me = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADR4WR];
 				//формируем команду
-				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_CODCMD] = I2CCODE_GET_ID_REQUEST;//код тот же
+				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_CODCMD] = P1_CODE_SEND_ADR;//код тот же
 				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_ADR4WR] =  _adr4Update2Me;
 				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_REZ] =  0xEE;
 
@@ -121,7 +121,12 @@ void   __attribute__((optimize("O0"))) PrepData()
 
 			case P1S2_S__SEND_ANSW_WAIT:
 				if(_usrI2CData[nI2C].PhaseSend == SEND_WAS_GOOD_END)
+				{
 					_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+#ifdef	DEBUG_ALLWAYS_GET_ADR
+					_usrI2CData[nI2C].PhaseSetAddr = P1S0_S__DEFVAL;//для отладки снова быть готовым получить адрес
+#endif
+				}
 				break;
 
 			default:
