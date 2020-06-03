@@ -1,7 +1,7 @@
 #ifndef __MYDEFINE_H
 #define __MYDEFINE_H
 
-#define GIVE_OUT_ADR_V1	//простая раздача адресов
+#define GIVE_OUT_ADR_V1	//простая раздача адресов*
 //#define	GIVE_OUT_ADR_V2
 #define ITS_SLAVE
 
