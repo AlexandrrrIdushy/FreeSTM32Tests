@@ -86,9 +86,7 @@ void   __attribute__((optimize("O0"))) PrepData()
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)
 	{
-		//постоянно перезапускать прием
-		if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
-			SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
+
 
 
 		switch (_usrI2CData[nI2C].PhaseSetAddr)
@@ -112,6 +110,10 @@ void   __attribute__((optimize("O0"))) PrepData()
 					else
 						_usrI2CData[nI2C].PhaseSetAddr = P0S0__DEFVAL;//если данные не разобрать - начинаем все с начала
 				}
+
+				//постоянно перезапускать прием
+				else if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
+					SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
 				break;
 
 
