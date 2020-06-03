@@ -9,8 +9,8 @@ void I2CInit()
 	{
 		_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
 		_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+		_usrI2CData[nI2C].PhaseSetAddr = RECEIVE_NEUTRAL;
 		_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
-		_usrI2CData[nI2C].PhaseSetAddr = 0;
 		memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
 	}
 
@@ -89,7 +89,12 @@ void   __attribute__((optimize("O0"))) PrepData()
 	{
 		//постоянно перезапускать прием
 		if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
+		{
+			_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
 			_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+			_usrI2CData[nI2C].PhaseSetAddr = RECEIVE_NEUTRAL;
+			_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
+		}
 
 		switch (_usrI2CData[nI2C].PhaseSetAddr)
 		{
@@ -122,7 +127,10 @@ void   __attribute__((optimize("O0"))) PrepData()
 			case P1S2_S__SEND_ANSW_WAIT:
 				if(_usrI2CData[nI2C].PhaseSend == SEND_WAS_GOOD_END)
 				{
+					_usrI2CData[nI2C].PhaseSend = SEND_NEUTRAL;
 					_usrI2CData[nI2C].PhaseReceive = RECEIVE_START;
+					_usrI2CData[nI2C].PhaseSetAddr = RECEIVE_NEUTRAL;
+					_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
 #ifdef	DEBUG_ALLWAYS_GET_ADR
 					_usrI2CData[nI2C].PhaseSetAddr = P1S0_S__DEFVAL;//для отладки снова быть готовым получить адрес
 #endif
