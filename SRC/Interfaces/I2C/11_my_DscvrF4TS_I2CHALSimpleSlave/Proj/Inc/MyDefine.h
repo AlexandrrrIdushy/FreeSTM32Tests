@@ -6,6 +6,7 @@
 #define ITS_SLAVE
 
 #define DEBUG_ALLWAYS_GET_ADR
+#define DEBUG_TRY_TESET_I2C
 
 
 #ifdef	GIVE_OUT_ADR_V1
