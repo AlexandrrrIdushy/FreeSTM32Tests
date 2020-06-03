@@ -107,7 +107,7 @@ int main(void)
 
 	  I2CReceive(&hi2c1, 0);
 	  I2CSend(&hi2c1, 0);
-	  PrepData();
+	  PrepData(0);
 	  HAL_SYSTICK_Callback();//временно
 
 

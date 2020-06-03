@@ -1,6 +1,6 @@
 #include "I2CMng.h"
 #include "MyDefine.h"
-#include <string.h>
+
 
 void I2CInit()
 {
@@ -24,7 +24,7 @@ void I2CInit()
 
 
 #ifdef	GIVE_OUT_ADR_V2
-void   __attribute__((optimize("O0"))) PrepData()
+void   __attribute__((optimize("O0"))) PrepData(int8_t)
 {
 	for (int nI2C = 0; nI2C < 3; nI2C++)
 	{
@@ -82,73 +82,67 @@ void   __attribute__((optimize("O0"))) PrepData()
 
 
 #ifdef	GIVE_OUT_ADR_V1
-void   __attribute__((optimize("O0"))) PrepData()
+void PrepData(int8_t nI2C)
 {
-	for (int nI2C = 0; nI2C < 3; nI2C++)
+	switch (_usrI2CData[nI2C].PhaseSetAddr)
 	{
+		case P1S0_S__DEFVAL:
+			_usrI2CData[nI2C].PhaseSetAddr = P1S1_S__START_RECEIVE_DATA;
+			break;
+
+		case P1S1_S__START_RECEIVE_DATA:
+			memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+			_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
+			SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_START, P1S1_S__WAIT_RECEIVE_DATA);
+			break;
+
+		case P1S1_S__WAIT_RECEIVE_DATA:
+			//при наличии данных пытаемся распознать входящий запрос "дай ID"
+			if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_YES_ANY_DATA)
+			{
+				if(_usrI2CData[nI2C].aRxBuffer[P1S1__I_B_CODCMD] == P1_CODE_SEND_ADR)
+					_usrI2CData[nI2C].PhaseSetAddr = P1S1_S__CH_ADR_CMD_DETECT;
+				else
+					_usrI2CData[nI2C].PhaseSetAddr = P0S0__DEFVAL;//если данные не разобрать - начинаем все с начала
+			}
+
+			//постоянно перезапускать прием
+			else if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
+				SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
+			break;
 
 
+		case P1S1_S__CH_ADR_CMD_DETECT:
+			//извлекаем из входящего пакета адрес устройства-ведущего которому сейчас пойдет команда и адрес для обновления
+			_adrOfReceiver = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADRMAST];
+			_adr4Update2Me = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADR4WR];
+			//формируем ответную команду подтверждения обновления адреса
+			_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_CODCMD] = P1_CODE_SEND_ADR;//код тот же
+			_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_ADR4WR] =  _adr4Update2Me;
+			_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_REZ] =  0xEE;
 
-		switch (_usrI2CData[nI2C].PhaseSetAddr)
-		{
-			case P1S0_S__DEFVAL:
-				_usrI2CData[nI2C].PhaseSetAddr = P1S1_S__START_RECEIVE_DATA;
-				break;
+			//назначить мне новый адрес
+			//to do
 
-			case P1S1_S__START_RECEIVE_DATA:
-				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+			//чистим приемный буфер
+			memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
+			_usrI2CData[nI2C].sizeTxCmd = P1S2_SIZE_ANSW;
+			SetPhases(nI2C, SEND_START_CAN, RECEIVE_NEUTRAL, P1S2_S__SEND_ANSW_WAIT);
+			break;
+
+		case P1S2_S__SEND_ANSW_WAIT:
+			if(_usrI2CData[nI2C].PhaseSend == SEND_WAS_GOOD_END)
+			{
+				SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_START, P1S0_S__DEFVAL);
 				_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
-				SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_START, P1S1_S__WAIT_RECEIVE_DATA);
-				break;
-
-			case P1S1_S__WAIT_RECEIVE_DATA:
-				//при наличии данных пытаемся распознать входящий запрос "дай ID"
-				if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_YES_ANY_DATA)
-				{
-					if(_usrI2CData[nI2C].aRxBuffer[P1S1__I_B_CODCMD] == P1_CODE_SEND_ADR)
-						_usrI2CData[nI2C].PhaseSetAddr = P1S1_S__CH_ADR_CMD_DETECT;
-					else
-						_usrI2CData[nI2C].PhaseSetAddr = P0S0__DEFVAL;//если данные не разобрать - начинаем все с начала
-				}
-
-				//постоянно перезапускать прием
-				else if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
-					SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
-				break;
-
-
-			case P1S1_S__CH_ADR_CMD_DETECT:
-				//извлекаем из входящего пакета адрес устройства-ведущего которому сейчас пойдет команда и адрес для обновления
-				_adrOfReceiver = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADRMAST];
-				_adr4Update2Me = _usrI2CData[nI2C].aRxBuffer[P1S1__I_B_ADR4WR];
-				//формируем ответную команду подтверждения обновления адреса
-				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_CODCMD] = P1_CODE_SEND_ADR;//код тот же
-				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_ADR4WR] =  _adr4Update2Me;
-				_usrI2CData[nI2C].aTxBuffer[P1S2__I_B_REZ] =  0xEE;
-
-				//назначить мне новый адрес
-				//to do
-
-				//чистим приемный буфер
-				memset(_usrI2CData[nI2C].aRxBuffer, 0, SZ_ARR_RX_BUFF);
-				_usrI2CData[nI2C].sizeTxCmd = P1S2_SIZE_ANSW;
-				SetPhases(nI2C, SEND_START_CAN, RECEIVE_NEUTRAL, P1S2_S__SEND_ANSW_WAIT);
-				break;
-
-			case P1S2_S__SEND_ANSW_WAIT:
-				if(_usrI2CData[nI2C].PhaseSend == SEND_WAS_GOOD_END)
-				{
-					SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_START, P1S0_S__DEFVAL);
-					_usrI2CData[nI2C].sizeRxCmd = P1S1_SZ_REQUEST;
 #ifdef	DEBUG_ALLWAYS_GET_ADR
-					_usrI2CData[nI2C].PhaseSetAddr = P1S0_S__DEFVAL;//для отладки снова быть готовым получить адрес
+				_usrI2CData[nI2C].PhaseSetAddr = P1S0_S__DEFVAL;//для отладки снова быть готовым получить адрес
 #endif
-				}
-				break;
+			}
+			break;
 
-			default:
-				break;
-		}
+		default:
+			break;
 	}
 #endif//#ifdef	GIVE_OUT_ADR_V1
 
