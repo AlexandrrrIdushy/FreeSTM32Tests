@@ -82,7 +82,7 @@ void   __attribute__((optimize("O0"))) PrepData(int8_t)
 
 
 #ifdef	GIVE_OUT_ADR_V1
-void PrepData(int8_t nI2C)
+void __attribute__((optimize("O0"))) PrepData(int8_t nI2C)
 {
 	switch (_usrI2CData[nI2C].PhaseSetAddr)
 	{
@@ -109,6 +109,13 @@ void PrepData(int8_t nI2C)
 			//постоянно перезапускать прием
 			else if(_usrI2CData[nI2C].PhaseReceive == RECEIVE_TIMOUT)
 				SetPhases(nI2C, SEND_NEUTRAL, RECEIVE_NEUTRAL, P0S0__DEFVAL);
+
+//				//выключаем включаем шину
+//				I2C1 ->CR1 &= (~I2C_CR1_PE);
+////				HAL_Delay(100);
+//				I2C1 ->CR1 |= I2C_CR1_PE;
+
+//				I2C1 ->CR1 |= I2C_CR1_SWRST;//сброс логики после каждого рестарта
 			break;
 
 
