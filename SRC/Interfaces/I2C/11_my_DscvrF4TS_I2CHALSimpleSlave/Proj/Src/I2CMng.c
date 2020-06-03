@@ -154,7 +154,7 @@ void   __attribute__((optimize("O0"))) PrepData()
 
 void SetPhases(uint8_t nI2C, uint8_t phaseSend, uint8_t phaseReceive, uint8_t phaseSetAddr)
 {
-	_usrI2CData[nI2C].PhaseReceive = RECEIVE_NEUTRAL;
-	_usrI2CData[nI2C].PhaseSend = SEND_START_CAN;
-	_usrI2CData[nI2C].PhaseSetAddr = P1S2_S__SEND_ANSW_WAIT;
+	_usrI2CData[nI2C].PhaseSend = phaseSend;
+	_usrI2CData[nI2C].PhaseReceive = phaseReceive;
+	_usrI2CData[nI2C].PhaseSetAddr = phaseSetAddr;
 }
