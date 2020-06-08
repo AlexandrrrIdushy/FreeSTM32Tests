@@ -121,7 +121,7 @@ void PendSV_Handler(void)
 /**
   * @brief This function handles System tick timer.
   */
-void SysTick_Handler(void)
+void __attribute__((optimize("O0"))) SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
