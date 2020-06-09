@@ -81,11 +81,11 @@ void __attribute__((optimize("O0"))) i2c_init2()
 
 
 //    i2c_init.I2C_ClockSpeed = 100000;
-    i2c_init.I2C_ClockSpeed = 2000;
+    i2c_init.I2C_ClockSpeed = 1000;
     i2c_init.I2C_Mode = I2C_Mode_I2C;
     i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
 //    i2c_init.I2C_OwnAddress1 = 0x30;
-    i2c_init.I2C_OwnAddress1 = 102;
+    i2c_init.I2C_OwnAddress1 = (3 << 1);
     i2c_init.I2C_Ack = I2C_Ack_Enable;
     i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
     I2C_Init(I2C2, &i2c_init);
@@ -119,7 +119,8 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
     uint32_t valSR2 = I2C2->SR2;
     asm("nop");
 
-	//адрес совпал
+	//адрес совпал.
+    //срабатывает при команде записи
 	if((I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED)
 	{
 		//для сброса флага ADDR
@@ -150,7 +151,7 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 	if(valSR1 == I2C_IT_TIMEOUT)
 		asm("nop");
 
-	//
+	//адрес общего вызова совпал
 	if((I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED)
 	{
 		//для сброса флага ADDR
