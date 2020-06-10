@@ -109,10 +109,14 @@ void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
         I2C2 ->SR1 &= 0x00FF;
     }
 }
-uint8_t _bufTx[20] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
-uint8_t _iBufTx = 0;
+#define	SZ_BUF_TX 20
+
 void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
+	static uint8_t _bufTx[SZ_BUF_TX];
+	static uint8_t _iBufTx = 0;
+	static uint8_t byteTx = 0;
+
     uint8_t dataRX;
     uint32_t Event = I2C_GetLastEvent(I2C2 );
     uint32_t valSR1 = I2C2->SR1;
@@ -126,8 +130,8 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 		//для сброса флага ADDR
 		I2C2 ->SR1;
 		I2C2 ->SR2;
-
-		I2C_SendData(I2C2, _bufTx[0]);
+		byteTx = 0;
+		I2C_SendData(I2C2, byteTx);
 	}
 
 	//байт принят
@@ -146,6 +150,7 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 	//обнаружено СТОП условие
 	if((I2C_EVENT_SLAVE_STOP_DETECTED & Event) == I2C_EVENT_SLAVE_STOP_DETECTED)
 	{
+
 		I2C2 ->SR1;
 		I2C2 ->CR1 |= I2C_CR1_PE;//включение шины
 	}
@@ -159,14 +164,14 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 
 	}
 
-
+	//пропихнулся очередной байт
 	if((I2C_EVENT_SLAVE_BYTE_TRANSMITTED & Event) == I2C_EVENT_SLAVE_BYTE_TRANSMITTED)
 	{
-		if(_iBufTx > 10)
-			_iBufTx = 0;
+		if(byteTx > SZ_BUF_TX)
+			byteTx = 0;
 		else
-			_iBufTx++;
-		I2C_SendData(I2C2, _bufTx[_iBufTx]);
+			byteTx++;
+		I2C_SendData(I2C2, byteTx);
 	}
 
 
