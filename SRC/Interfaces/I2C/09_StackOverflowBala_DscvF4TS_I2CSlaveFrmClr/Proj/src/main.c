@@ -113,9 +113,8 @@ void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
 
 void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
-	static uint8_t _bufTx[SZ_BUF_TX];
-	static uint8_t _iBufTx = 0;
 	static uint8_t byteTx = 0;
+	static uint8_t iByte = 0;
 
     uint8_t dataRX;
     uint32_t Event = I2C_GetLastEvent(I2C2 );
@@ -130,8 +129,8 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 		//для сброса флага ADDR
 		I2C2 ->SR1;
 		I2C2 ->SR2;
-		byteTx = 0;
-		I2C_SendData(I2C2, byteTx);
+		iByte = 0;
+		I2C_SendData(I2C2, iByte);
 	}
 
 	//байт принят
@@ -167,10 +166,16 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 	//пропихнулся очередной байт
 	if((I2C_EVENT_SLAVE_BYTE_TRANSMITTED & Event) == I2C_EVENT_SLAVE_BYTE_TRANSMITTED)
 	{
-		if(byteTx > SZ_BUF_TX)
-			byteTx = 0;
+		if(iByte > SZ_BUF_TX)
+			iByte = 0;
 		else
-			byteTx++;
+			iByte++;
+
+		if(iByte%2)
+			byteTx = (iByte / 2);
+		else
+			byteTx = 0;
+
 		I2C_SendData(I2C2, byteTx);
 	}
 
