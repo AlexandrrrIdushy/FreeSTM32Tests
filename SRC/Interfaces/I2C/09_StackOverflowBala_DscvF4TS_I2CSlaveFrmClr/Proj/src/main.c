@@ -80,7 +80,6 @@ void __attribute__((optimize("O0"))) i2c_init2()
     I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
 
 
-//    i2c_init.I2C_ClockSpeed = 100000;
     i2c_init.I2C_ClockSpeed = 1000;
     i2c_init.I2C_Mode = I2C_Mode_I2C;
     i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
@@ -110,7 +109,8 @@ void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
         I2C2 ->SR1 &= 0x00FF;
     }
 }
-
+uint8_t _bufTx[20] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+uint8_t _iBufTx = 0;
 void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
     uint8_t dataRX;
@@ -126,6 +126,8 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 		//для сброса флага ADDR
 		I2C2 ->SR1;
 		I2C2 ->SR2;
+
+		I2C_SendData(I2C2, _bufTx[0]);
 	}
 
 	//байт принят
@@ -148,17 +150,34 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 		I2C2 ->CR1 |= I2C_CR1_PE;//включение шины
 	}
 
-	if(valSR1 == I2C_IT_TIMEOUT)
-		asm("nop");
-
 	//адрес общего вызова совпал
 	if((I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_GENERALCALLADDRESS_MATCHED)
 	{
 		//для сброса флага ADDR
 	//			I2C2 ->SR1;
 	//			I2C2 ->SR2;
-		dataRX = I2C_ReceiveData(I2C2 );
+
 	}
+
+
+	if((I2C_EVENT_SLAVE_BYTE_TRANSMITTED & Event) == I2C_EVENT_SLAVE_BYTE_TRANSMITTED)
+	{
+		if(_iBufTx > 10)
+			_iBufTx = 0;
+		else
+			_iBufTx++;
+		I2C_SendData(I2C2, _bufTx[_iBufTx]);
+	}
+
+
+
+	//SR1
+//	if(valSR1 == I2C_IT_TIMEOUT)
+//		asm("nop");
+//	if((valSR1 & I2C_IT_TXE) == I2C_IT_TXE)
+//	{
+//		asm("nop");
+//	}
 
 }
 
