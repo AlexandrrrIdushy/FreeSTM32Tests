@@ -80,7 +80,7 @@ void __attribute__((optimize("O0"))) i2c_init2()
     I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
 
 
-    i2c_init.I2C_ClockSpeed = 1000;
+    i2c_init.I2C_ClockSpeed = 250;
     i2c_init.I2C_Mode = I2C_Mode_I2C;
     i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
 //    i2c_init.I2C_OwnAddress1 = 0x30;
@@ -123,7 +123,7 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
     asm("nop");
 
 	//адрес совпал.
-    //срабатывает при команде записи
+    //срабатывает при команде записи и чтения
 	if((I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED & Event) == I2C_EVENT_SLAVE_RECEIVER_ADDRESS_MATCHED)
 	{
 		//для сброса флага ADDR
@@ -223,6 +223,10 @@ int main(void)
   /* Infinite loop */
   while (1)
   {
-	i++;
+//	i++;
+//	i2c_init.I2C_OwnAddress1 = (i << 1);
+	for (int var = 0; var < 10000; ++var) {
+
+	}
   }
 }
