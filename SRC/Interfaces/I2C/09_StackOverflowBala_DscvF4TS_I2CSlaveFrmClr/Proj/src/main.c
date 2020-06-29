@@ -31,11 +31,11 @@ SOFTWARE.
 #include "stm32f4xx.h"
 
 
-
+I2C_InitTypeDef _i2c_init;
 void __attribute__((optimize("O0"))) i2c_init2()
 {
     GPIO_InitTypeDef gpio_init;
-    I2C_InitTypeDef i2c_init;
+
     NVIC_InitTypeDef NVIC_InitStructure, NVIC_InitStructure2;
 
     I2C_DeInit(I2C2 );       //Deinit and reset the I2C to avoid it locking up
@@ -80,14 +80,14 @@ void __attribute__((optimize("O0"))) i2c_init2()
     I2C_ITConfig(I2C2, I2C_IT_BUF, ENABLE);
 
 
-    i2c_init.I2C_ClockSpeed = 250;
-    i2c_init.I2C_Mode = I2C_Mode_I2C;
-    i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
+    _i2c_init.I2C_ClockSpeed = 250;
+    _i2c_init.I2C_Mode = I2C_Mode_I2C;
+    _i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
 //    i2c_init.I2C_OwnAddress1 = 0x30;
-    i2c_init.I2C_OwnAddress1 = (3 << 1);
-    i2c_init.I2C_Ack = I2C_Ack_Enable;
-    i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-    I2C_Init(I2C2, &i2c_init);
+    _i2c_init.I2C_OwnAddress1 = (3 << 1);
+    _i2c_init.I2C_Ack = I2C_Ack_Enable;
+    _i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+    I2C_Init(I2C2, &_i2c_init);
 
     I2C_StretchClockCmd(I2C2, ENABLE);
     I2C_Cmd(I2C2, ENABLE);
@@ -110,7 +110,8 @@ void __attribute__((optimize("O0"))) I2C2_ER_IRQHandler(void)
     }
 }
 #define	SZ_BUF_TX 20
-
+uint8_t _iRX;
+uint8_t _adr;
 void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 {
 	static uint8_t byteTx = 0;
@@ -120,6 +121,8 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
     uint32_t Event = I2C_GetLastEvent(I2C2 );
     uint32_t valSR1 = I2C2->SR1;
     uint32_t valSR2 = I2C2->SR2;
+
+
     asm("nop");
 
 	//адрес совпал.
@@ -138,6 +141,31 @@ void __attribute__((optimize("O0"))) I2C2_EV_IRQHandler(void)
 	{
 		//читаем пришедший байт
 		dataRX = I2C_ReceiveData(I2C2 );
+
+		if(_iRX == 1)
+		{
+			_adr = dataRX;
+
+			_i2c_init.I2C_OwnAddress1 = (_adr << 1);
+
+
+//			I2C_InitTypeDef i2c_init;
+//		    i2c_init.I2C_ClockSpeed = 250;
+//		    i2c_init.I2C_Mode = I2C_Mode_I2C;
+//		    i2c_init.I2C_DutyCycle = I2C_DutyCycle_2;
+//		//    i2c_init.I2C_OwnAddress1 = 0x30;
+//		    i2c_init.I2C_OwnAddress1 = (3 << 1);
+//		    i2c_init.I2C_Ack = I2C_Ack_Enable;
+//		    i2c_init.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+//			I2C_DeInit(I2C2);
+		    I2C_Init(I2C2, &_i2c_init);
+		    _iRX = 0;
+		}
+
+		if(dataRX == 0xFA)
+			_iRX = 1;
+		else
+			_iRX = 0;
 	}
 
 	//ошибка подверждения
