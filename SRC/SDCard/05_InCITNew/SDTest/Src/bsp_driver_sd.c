@@ -5,7 +5,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -15,7 +15,7 @@
   *
   ******************************************************************************
   */
-#include "user.h"
+
 #ifdef OLD_API
 /* kept to avoid issue when migrating old projects. */
 /* USER CODE BEGIN 0 */
@@ -45,7 +45,6 @@ uint8_t BSP_SD_Init(void)
   /* Check if the SD card is plugged in the slot */
   if (BSP_SD_IsDetected() != SD_PRESENT)
   {
-	errs[2] = 1;
     return MSD_ERROR_SD_NOT_PRESENT;
   }
   /* HAL SD initialization */
@@ -56,12 +55,10 @@ uint8_t BSP_SD_Init(void)
     /* Enable wide operation */
     if (HAL_SD_ConfigWideBusOperation(&hsd1, SDMMC_BUS_WIDE_4B) != HAL_OK)
     {
-    	errs[3] = 1;
       sd_state = MSD_ERROR;
     }
   }
-  if (sd_state != MSD_OK)
-	  errs[4] = 1;
+
   return sd_state;
 }
 /* USER CODE BEGIN AfterInitSection */

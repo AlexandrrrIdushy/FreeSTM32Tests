@@ -34,7 +34,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
-#include "user.h"
 
 /** @addtogroup STM32L4xx_HAL_Driver
   * @{
@@ -178,7 +177,6 @@ HAL_StatusTypeDef HAL_Init(void)
   if (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK)
   {
     status = HAL_ERROR;
-    errs[0] = 1;
   }
   else
   {
