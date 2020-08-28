@@ -128,7 +128,7 @@ int main(void)
 	  }
   while (1)
   {
-
+	  asm("nop");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
