@@ -116,15 +116,15 @@ int main(void)
 		  uint8_t arr[] = {0, 1, 2};
 		  uint8_t arrrd[20];
 		  uint8_t* bw;
-		  res = f_open(&MyFile, "abc.txt", FA_READ|FA_WRITE);
+		  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
 		  res = f_read(&MyFile, arrrd, 10, bw);
 		  res = f_write(&MyFile, arr, 3, bw);
-          if(f_open(&MyFile, ".\abc.txt", FA_READ) != FR_OK)
-                    Error_Handler();
-            else
-            {
-                          f_close(&MyFile);
-            }
+//          if(f_open(&MyFile, ".\adr.txt", FA_READ) != FR_OK)
+//                    Error_Handler();
+//            else
+//            {
+//                          f_close(&MyFile);
+//            }
 	  }
   while (1)
   {
