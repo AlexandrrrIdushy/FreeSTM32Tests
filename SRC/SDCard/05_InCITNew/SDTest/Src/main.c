@@ -68,13 +68,15 @@ static void MX_SDMMC1_SD_Init(void);
 /* USER CODE BEGIN 0 */
 volatile uint8_t InfoImg[1024];
 int errs[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int  __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -109,32 +111,22 @@ int main(void)
 
   if(f_mount(&fileSystem, SDPath, 1) == FR_OK)
   {
-	  uint8_t FileName[64] = "test.xml";
+	  //прежний код
+//	  uint8_t FileName[64] = "adr.txt";
+//	  volatile uint8_t res;
+//	  res = f_open(&texFile, (char *)FileName, FA_READ);
+//	  res = f_read(&texFile, InfoImg, 8, &readByte );
+//	res = f_close(&texFile);
+
+
 	  volatile uint8_t res;
-	  res = f_open(&texFile, (char *)FileName, FA_READ);
-	/*Read 1 byte - color type, 2 byte - width, 2 byte - height*/
-
-	res = f_read(&texFile, InfoImg, 8, &readByte );
-	/*res = f_read(&texFile, (uint32_t)&imgW, 2, &readByte );
-	res = f_read(&texFile, (uint32_t)&imgH, 2, &readByte );*/
-
-
-//	/********
-//	 * СОЗДАТЬ СЛОЙ
-//	 * ******/
-//	uint32_t Layer1 = CreateLayer("one", 1);
-//	/***************
-//	 * Создать контрол
-//	 */
-//	Texture texs[3];
-//	  texs[0] = (Texture){ "0:output.tte", StateNormal };
-//
-//	  img = CreateElement(Layer1, 0, 0, 10, 10, GL_QUAD,
-//	  		  0x00000000, 0, 255, 0, "back2",
-//	  		  StateNormal, (Texture *)&texs, 0);
-
-
-	res = f_close(&texFile);
+	  uint8_t arr[] = {0, 1, 2};
+	  uint8_t arrrd[20];
+	  uint8_t* bw;
+	  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
+	  res = f_read(&MyFile, arrrd, 10, bw);
+	  res = f_write(&MyFile, arr, 3, bw);
+	  asm("nop");
   }
 
   /* USER CODE END 2 */
