@@ -119,13 +119,13 @@ int  __attribute__((optimize("O0"))) main(void)
 //	res = f_close(&texFile);
 
 
-//	  volatile uint8_t res;
-//	  uint8_t arr[] = {0, 1, 2};
-//	  uint8_t arrrd[20];
-//	  uint8_t* bw;
-//	  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
-//	  res = f_read(&MyFile, arrrd, 10, bw);
-//	  res = f_write(&MyFile, arr, 3, bw);
+	  volatile uint8_t res;
+	  uint8_t arr[] = {0, 1, 2};
+	  uint8_t arrrd[20];
+	  uint8_t* bw;
+	  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
+	  res = f_read(&MyFile, arrrd, 10, bw);
+	  res = f_write(&MyFile, arr, 3, bw);
 	  asm("nop");
   }
 
