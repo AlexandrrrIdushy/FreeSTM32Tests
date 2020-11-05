@@ -99,6 +99,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  asm("nop");
 	  printf ( "123\n" );
     /* USER CODE END WHILE */
 
