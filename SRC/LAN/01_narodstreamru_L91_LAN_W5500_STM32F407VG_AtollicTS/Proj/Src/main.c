@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "net.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,7 +84,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  net_ini();
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -108,6 +108,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  net_poll();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
