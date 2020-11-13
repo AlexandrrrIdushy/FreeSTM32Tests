@@ -33,7 +33,8 @@ void w5500_writeReg(uint8_t op, uint16_t addres, uint8_t data)
 
 //  Затем мы опускаем ножку выбора, передаём эти 4 байта, используя соответствующую функцию библиотеки HAL, а затем поднимаем ножку выбора устройства.
   SS_SELECT();
-  HAL_SPI_Transmit(&hspi1, buf, 4, 0xFFFFFFFF);
+//  HAL_SPI_Transmit(&hspi1, buf, 4, 0xFFFFFFFF);
+  HAL_SPI_Transmit(&hspi1, buf, 4, 3000);
   SS_DESELECT();
 }
 
