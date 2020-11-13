@@ -43,7 +43,7 @@ void w5500_writeReg(uint8_t op, uint16_t addres, uint8_t data)
 void w5500_ini(void)
 
 {
-  uint8_t dtt=0;
+  //uint8_t dtt=0;
   uint8_t opcode=0;
 
   //Hard Reset
@@ -86,12 +86,9 @@ void w5500_ini(void)
 
 //-----------------------------------------------
 
-static void Error (void)
-
-{
-
-HAL_UART_Transmit(&huart2,(uint8_t*)"Error!rn",8,0x1000);
-
-}
+//static void Error (void)
+//{
+//	HAL_UART_Transmit(&huart2,(uint8_t*)"Error!rn",8,0x1000);
+//}
 
 //-----------------------------------------------

@@ -30,4 +30,7 @@
 
 //--------------------------------------------------
 
+
+extern void net_ini(void);
+extern void net_poll(void);
 #endif /* __NET_H */
