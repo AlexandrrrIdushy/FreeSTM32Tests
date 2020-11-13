@@ -58,6 +58,10 @@
 #define SIPR2 0x0011
 #define SIPR3 0x0012// LSB
 //--------------------------------------------------
+//Теперь настроим порт для сокета 0.
+#define Sn_PORT0 0x0004 // Socket 0 Source Port Register MSB
+#define Sn_PORT1 0x0005 // Socket 0 Source Port Register LSB
+//--------------------------------------------------
 
 #define be16toword(a) ((((a)>>8)&0xff)|(((a)<<8)&0xff00))
 

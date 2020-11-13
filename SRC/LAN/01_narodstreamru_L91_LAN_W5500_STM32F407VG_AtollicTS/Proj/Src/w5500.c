@@ -76,6 +76,11 @@ void w5500_ini(void)
   w5500_writeReg(opcode, SIPR1,ipaddr[1]);
   w5500_writeReg(opcode, SIPR2,ipaddr[2]);
   w5500_writeReg(opcode, SIPR3,ipaddr[3]);
+
+  //Настраиваем сокет 0
+  opcode = (BSB_S0<<3)|OM_FDM1;
+  w5500_writeReg(opcode, Sn_PORT0,local_port>>8);
+  w5500_writeReg(opcode, Sn_PORT1,local_port);
 }
 
 
