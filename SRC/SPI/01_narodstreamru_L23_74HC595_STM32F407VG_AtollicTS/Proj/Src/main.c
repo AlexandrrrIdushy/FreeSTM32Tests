@@ -113,7 +113,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		for(i=0;i<=255;i++)
+		for(i=0;i<=255;i+=10)
 		{
 			aTxBuffer[0]=i;
 			HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
