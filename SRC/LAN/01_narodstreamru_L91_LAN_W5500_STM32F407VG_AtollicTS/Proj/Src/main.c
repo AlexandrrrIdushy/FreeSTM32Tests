@@ -29,7 +29,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+//#define	DEBUG_TEST_SPI_AS_23_LESSONS
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,7 +49,13 @@ SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+#ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
+	//некоторые дефайны для управления ножкой Chip Select
+#define cs_set() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET)
+#define cs_reset() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET)
+#define cs_strob() cs_reset();cs_set()
+uint8_t aTxBuffer[1]={0};
+#endif
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -84,7 +90,9 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+#ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
   net_ini();
+#endif
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -101,14 +109,36 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-
+#ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
+  uint8_t i=0;
+	cs_set();
+	aTxBuffer[0]=0x01;
+	HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+	cs_strob();
+	HAL_Delay(100);
+	aTxBuffer[0]=0xFF;
+	HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+	cs_strob();
+	HAL_Delay(100);
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  net_poll();
+#ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
+
+		for(i=0;i<=255;i+=10)
+		{
+			aTxBuffer[0]=i;
+			HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+			cs_strob();
+			//HAL_Delay(1);
+		}
+#else
+		net_poll();
+#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
