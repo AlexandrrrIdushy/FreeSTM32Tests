@@ -90,9 +90,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-#ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
-  net_ini();
-#endif
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -109,6 +107,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+#ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
+  net_ini();
+#endif
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
 	cs_set();
