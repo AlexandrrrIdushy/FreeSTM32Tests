@@ -75,13 +75,15 @@ const char MSG[] = "Hello World";
 // включить модуль W5500 сигналом SCNn=0
 void cs_sel()
 {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS LOW
+    //HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS LOW
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
 }
 
 // выключить модуль W5500 сигналом SCNn=1
 void cs_desel()
 {
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); //CS HIGH
+//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); //CS HIGH
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
 }
 
 // принять байт через SPI
@@ -172,10 +174,7 @@ void tcp_server()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	close(1);
-	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
-	reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
-	tcp_server();
+
   /* USER CODE END 1 */
   
 
@@ -202,7 +201,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-
+	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
+	reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
+	tcp_server();
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
 	cs_set();
