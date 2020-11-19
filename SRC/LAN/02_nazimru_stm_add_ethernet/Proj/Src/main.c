@@ -172,6 +172,7 @@ void tcp_server()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	close(1);
 	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
 	//reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
   /* USER CODE END 1 */

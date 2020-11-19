@@ -60,6 +60,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 //extern void reg_wizchip_cs_cbfunc(void(*cs_sel)(void), void(*cs_desel)(void));
+extern void reg_wizchip_cs_cbfunc(void(*)(void), void(*)(void));
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
