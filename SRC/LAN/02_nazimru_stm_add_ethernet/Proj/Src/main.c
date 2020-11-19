@@ -65,12 +65,76 @@ static void MX_SDIO_SD_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+#include "socket.h"
+char msg[60];
+// это будем посылать tcp клиенту, когда он к нам приконнектится
+const char MSG[] = "Hello World";
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// простой tcp сервер. Данные не принимаем, только посылаем строчку Hello World.
+// вы можете самостоятельно дополнить функцию для получения данных от клиента
+void tcp_server()
+{
+  uint8_t retVal, sockStatus;
 
+  // а вот это как раз моя функция вывода сообщений через модуль UART-USB
+  // если вместо -1 поставить число, она и его отобразит.
+  // в недрах этой функции работающая строка будет
+  // HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
+  trace(-1,"Try open socket\r\n");
+
+  // открываем сокет 0 как TCP_SOCKET, порт 5000 */
+  if((retVal = socket(0, Sn_MR_TCP, 5000, 0)) != 0)
+  {
+    trace(-1, "Error open socket\r\n");
+    return;
+  }
+  trace(-1,"Socket opened, try listen\r\n");
+
+  // устанавливаем сокет в режим LISTEN. Так будет создан tcp сервер
+  if((retVal = listen(0)) != SOCK_OK)
+  {
+    trace(-1, "Error listen socket\r\n");
+    return;
+  }
+
+  trace(-1,"Socked listened, wait for input connection\r\n");
+  // ждем входящих соединений. здесь мы немножко крутимся в бесконечном цикле
+  // и чтобы не заскучать одновременно мигаем светодиодом
+  while((sockStatus = getSn_SR(0)) == SOCK_LISTEN)
+  {
+    HAL_Delay(200);
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+  }
+
+  // раз мы попали сюда, значит выскочили из цикла. входящее соединение!
+  trace(-1,"Input connection\r\n");
+
+  if((sockStatus = getSn_SR(0)) != SOCK_ESTABLISHED)
+  {
+    trace(-1, "Error socket status\r\n");
+    return;
+  }
+  // из сокета вытаскиваем информацию: кто к нам пришел, откуда
+  // можете также отобразить инфу в трассировке
+  uint8_t remoteIP[4];
+  uint16_t remotePort;
+  getsockopt(0, SO_DESTIP, remoteIP);
+  getsockopt(0, SO_DESTPORT, (uint8_t*)&remotePort);
+
+  // посылаем клиенту приветствие и закрываем сокет
+  if((retVal = send(0, (uint8_t*)MSG, strlen(MSG))) == (int16_t)strlen(MSG))
+    // нехорошо так писать код. TODO: добавить фигурные скобки даже для одной строчки )
+    trace(-1, "Msg sent\r\n");
+  else
+    trace(-1, "Error socket send\r\n");
+
+  // закрываемся. когда нас снова вызовут, мы всегда готовы кработе
+  disconnect(0);
+  close(0);
+}
 /* USER CODE END 0 */
 
 /**
