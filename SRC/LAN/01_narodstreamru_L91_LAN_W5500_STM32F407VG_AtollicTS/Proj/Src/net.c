@@ -22,9 +22,13 @@ void net_ini(void)
 
 //-----------------------------------------------
 void packet_receive(void)
-
 {
+	w5500_packetReceive();
+	if(GetSocketStatus(tcpprop.cur_sock)==SOCK_ESTABLISHED)
 
+	{
+		asm("nop");
+	}
 }
 
 //-----------------------------------------------

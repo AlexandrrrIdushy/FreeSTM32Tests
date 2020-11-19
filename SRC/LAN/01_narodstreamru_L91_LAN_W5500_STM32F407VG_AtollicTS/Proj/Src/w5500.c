@@ -116,7 +116,30 @@ void w5500_ini(void)
    HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
 }
 
+//-----------------------------------------------
 
+void w5500_packetReceive(void)
+{
+  uint16_t point;
+  uint16_t len;
+}
+
+//функцию определения текущего состояния сокета
+uint8_t GetSocketStatus(uint8_t sock_num)
+
+{
+
+  uint8_t dt;
+
+  uint8_t opcode=0;
+
+  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+
+  dt = w5500_readReg(opcode, Sn_SR);
+
+  return dt;
+
+}
 //-----------------------------------------------
 
 //добавим ещё две функции для инициализации и ожидания окончания инициализации сокета

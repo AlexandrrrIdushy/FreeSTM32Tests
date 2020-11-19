@@ -107,12 +107,15 @@ typedef struct tcp_prop
 } tcp_prop_ptr;
 //--------------------------------------------------
 
+extern tcp_prop_ptr tcpprop;
+
 extern void w5500_ini(void);
 
 void OpenSocket(uint8_t, uint16_t);
 void SocketInitWait(uint8_t);
 void ListenSocket(uint8_t);
 void SocketListenWait(uint8_t);
-
+void w5500_packetReceive(void);
+uint8_t GetSocketStatus(uint8_t);
 extern uint8_t w5500_readReg(uint8_t, uint16_t);
 #endif /* W5500_H_ */
