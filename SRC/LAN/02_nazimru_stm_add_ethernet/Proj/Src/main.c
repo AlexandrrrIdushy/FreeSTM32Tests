@@ -111,24 +111,24 @@ void tcp_server()
   // если вместо -1 поставить число, она и его отобразит.
   // в недрах этой функции работающая строка будет
   // HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 0xFFFF);
-  trace(-1,"Try open socket\r\n");
+//  trace(-1,"Try open socket\r\n");
 
   // открываем сокет 0 как TCP_SOCKET, порт 5000 */
   if((retVal = socket(0, Sn_MR_TCP, 5000, 0)) != 0)
   {
-    trace(-1, "Error open socket\r\n");
+//    trace(-1, "Error open socket\r\n");
     return;
   }
-  trace(-1,"Socket opened, try listen\r\n");
+//  trace(-1,"Socket opened, try listen\r\n");
 
   // устанавливаем сокет в режим LISTEN. Так будет создан tcp сервер
   if((retVal = listen(0)) != SOCK_OK)
   {
-    trace(-1, "Error listen socket\r\n");
+//    trace(-1, "Error listen socket\r\n");
     return;
   }
 
-  trace(-1,"Socked listened, wait for input connection\r\n");
+//  trace(-1,"Socked listened, wait for input connection\r\n");
   // ждем входящих соединений. здесь мы немножко крутимся в бесконечном цикле
   // и чтобы не заскучать одновременно мигаем светодиодом
   while((sockStatus = getSn_SR(0)) == SOCK_LISTEN)
@@ -138,11 +138,11 @@ void tcp_server()
   }
 
   // раз мы попали сюда, значит выскочили из цикла. входящее соединение!
-  trace(-1,"Input connection\r\n");
+//  trace(-1,"Input connection\r\n");
 
   if((sockStatus = getSn_SR(0)) != SOCK_ESTABLISHED)
   {
-    trace(-1, "Error socket status\r\n");
+//    trace(-1, "Error socket status\r\n");
     return;
   }
   // из сокета вытаскиваем информацию: кто к нам пришел, откуда
@@ -153,11 +153,11 @@ void tcp_server()
   getsockopt(0, SO_DESTPORT, (uint8_t*)&remotePort);
 
   // посылаем клиенту приветствие и закрываем сокет
-  if((retVal = send(0, (uint8_t*)MSG, strlen(MSG))) == (int16_t)strlen(MSG))
+//  if((retVal = send(0, (uint8_t*)MSG, strlen(MSG))) == (int16_t)strlen(MSG))
     // нехорошо так писать код. TODO: добавить фигурные скобки даже для одной строчки )
-    trace(-1, "Msg sent\r\n");
-  else
-    trace(-1, "Error socket send\r\n");
+//    trace(-1, "Msg sent\r\n");
+//  else
+//    trace(-1, "Error socket send\r\n");
 
   // закрываемся. когда нас снова вызовут, мы всегда готовы кработе
   disconnect(0);
@@ -174,7 +174,8 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	close(1);
 	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
-	//reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
+	reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
+	tcp_server();
   /* USER CODE END 1 */
   
 
