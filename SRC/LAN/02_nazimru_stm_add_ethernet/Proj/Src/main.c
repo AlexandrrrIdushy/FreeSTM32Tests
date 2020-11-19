@@ -24,7 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "net.h"
+//#include "net.h"
+#include "socket.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,10 +66,37 @@ static void MX_SDIO_SD_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-#include "socket.h"
+
 char msg[60];
 // это будем посылать tcp клиенту, когда он к нам приконнектится
 const char MSG[] = "Hello World";
+
+
+// включить модуль W5500 сигналом SCNn=0
+void cs_sel()
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); //CS LOW
+}
+
+// выключить модуль W5500 сигналом SCNn=1
+void cs_desel()
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET); //CS HIGH
+}
+
+// принять байт через SPI
+uint8_t spi_rb(void)
+{
+    uint8_t rbuf;
+    HAL_SPI_Receive(&hspi1, &rbuf, 1, 0xFFFFFFFF);
+    return rbuf;
+}
+
+// передать байт через SPI
+void spi_wb(uint8_t b)
+{
+    HAL_SPI_Transmit(&hspi1, &b, 1, 0xFFFFFFFF);
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -144,7 +172,8 @@ void tcp_server()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	reg_wizchip_cs_cbfunc(cs_sel, cs_desel);
+	//reg_wizchip_spi_cbfunc(spi_rb, spi_wb);
   /* USER CODE END 1 */
   
 
@@ -171,9 +200,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-#ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
-  net_ini();
-#endif
+
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
 	cs_set();
@@ -201,8 +228,6 @@ int main(void)
 			cs_strob();
 			//HAL_Delay(1);
 		}
-#else
-		net_poll();
 #endif
     /* USER CODE END WHILE */
 

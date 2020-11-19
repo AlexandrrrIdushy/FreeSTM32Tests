@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+//#include "wizchip_conf.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,7 +59,7 @@ void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-
+//extern void reg_wizchip_cs_cbfunc(void(*cs_sel)(void), void(*cs_desel)(void));
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
