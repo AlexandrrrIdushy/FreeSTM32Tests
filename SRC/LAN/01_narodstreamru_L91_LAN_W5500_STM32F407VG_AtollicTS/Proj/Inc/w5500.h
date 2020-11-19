@@ -62,11 +62,57 @@
 #define Sn_PORT0 0x0004 // Socket 0 Source Port Register MSB
 #define Sn_PORT1 0x0005 // Socket 0 Source Port Register LSB
 //--------------------------------------------------
+//--------------------------------------------------
+
+#define Sn_MR 0x0000 // Socket 0 Mode Register
+#define Sn_CR 0x0001 // Socket 0 Command Register
+#define Sn_SR 0x0003 // Socket 0 Status Register
+//--------------------------------------------------
+
+//Socket mode
+#define Mode_CLOSED 0x00
+#define Mode_TCP 0x01
+#define Mode_UDP 0x02
+#define Mode_MACRAV 0x04
+
+//--------------------------------------------------
+
+//Socket states
+#define SOCK_CLOSED 0x00
+#define SOCK_INIT 0x13
+#define SOCK_LISTEN 0x14
+#define SOCK_ESTABLISHED 0x17
+
+//-------------------------------------------
+#define Sn_MSSR0 0x0012
+#define Sn_MSSR1 0x0013
+#define Sn_TX_FSR0 0x0020
+#define Sn_TX_FSR1 0x0021
+#define Sn_TX_RD0 0x0022
+#define Sn_TX_RD1 0x0023
+#define Sn_TX_WR0 0x0024
+#define Sn_TX_WR1 0x0025
+#define Sn_RX_RSR0 0x0026
+#define Sn_RX_RSR1 0x0027
+#define Sn_RX_RD0 0x0028
+#define Sn_RX_RD1 0x0029
+//--------------------------------------------------
 
 #define be16toword(a) ((((a)>>8)&0xff)|(((a)<<8)&0xff00))
+//--------------------------------------------------
 
+typedef struct tcp_prop
+{
+	volatile uint8_t cur_sock;//активный сокет
+} tcp_prop_ptr;
 //--------------------------------------------------
 
 extern void w5500_ini(void);
 
+void OpenSocket(uint8_t, uint16_t);
+void SocketInitWait(uint8_t);
+void ListenSocket(uint8_t);
+void SocketListenWait(uint8_t);
+
+extern uint8_t w5500_readReg(uint8_t, uint16_t);
 #endif /* W5500_H_ */

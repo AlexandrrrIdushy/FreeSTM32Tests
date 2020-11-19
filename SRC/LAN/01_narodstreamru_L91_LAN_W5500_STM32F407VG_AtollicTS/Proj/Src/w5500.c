@@ -9,6 +9,7 @@ extern UART_HandleTypeDef huart2;
 //-----------------------------------------------
 
 extern char str1[60];
+tcp_prop_ptr tcpprop;
 
 //-----------------------------------------------
 
@@ -38,13 +39,25 @@ void w5500_writeReg(uint8_t op, uint16_t addres, uint8_t data)
   SS_DESELECT();
 }
 
+//-----------------------------------------------
 
+uint8_t w5500_readReg(uint8_t op, uint16_t addres)
+{
+  uint8_t data;
+  uint8_t wbuf[] = {addres >> 8, addres, op, 0x0};
+  uint8_t rbuf[4];
+  SS_SELECT();
+  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, 4, 0xFFFFFFFF);
+  SS_DESELECT();
+  data = rbuf[3];
+  return data;
+}
 //-----------------------------------------------
 
 void w5500_ini(void)
 
 {
-  //uint8_t dtt=0;
+  uint8_t dtt=0;
   uint8_t opcode=0;
 
   //Hard Reset
@@ -82,11 +95,95 @@ void w5500_ini(void)
   opcode = (BSB_S0<<3)|OM_FDM1;
   w5500_writeReg(opcode, Sn_PORT0,local_port>>8);
   w5500_writeReg(opcode, Sn_PORT1,local_port);
+
+  //инициализируем активный сокет
+  tcpprop.cur_sock = 0;
+
+  //Открываем сокет 0
+  OpenSocket(0,Mode_TCP);
+  SocketInitWait(0);
+
+  //Начинаем слушать сокет
+  ListenSocket(0);
+  SocketListenWait(0);
+
+  HAL_Delay(500);
+
+   //Посмотрим статусы
+   opcode = (BSB_S0<<3)|OM_FDM1;
+   dtt = w5500_readReg(opcode, Sn_SR);
+   sprintf(str1,"First Status Sn0: 0x%02X\r\n",dtt);
+   HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
 }
 
 
 //-----------------------------------------------
 
+//добавим ещё две функции для инициализации и ожидания окончания инициализации сокета
+void OpenSocket(uint8_t sock_num, uint16_t mode)
+
+{
+  uint8_t opcode=0;
+  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+  w5500_writeReg(opcode, Sn_MR, mode);
+  w5500_writeReg(opcode, Sn_CR, 0x01);
+}
+
+//-----------------------------------------------
+
+void SocketInitWait(uint8_t sock_num)
+
+{
+  uint8_t opcode=0;
+  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+  while(1)
+  {
+    if(w5500_readReg(opcode, Sn_SR)==SOCK_INIT)
+    {
+      break;
+    }
+  }
+}
+
+//-----------------------------------------------
+
+void ListenSocket(uint8_t sock_num)
+
+{
+
+  uint8_t opcode=0;
+
+  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+
+  w5500_writeReg(opcode, Sn_CR, 0x02); //LISTEN SOCKET
+
+}
+
+//-----------------------------------------------
+
+void SocketListenWait(uint8_t sock_num)
+
+{
+
+  uint8_t opcode=0;
+
+  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+
+  while(1)
+
+  {
+
+    if(w5500_readReg(opcode, Sn_SR)==SOCK_LISTEN)
+
+    {
+
+      break;
+
+    }
+
+  }
+
+}
 //static void Error (void)
 //{
 //	HAL_UART_Transmit(&huart2,(uint8_t*)"Error!rn",8,0x1000);
