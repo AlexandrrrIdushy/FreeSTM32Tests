@@ -129,6 +129,7 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	int i =0;
   while (1)
   {
 #ifdef	DEBUG_TEST_SPI_READ_MAC
@@ -157,10 +158,27 @@ int __attribute__((optimize("O0"))) main(void)
 //	  5th Data = 0xEE
 
 //	  01111000 = 0x78
-	 w5500_readReg_4Test(0x78, 0x0100);
+//	 w5500_readReg_4Test(0x78, 0x0100);
+//	 HAL_Delay(100);
+
+//	  //пример 3. попробую mac адреса
+////	  0
+//	 w5500_readReg_4Test(0, i);
+//	 HAL_Delay(100);
+//	 if(i > 0x39)
+//		 i =0;
+//	 else
+//		 i+=5;
+
+	 w5500_readReg(0, i);
 	 HAL_Delay(100);
+	 if(i > 0x39)
+		 i =0;
+	 else
+		 i++;
 
-
+//	 w5500_readReg(0, 0x39);
+//	 HAL_Delay(100);
 
 
 
