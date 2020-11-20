@@ -132,15 +132,38 @@ int __attribute__((optimize("O0"))) main(void)
   while (1)
   {
 #ifdef	DEBUG_TEST_SPI_READ_MAC
-	  //попробую читать как в примерах даташита 1 Byte READ Access Example
-//	  Offset Address = 0x0003
-//	  BSB[4:0] = С11101Т
+//	  //пример 1. попробую читать как в примерах даташита "1 Byte READ Access Example"
+//
+////	  Offset Address = 0x0003
+////	  BSB[4:0] = С11101Т
+////	  RWB = С0Т
+////	  OM[1:0] = С00Т
+//
+////	  11101000 = 0xE8
+//	 uint8_t res = w5500_readReg(0xE8, 0x3);
+//	 HAL_Delay(100);
+
+
+	  //пример 2. попробую читать как в примерах даташита  "N-Bytes Read Access Example"
+
+//	  Offset Address = 0x0100
+//	  BSB[4:0] = С01111Т
 //	  RWB = С0Т
 //	  OM[1:0] = С00Т
+//	  1st Data = 0xAA
+//	  2nd Data = 0xBB
+//	  3rd Data = 0xCC
+//	  4th Data = 0xDD
+//	  5th Data = 0xEE
 
-//	  11101000 = 0xE8
-	 uint8_t res = w5500_readReg(0xE8, 0x3);
+//	  01111000 = 0x78
+	 w5500_readReg_4Test(0x78, 0x0100);
 	 HAL_Delay(100);
+
+
+
+
+
 
 
 //	  uint8_t opcode=0;
@@ -148,7 +171,7 @@ int __attribute__((optimize("O0"))) main(void)
 ////	  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
 //	  opcode = (((sock_num<<2)|BSB_COMMON)<<3)|OM_FDM1;
 //	  uint8_t res = 0;
-//	 res = w5500_readReg(opcode, 0x1E);
+//	 res = w5500_readReg_4Test(opcode, 0x1E);
 //	 HAL_Delay(100);
 
 #else

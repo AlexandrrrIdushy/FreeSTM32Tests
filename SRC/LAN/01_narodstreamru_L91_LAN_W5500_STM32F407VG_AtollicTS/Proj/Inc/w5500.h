@@ -118,4 +118,5 @@ void SocketListenWait(uint8_t);
 void w5500_packetReceive(void);
 uint8_t GetSocketStatus(uint8_t);
 extern uint8_t w5500_readReg(uint8_t, uint16_t);
+extern uint8_t w5500_readReg_4Test(uint8_t, uint16_t);
 #endif /* W5500_H_ */

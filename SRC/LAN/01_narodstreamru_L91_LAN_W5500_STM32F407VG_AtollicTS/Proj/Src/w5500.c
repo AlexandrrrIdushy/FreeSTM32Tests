@@ -52,6 +52,18 @@ uint8_t __attribute__((optimize("O0"))) w5500_readReg(uint8_t op, uint16_t addre
   data = rbuf[3];
   return data;
 }
+
+uint8_t __attribute__((optimize("O0"))) w5500_readReg_4Test(uint8_t op, uint16_t addres)
+{
+  uint8_t data;
+  uint8_t wbuf[] = {addres >> 8, addres, op, 0x0};
+  uint8_t rbuf[(4 +5)];
+  SS_SELECT();
+  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (4 + 5), 0xFFFFFFFF);
+  SS_DESELECT();
+  data = rbuf[3];
+  return data;
+}
 //-----------------------------------------------
 
 void w5500_ini(void)

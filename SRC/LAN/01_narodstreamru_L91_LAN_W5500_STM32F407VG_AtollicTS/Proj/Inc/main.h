@@ -65,7 +65,7 @@ void Error_Handler(void);
 #ifdef __cplusplus
 }
 #endif
-extern uint8_t w5500_readReg(uint8_t, uint16_t);
+
 #endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
