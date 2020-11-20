@@ -30,6 +30,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_TEST_SPI_AS_23_LESSONS
+#define	DEBUG_TEST_SPI_READ_MAC
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -77,7 +78,7 @@ static void MX_USART2_UART_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -108,7 +109,9 @@ int main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 #ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
+#ifndef	DEBUG_TEST_SPI_READ_MAC
   net_ini();
+#endif
 #endif
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
@@ -128,7 +131,29 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-#ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
+#ifdef	DEBUG_TEST_SPI_READ_MAC
+	  //попробую читать как в примерах даташита 1 Byte READ Access Example
+//	  Offset Address = 0x0003
+//	  BSB[4:0] = С11101Т
+//	  RWB = С0Т
+//	  OM[1:0] = С00Т
+
+//	  11101000 = 0xE8
+	 uint8_t res = w5500_readReg(0xE8, 0x3);
+	 HAL_Delay(100);
+
+
+//	  uint8_t opcode=0;
+//	  uint8_t sock_num = 0;
+////	  opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+//	  opcode = (((sock_num<<2)|BSB_COMMON)<<3)|OM_FDM1;
+//	  uint8_t res = 0;
+//	 res = w5500_readReg(opcode, 0x1E);
+//	 HAL_Delay(100);
+
+#else
+
+ #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
 
 		for(i=0;i<=255;i+=10)
 		{
@@ -137,8 +162,9 @@ int main(void)
 			cs_strob();
 			//HAL_Delay(1);
 		}
-#else
+ #else
 		net_poll();
+ #endif
 #endif
     /* USER CODE END WHILE */
 

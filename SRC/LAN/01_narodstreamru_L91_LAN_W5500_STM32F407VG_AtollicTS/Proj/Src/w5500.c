@@ -41,7 +41,7 @@ void w5500_writeReg(uint8_t op, uint16_t addres, uint8_t data)
 
 //-----------------------------------------------
 
-uint8_t w5500_readReg(uint8_t op, uint16_t addres)
+uint8_t __attribute__((optimize("O0"))) w5500_readReg(uint8_t op, uint16_t addres)
 {
   uint8_t data;
   uint8_t wbuf[] = {addres >> 8, addres, op, 0x0};
@@ -154,17 +154,17 @@ void OpenSocket(uint8_t sock_num, uint16_t mode)
 
 //-----------------------------------------------
 
-void SocketInitWait(uint8_t sock_num)
+void __attribute__((optimize("O0"))) SocketInitWait(uint8_t sock_num)
 
 {
   uint8_t opcode=0;
   opcode = (((sock_num<<2)|BSB_S0)<<3)|OM_FDM1;
+  uint8_t res = 0;
   while(1)
   {
-    if(w5500_readReg(opcode, Sn_SR)==SOCK_INIT)
-    {
-      break;
-    }
+		res = w5500_readReg(opcode, Sn_SR);
+		if(res == SOCK_INIT)
+		  break;
   }
 }
 

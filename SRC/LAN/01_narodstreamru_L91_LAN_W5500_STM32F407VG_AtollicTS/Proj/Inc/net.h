@@ -20,7 +20,8 @@
 
 #define IP_GATE {192,168,1,1}
 
-#define IP_MASK {255,255,255,0}
+//#define IP_MASK {255,255,255,0}//так изначально
+#define IP_MASK {255,255,0,0}//так показывает ipconfig
 
 #define LOCAL_PORT 80
 
