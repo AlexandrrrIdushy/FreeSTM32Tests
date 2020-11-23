@@ -84,48 +84,52 @@ void w5500_ini(void)
   HAL_Delay(100);
 
   //Configure Net
-  w5500_writeReg(opcode, SHAR0,macaddr[0]);
-  w5500_writeReg(opcode, SHAR1,macaddr[1]);
-  w5500_writeReg(opcode, SHAR2,macaddr[2]);
-  w5500_writeReg(opcode, SHAR3,macaddr[3]);
-  w5500_writeReg(opcode, SHAR4,macaddr[4]);
-  w5500_writeReg(opcode, SHAR5,macaddr[5]);
-  w5500_writeReg(opcode, GWR0,ipgate[0]);
-  w5500_writeReg(opcode, GWR1,ipgate[1]);
-  w5500_writeReg(opcode, GWR2,ipgate[2]);
-  w5500_writeReg(opcode, GWR3,ipgate[3]);
+//  w5500_writeReg(opcode, SHAR0,macaddr[0]);
+//  w5500_writeReg(opcode, SHAR1,macaddr[1]);
+//  w5500_writeReg(opcode, SHAR2,macaddr[2]);
+//  w5500_writeReg(opcode, SHAR3,macaddr[3]);
+//  w5500_writeReg(opcode, SHAR4,macaddr[4]);
+//  w5500_writeReg(opcode, SHAR5,macaddr[5]);
+//  w5500_writeReg(opcode, GWR0,ipgate[0]);
+//  HAL_Delay(1000);
+//  w5500_writeReg(opcode, GWR1,ipgate[1]);
+//  HAL_Delay(1000);
+//  w5500_writeReg(opcode, GWR2,ipgate[2]);
+//  HAL_Delay(1000);
+//  w5500_writeReg(opcode, GWR3,ipgate[3]);
+//  HAL_Delay(1000);
   w5500_writeReg(opcode, SUBR0,ipmask[0]);
   w5500_writeReg(opcode, SUBR1,ipmask[1]);
   w5500_writeReg(opcode, SUBR2,ipmask[2]);
   w5500_writeReg(opcode, SUBR3,ipmask[3]);
-  w5500_writeReg(opcode, SIPR0,ipaddr[0]);
-  w5500_writeReg(opcode, SIPR1,ipaddr[1]);
-  w5500_writeReg(opcode, SIPR2,ipaddr[2]);
-  w5500_writeReg(opcode, SIPR3,ipaddr[3]);
+//  w5500_writeReg(opcode, SIPR0,ipaddr[0]);
+//  w5500_writeReg(opcode, SIPR1,ipaddr[1]);
+//  w5500_writeReg(opcode, SIPR2,ipaddr[2]);
+//  w5500_writeReg(opcode, SIPR3,ipaddr[3]);
 
-  //Настраиваем сокет 0
-  opcode = (BSB_S0<<3)|OM_FDM1;
-  w5500_writeReg(opcode, Sn_PORT0,local_port>>8);
-  w5500_writeReg(opcode, Sn_PORT1,local_port);
-
-  //инициализируем активный сокет
-  tcpprop.cur_sock = 0;
-
-  //Открываем сокет 0
-  OpenSocket(0,Mode_TCP);
-  SocketInitWait(0);
-
-  //Начинаем слушать сокет
-  ListenSocket(0);
-  SocketListenWait(0);
-
-  HAL_Delay(500);
-
-   //Посмотрим статусы
-   opcode = (BSB_S0<<3)|OM_FDM1;
-   dtt = w5500_readReg(opcode, Sn_SR);
-   sprintf(str1,"First Status Sn0: 0x%02X\r\n",dtt);
-   HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
+//  //Настраиваем сокет 0
+//  opcode = (BSB_S0<<3)|OM_FDM1;
+//  w5500_writeReg(opcode, Sn_PORT0,local_port>>8);
+//  w5500_writeReg(opcode, Sn_PORT1,local_port);
+//
+//  //инициализируем активный сокет
+//  tcpprop.cur_sock = 0;
+//
+//  //Открываем сокет 0
+//  OpenSocket(0,Mode_TCP);
+//  SocketInitWait(0);
+//
+//  //Начинаем слушать сокет
+//  ListenSocket(0);
+//  SocketListenWait(0);
+//
+//  HAL_Delay(500);
+//
+//   //Посмотрим статусы
+//   opcode = (BSB_S0<<3)|OM_FDM1;
+//   dtt = w5500_readReg(opcode, Sn_SR);
+//   sprintf(str1,"First Status Sn0: 0x%02X\r\n",dtt);
+//   HAL_UART_Transmit(&huart2,(uint8_t*)str1,strlen(str1),0x1000);
 }
 
 //-----------------------------------------------

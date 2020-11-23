@@ -30,7 +30,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_TEST_SPI_AS_23_LESSONS
-#define	DEBUG_TEST_SPI_READ_MAC
+#define	DEBUG_SPI_READ_ANY_REGS
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -109,9 +109,7 @@ int __attribute__((optimize("O0"))) main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 #ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
-#ifndef	DEBUG_TEST_SPI_READ_MAC
   net_ini();
-#endif
 #endif
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
@@ -132,7 +130,7 @@ int __attribute__((optimize("O0"))) main(void)
 	int i =0;
   while (1)
   {
-#ifdef	DEBUG_TEST_SPI_READ_MAC
+#ifdef	DEBUG_SPI_READ_ANY_REGS
 //	  //пример 1. попробую читать как в примерах даташита "1 Byte READ Access Example"
 //
 ////	  Offset Address = 0x0003
@@ -170,6 +168,7 @@ int __attribute__((optimize("O0"))) main(void)
 //	 else
 //		 i+=5;
 
+	  //читаем все регистры в общем блоке
 	 w5500_readReg(0, i);
 	 HAL_Delay(100);
 	 if(i > 0x39)
