@@ -140,7 +140,7 @@ int __attribute__((optimize("O0"))) main(void)
 
 	  if(nRepit4Write < 3)
 	  {
-		  HAL_Delay(500);
+		  HAL_Delay(100);
 				uint8_t wstartAdr = 1;
 			  uint8_t wnCicl = 4;
 			  uint8_t wnByteRead = 1;
@@ -160,20 +160,21 @@ int __attribute__((optimize("O0"))) main(void)
 				  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
 				  SS_DESELECT();
 				  i++;
+				  HAL_Delay(100);
 			}
 			nRepit4Write++;
 	  }
 
 
 		//чтение
-		HAL_Delay(500);
+		HAL_Delay(100);
 	//	  uint8_t data;
-			uint8_t startAdr = 1;
-		  uint8_t nCicl = 4;
-		  uint8_t nByteRead = 1;
+			uint8_t startAdr = 2;
+		  uint8_t nCicl = 1;
+		  uint8_t nByteRead = 2;
 		  uint8_t bsb = 0;
 		  uint8_t rwb = 0;
-		  uint8_t om = 1;
+		  uint8_t om = 2;
 		  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
 
 		for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
@@ -184,6 +185,7 @@ int __attribute__((optimize("O0"))) main(void)
 			  SS_SELECT();
 			  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
 			  SS_DESELECT();
+			  HAL_Delay(100);
 		}
 
 
