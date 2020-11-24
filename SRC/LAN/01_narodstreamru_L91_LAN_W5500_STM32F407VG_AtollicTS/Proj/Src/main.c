@@ -127,12 +127,27 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-//	for (int i = 5; i < (5 + 4); ++i)
-//	{
-		HAL_Delay(2000);
-		 w5500_readReg(0, 1);
-//		 HAL_Delay(100);
-//	}
+
+	//чтение
+	HAL_Delay(500);
+//	  uint8_t data;
+		uint8_t startAdr = 1;
+	  uint8_t nCicl = 4;
+	  uint8_t nByteRead = 1;
+	  uint8_t bsb = 0;
+	  uint8_t rwb = 0;
+	  uint8_t om = 1;
+	  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
+
+	for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
+	{
+		  uint8_t wbuf[] = {adr >> 8, adr, opcode};
+		  uint8_t rbuf[(3 + nByteRead)];
+
+		  SS_SELECT();
+		  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
+		  SS_DESELECT();
+	}
 
 
   while (1)
