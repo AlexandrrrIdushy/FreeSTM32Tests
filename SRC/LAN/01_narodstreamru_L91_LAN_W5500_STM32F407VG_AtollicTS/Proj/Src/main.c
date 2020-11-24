@@ -127,7 +127,14 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	int i =0;
+//	for (int i = 5; i < (5 + 4); ++i)
+//	{
+		HAL_Delay(2000);
+		 w5500_readReg(0, 1);
+//		 HAL_Delay(100);
+//	}
+
+
   while (1)
   {
 #ifdef	DEBUG_SPI_READ_ANY_REGS
@@ -168,13 +175,13 @@ int __attribute__((optimize("O0"))) main(void)
 //	 else
 //		 i+=5;
 
-	  //читаем все регистры в общем блоке
-	 w5500_readReg(0, i);
-	 HAL_Delay(100);
-	 if(i > 0x39)
-		 i =0;
-	 else
-		 i++;
+//	  //читаем все регистры в общем блоке
+//	 w5500_readReg(0, i);
+//	 HAL_Delay(100);
+//	 if(i > 0x39)
+//		 i =0;
+//	 else
+//		 i++;
 
 //	 w5500_readReg(0, 0x39);
 //	 HAL_Delay(100);
