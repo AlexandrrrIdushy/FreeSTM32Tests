@@ -129,55 +129,64 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	//запись
-//	  uint8_t data;
-		uint8_t wstartAdr = 1;
-	  uint8_t wnCicl = 4;
-	  uint8_t wnByteRead = 1;
-	  uint8_t wbsb = 0;
-	  uint8_t wrwb = 1;
-	  uint8_t wom = 1;
-	  uint8_t wopcode = (((wbsb << 3)|(wrwb << 2))|wom);//BSB + RWB + OM
-	  uint8_t buf[] = {0,0,0,0};
-	  uint8_t sendarr[] = {0x11,0x22,0x33,0x44};
-	  uint8_t i = 0;
-	for (int wadr = wstartAdr; wadr < (wstartAdr + wnCicl); wadr++)
-	{
-		  uint8_t wwbuf[] = {wadr >> 8, wadr, wopcode, sendarr[i]};
 
 
-		  SS_SELECT();
-		  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
-		  SS_DESELECT();
-		  i++;
-	}
-
-
-	//чтение
-	HAL_Delay(500);
-//	  uint8_t data;
-		uint8_t startAdr = 1;
-	  uint8_t nCicl = 4;
-	  uint8_t nByteRead = 1;
-	  uint8_t bsb = 0;
-	  uint8_t rwb = 0;
-	  uint8_t om = 1;
-	  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
-
-	for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
-	{
-		  uint8_t wbuf[] = {adr >> 8, adr, opcode};
-		  uint8_t rbuf[(3 + nByteRead)];
-
-		  SS_SELECT();
-		  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
-		  SS_DESELECT();
-	}
-
-
+	int8_t nRepit4Write = 0;
   while (1)
   {
 #ifdef	DEBUG_SPI_READ_ANY_REGS
+		//запись
+	//	  uint8_t data;
+
+	  if(nRepit4Write < 3)
+	  {
+		  HAL_Delay(500);
+				uint8_t wstartAdr = 1;
+			  uint8_t wnCicl = 4;
+			  uint8_t wnByteRead = 1;
+			  uint8_t wbsb = 0;
+			  uint8_t wrwb = 1;
+			  uint8_t wom = 1;
+			  uint8_t wopcode = (((wbsb << 3)|(wrwb << 2))|wom);//BSB + RWB + OM
+			  uint8_t buf[] = {0,0,0,0};
+			  uint8_t sendarr[] = {0x11,0x22,0x33,0x44};
+			  uint8_t i = 0;
+			for (int wadr = wstartAdr; wadr < (wstartAdr + wnCicl); wadr++)
+			{
+				  uint8_t wwbuf[] = {wadr >> 8, wadr, wopcode, sendarr[i]};
+
+
+				  SS_SELECT();
+				  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
+				  SS_DESELECT();
+				  i++;
+			}
+			nRepit4Write++;
+	  }
+
+
+		//чтение
+		HAL_Delay(500);
+	//	  uint8_t data;
+			uint8_t startAdr = 1;
+		  uint8_t nCicl = 4;
+		  uint8_t nByteRead = 1;
+		  uint8_t bsb = 0;
+		  uint8_t rwb = 0;
+		  uint8_t om = 1;
+		  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
+
+		for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
+		{
+			  uint8_t wbuf[] = {adr >> 8, adr, opcode};
+			  uint8_t rbuf[(3 + nByteRead)];
+
+			  SS_SELECT();
+			  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
+			  SS_DESELECT();
+		}
+
+
 //	  //пример 1. попробую читать как в примерах даташита "1 Byte READ Access Example"
 //
 ////	  Offset Address = 0x0003
