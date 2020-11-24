@@ -109,7 +109,9 @@ int __attribute__((optimize("O0"))) main(void)
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
 #ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
-  net_ini();
+//  net_ini();
+
+
 #endif
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
@@ -127,6 +129,29 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	//запись
+//	  uint8_t data;
+		uint8_t wstartAdr = 1;
+	  uint8_t wnCicl = 4;
+	  uint8_t wnByteRead = 1;
+	  uint8_t wbsb = 0;
+	  uint8_t wrwb = 1;
+	  uint8_t wom = 1;
+	  uint8_t wopcode = (((wbsb << 3)|(wrwb << 2))|wom);//BSB + RWB + OM
+	  uint8_t buf[] = {0,0,0,0};
+	  uint8_t sendarr[] = {0x11,0x22,0x33,0x44};
+	  uint8_t i = 0;
+	for (int wadr = wstartAdr; wadr < (wstartAdr + wnCicl); wadr++)
+	{
+		  uint8_t wwbuf[] = {wadr >> 8, wadr, wopcode, sendarr[i]};
+
+
+		  SS_SELECT();
+		  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
+		  SS_DESELECT();
+		  i++;
+	}
+
 
 	//чтение
 	HAL_Delay(500);
