@@ -30,7 +30,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_TEST_SPI_AS_23_LESSONS
-#define	DEBUG_SPI_READ_ANY_REGS
+//#define	DEBUG_SPI_READ_ANY_REGS
+#define	DEBUG_TEST_SPI_WRITE_AND_READE_FEW
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -78,7 +79,7 @@ static void MX_USART2_UART_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int __attribute__((optimize("O0"))) main(void)
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -129,64 +130,69 @@ int __attribute__((optimize("O0"))) main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-
+#ifdef	DEBUG_TEST_SPI_WRITE_AND_READE_FEW
 	int8_t nRepit4Write = 0;
+	uint8_t wstartAdr = 1;
+  uint8_t wnCicl = 4;
+  uint8_t wnByteRead = 1;
+  uint8_t wbsb = 0;
+  uint8_t wrwb = 1;
+  uint8_t wom = 1;
+  uint8_t i = 0;
+  uint8_t buf[] = {0,0,0,0};
+  uint8_t wopcode;
+  uint8_t sendarr[] = {0x11,0x22,0x33,0x44};
+		  for (int var = 0; var < 3; var++)
+		  {
+			  HAL_Delay(100);
+			  wopcode = (((wbsb << 3)|(wrwb << 2))|wom);//BSB + RWB + OM
+				  i = 0;
+				for (int wadr = wstartAdr; wadr < (wstartAdr + wnCicl); wadr++)
+				{
+					  uint8_t wwbuf[] = {wadr >> 8, wadr, wopcode, sendarr[i]};
+					  SS_SELECT();
+					  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
+					  SS_DESELECT();
+					  i++;
+					  HAL_Delay(100);
+				}
+		  }
+#endif
+
+	int8_t adr = 0;
   while (1)
   {
+
+#ifdef DEBUG_TEST_SPI_WRITE_AND_READE_FEW
+	  		//чтение
+	  		HAL_Delay(100);
+	  	//	  uint8_t data;
+	  			uint8_t startAdr = 1;
+	  		  uint8_t nCicl = 4;
+	  		  uint8_t nByteRead = 1;
+	  		  uint8_t bsb = 0;
+	  		  uint8_t rwb = 0;
+	  		  uint8_t om = 1;
+	  		  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
+
+	  		for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
+	  		{
+	  			  uint8_t wbuf[] = {adr >> 8, adr, opcode, 0xF1};
+	  			  uint8_t rbuf[(3 + nByteRead)];
+
+	  			  SS_SELECT();
+	  			  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
+	  			  SS_DESELECT();
+	  			  HAL_Delay(100);
+	  		}
+#endif
 #ifdef	DEBUG_SPI_READ_ANY_REGS
 		//запись
 	//	  uint8_t data;
 
-	  if(nRepit4Write < 3)
-	  {
-		  HAL_Delay(100);
-				uint8_t wstartAdr = 1;
-			  uint8_t wnCicl = 4;
-			  uint8_t wnByteRead = 1;
-			  uint8_t wbsb = 0;
-			  uint8_t wrwb = 1;
-			  uint8_t wom = 1;
-			  uint8_t wopcode = (((wbsb << 3)|(wrwb << 2))|wom);//BSB + RWB + OM
-			  uint8_t buf[] = {0,0,0,0};
-			  uint8_t sendarr[] = {0x11,0x22,0x33,0x44};
-			  uint8_t i = 0;
-			for (int wadr = wstartAdr; wadr < (wstartAdr + wnCicl); wadr++)
-			{
-				  uint8_t wwbuf[] = {wadr >> 8, wadr, wopcode, sendarr[i]};
 
 
-				  SS_SELECT();
-				  HAL_SPI_TransmitReceive(&hspi1, wwbuf, buf, (3 + wnByteRead), 0xFFFFFFFF);
-				  SS_DESELECT();
-				  i++;
-				  HAL_Delay(100);
-			}
-			nRepit4Write++;
-	  }
 
-
-		//чтение
-		HAL_Delay(100);
-	//	  uint8_t data;
-			uint8_t startAdr = 2;
-		  uint8_t nCicl = 1;
-		  uint8_t nByteRead = 2;
-		  uint8_t bsb = 0;
-		  uint8_t rwb = 0;
-		  uint8_t om = 2;
-		  uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
-
-		for (int adr = startAdr; adr < (startAdr + nCicl); adr++)
-		{
-			  uint8_t wbuf[] = {adr >> 8, adr, opcode};
-			  uint8_t rbuf[(3 + nByteRead)];
-
-			  SS_SELECT();
-			  HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, (3 + nByteRead), 0xFFFFFFFF);
-			  SS_DESELECT();
-			  HAL_Delay(100);
-		}
 
 
 //	  //пример 1. попробую читать как в примерах даташита "1 Byte READ Access Example"
@@ -226,13 +232,22 @@ int __attribute__((optimize("O0"))) main(void)
 //	 else
 //		 i+=5;
 
-//	  //читаем все регистры в общем блоке
-//	 w5500_readReg(0, i);
-//	 HAL_Delay(100);
-//	 if(i > 0x39)
-//		 i =0;
-//	 else
-//		 i++;
+	//чтение
+	uint8_t bsb = 0;
+	uint8_t rwb = 0;
+	uint8_t om = 1;
+	uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
+	uint8_t wbuf[] = {adr >> 8, adr, opcode,0xF1};
+	uint8_t rbuf[4];
+
+	SS_SELECT();
+	HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, 4, 0xFFFFFFFF);
+	SS_DESELECT();
+	HAL_Delay(100);
+	if(adr > 0x39)
+		adr = 0;
+	else
+		adr++;
 
 //	 w5500_readReg(0, 0x39);
 //	 HAL_Delay(100);
@@ -261,7 +276,7 @@ int __attribute__((optimize("O0"))) main(void)
 			//HAL_Delay(1);
 		}
  #else
-		net_poll();
+//		net_poll();
  #endif
 #endif
     /* USER CODE END WHILE */
@@ -362,7 +377,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
