@@ -31,7 +31,7 @@
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_TEST_SPI_AS_23_LESSONS
 //#define	DEBUG_SPI_READ_ANY_REGS
-#define	DEBUG_TEST_SPI_WRITE_AND_READE_FEW
+#define	DEBUG_TEST_SPI_WRITE_AND_READE_FEW//пишем что то и желаем прочитать обратно это
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
