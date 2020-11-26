@@ -122,15 +122,15 @@ void     WIZCHIP_WRITE(uint32_t AddrSel, uint8_t wb )
    WIZCHIP_CRITICAL_EXIT();
 }
          
-void     WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
+void     __attribute__((optimize("O0"))) WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, uint16_t len)
 {
    uint8_t spi_data[3];
    uint16_t i;
 
    WIZCHIP_CRITICAL_ENTER();
-   WIZCHIP.CS._select();
+   WIZCHIP.CS._select();//чит селект выбрать
 
-   AddrSel |= (_W5500_SPI_READ_ | _W5500_SPI_VDM_OP_);
+   AddrSel |= (_W5500_SPI_READ_ | _W5500_SPI_VDM_OP_);//читать + режим VDM
 
    if(!WIZCHIP.IF.SPI._read_burst || !WIZCHIP.IF.SPI._write_burst) 	// byte operation
    {

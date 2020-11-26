@@ -102,7 +102,7 @@ uint8_t  sock_pack_info[_WIZCHIP_SOCK_NUM_] = {0,};
 
 
 
-int8_t socket(uint8_t sn, uint8_t protocol, uint16_t port, uint8_t flag)
+int8_t __attribute__((optimize("O0"))) socket(uint8_t sn, uint8_t protocol, uint16_t port, uint8_t flag)
 {
 	CHECK_SOCKNUM();
 	switch(protocol)
@@ -115,7 +115,7 @@ int8_t socket(uint8_t sn, uint8_t protocol, uint16_t port, uint8_t flag)
             getSIPR(taddr);
             */
             uint32_t taddr;
-            getSIPR((uint8_t*)&taddr);
+            getSIPR((uint8_t*)&taddr);//читает IP из общего регистра Source IP Address 0xF..0x12
             if(taddr == 0) return SOCKERR_SOCKINIT;
 	    break;
          }
