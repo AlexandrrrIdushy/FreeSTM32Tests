@@ -744,7 +744,7 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_Ca
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef __attribute__((optimize("O0"))) HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
@@ -849,8 +849,7 @@ HAL_StatusTypeDef __attribute__((optimize("O0"))) HAL_SPI_Transmit(SPI_HandleTyp
     while (hspi->TxXferCount > 0U)
     {
       /* Wait until TXE flag is set to send data */
-    	int res = __HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE);
-      if (res)
+      if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         *((__IO uint8_t *)&hspi->Instance->DR) = (*hspi->pTxBuffPtr);
         hspi->pTxBuffPtr += sizeof(uint8_t);
