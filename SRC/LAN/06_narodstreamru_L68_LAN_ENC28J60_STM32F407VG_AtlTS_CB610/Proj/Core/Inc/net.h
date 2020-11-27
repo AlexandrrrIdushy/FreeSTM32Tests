@@ -7,4 +7,5 @@
 #include <stdint.h>
 #include "enc28j60.h"
 //--------------------------------------------------
+extern void net_ini(void);
 #endif /* __NET_H */

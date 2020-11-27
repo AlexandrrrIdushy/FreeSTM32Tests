@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "net.h"
-#include "enc28j60.h"
+//#include "enc28j60.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
