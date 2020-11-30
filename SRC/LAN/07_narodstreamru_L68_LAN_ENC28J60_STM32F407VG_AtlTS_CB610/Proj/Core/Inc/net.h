@@ -70,5 +70,6 @@ typedef struct icmp_pkt{
 //--------------------------------------------------
 void net_ini(void);
 extern void net_poll(void);
+extern UART_HandleTypeDef huart1;
 //--------------------------------------------------
 #endif /* __NET_H */
