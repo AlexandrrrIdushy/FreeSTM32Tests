@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "enc28j60.h"
 //--------------------------------------------------
 #define IP_ADDR {192,168,1,197}
