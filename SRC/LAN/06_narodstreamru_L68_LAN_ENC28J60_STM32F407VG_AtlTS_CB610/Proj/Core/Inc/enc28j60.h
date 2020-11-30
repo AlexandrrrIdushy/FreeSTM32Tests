@@ -178,5 +178,7 @@
 #define MAX_FRAMELEN      1500
 //--------------------------------------------------
 extern void enc28j60_ini(void);
+//L5. В файле enc28j60.h добавим прототип функции enc28j60_packetReceive
+uint16_t enc28j60_packetReceive(uint8_t *buf,uint16_t buflen);
 //--------------------------------------------------
 #endif /* ENC28J60_H_ */

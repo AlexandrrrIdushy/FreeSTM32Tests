@@ -141,13 +141,12 @@ void enc28j60_writePhy(uint8_t addres,uint16_t data)
 
 //--------------------------------------------------
 //L4.Создадим функцию для приёма пакета в файле enc28j60.c и создадим в ней локальную переменную для подсчёта длины пакета и последующего его возврата
-uint16_t enc28j60_packetReceive(uint8_t *buf,uint16_t buflen)
+uint16_t __attribute__((optimize("O0"))) enc28j60_packetReceive(uint8_t *buf,uint16_t buflen)
 
 {
 	uint16_t len=0;
 //В регистре EPKTCNT хранится количество принятых на данный момент пакетов, поэтому проверим его
 	if(enc28j60_readRegByte(EPKTCNT)>0)
-
 	{
 		enc28j60_writeReg(ERDPT,gNextPacketPtr);//В регистр ERDPT установим указатель
 		//Начнём считывать пакет. Объявим локльную структуру для заголовка
@@ -165,7 +164,8 @@ uint16_t enc28j60_packetReceive(uint8_t *buf,uint16_t buflen)
 		//Укоротим длину до заданной во входном параметре
 		if(len>buflen) len=buflen;
 		//Проверим статус и считаем буфер
-		if((header.status&0x80)==0) len=0;
+		if((header.status&0x80)==0)
+			len=0;
 		else enc28j60_readBuf(len, buf);
 		//		Завершим буфер нулём
 		buf[len]=0;
