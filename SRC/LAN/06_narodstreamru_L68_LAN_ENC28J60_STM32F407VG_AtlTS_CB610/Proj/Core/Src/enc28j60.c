@@ -4,9 +4,12 @@
 extern UART_HandleTypeDef huart1;
 extern SPI_HandleTypeDef hspi1;
 
+
+
 //Создадим переменную для хранения номера текущего банка
 
 uint8_t Enc28j60Bank;
+static int gNextPacketPtr;
 //L4. Добавим в наш файл глобальную переменную нашего физического адреса
 uint8_t macaddr[6]=MAC_ADDR;
 
@@ -136,7 +139,48 @@ void enc28j60_writePhy(uint8_t addres,uint16_t data)
 
 //--------------------------------------------------
 
+//--------------------------------------------------
+//L4.Создадим функцию для приёма пакета в файле enc28j60.c и создадим в ней локальную переменную для подсчёта длины пакета и последующего его возврата
+uint16_t enc28j60_packetReceive(uint8_t *buf,uint16_t buflen)
 
+{
+	uint16_t len=0;
+//В регистре EPKTCNT хранится количество принятых на данный момент пакетов, поэтому проверим его
+	if(enc28j60_readRegByte(EPKTCNT)>0)
+
+	{
+		enc28j60_writeReg(ERDPT,gNextPacketPtr);//В регистр ERDPT установим указатель
+		//Начнём считывать пакет. Объявим локльную структуру для заголовка
+		//считаем заголовок
+		struct{
+		  uint16_t nextPacket;
+		  uint16_t byteCount;
+		  uint16_t status;
+		} header;
+		enc28j60_readBuf(sizeof header,(uint8_t*)&header);
+		//Запишем значение указателя на следующий пакет в глобальную переменную
+		gNextPacketPtr=header.nextPacket;
+		//Инициализируем переменную длины пакеты, отрезав от неё контрольную сумму
+		len=header.byteCount-4;//remove the CRC count
+		//Укоротим длину до заданной во входном параметре
+		if(len>buflen) len=buflen;
+		//Проверим статус и считаем буфер
+		if((header.status&0x80)==0) len=0;
+		else enc28j60_readBuf(len, buf);
+		//		Завершим буфер нулём
+		buf[len]=0;
+		//Инициализируем указатель буфера на адрес следующего пакета
+		if(gNextPacketPtr-1>RXSTOP_INIT)
+			enc28j60_writeReg(ERXRDPT,RXSTOP_INIT);
+		else
+			enc28j60_writeReg(ERXRDPT,gNextPacketPtr-1);
+		enc28j60_writeOp(ENC28J60_BIT_FIELD_SET,ECON2,ECON2_PKTDEC);
+
+	}
+	return len;
+}
+
+//--------------------------------------------------
 
 
 //--------------------------------------------------
