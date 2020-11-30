@@ -67,7 +67,7 @@ static void MX_USART1_UART_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
 

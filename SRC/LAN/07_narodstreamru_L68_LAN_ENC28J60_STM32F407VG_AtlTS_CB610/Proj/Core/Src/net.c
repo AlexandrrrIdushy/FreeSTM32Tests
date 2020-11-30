@@ -132,7 +132,7 @@ uint8_t ip_read(enc28j60_frame_ptr *frame, uint16_t len)
 	return res;
 }
 //-----------------------------------------------
-void eth_read(enc28j60_frame_ptr *frame, uint16_t len)
+void __attribute__((optimize("O0"))) eth_read(enc28j60_frame_ptr *frame, uint16_t len)
 {
 	if(len>sizeof(enc28j60_frame_ptr))
 	{
@@ -162,7 +162,7 @@ void eth_read(enc28j60_frame_ptr *frame, uint16_t len)
 	}
 }
 //-----------------------------------------------
-void net_poll(void)
+void __attribute__((optimize("O0"))) net_poll(void)
 {
 	uint16_t len;
 	enc28j60_frame_ptr *frame=(void*)net_buf;
