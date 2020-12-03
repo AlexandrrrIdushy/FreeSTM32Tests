@@ -93,7 +93,8 @@ int main(void)
   MX_DAC_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start(&htim6);
+  HAL_DAC_Start(&hdac,DAC_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
