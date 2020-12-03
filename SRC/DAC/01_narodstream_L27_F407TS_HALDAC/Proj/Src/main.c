@@ -91,13 +91,30 @@ int main(void)
   MX_GPIO_Init();
   MX_DAC_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_DAC_Start(&hdac,DAC_CHANNEL_1);
+  HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000000);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000280);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000500);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000780);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000999);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000780);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000500);
+//	HAL_Delay(2);
+//	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000280);
+//	HAL_Delay(2);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
