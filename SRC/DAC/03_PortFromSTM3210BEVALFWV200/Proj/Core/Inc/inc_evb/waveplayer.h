@@ -45,8 +45,9 @@ Finally, the data chunk contains the sample data:
 */
 
 /* Includes --------------------------------------------------------------------*/
-#include "stm32f10x.h"
-#include "spi_flash.h"
+//#include "stm32f10x.h"
+//#include "spi_flash.h"
+#include "stm32f4xx_hal.h"
 
 /* Exported types --------------------------------------------------------------*/
 typedef struct

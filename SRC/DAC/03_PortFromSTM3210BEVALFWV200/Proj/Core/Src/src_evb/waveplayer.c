@@ -15,7 +15,8 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "waveplayer.h"
+#include "stm32f4xx_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef enum
@@ -85,37 +86,37 @@ void WavePlayer_Init(void)
 
   /* TIM4 and TIM2 configuration is used also for voice recorder application */
 
-  /* Configure PB.08 as alternate function (TIM4_OC3) */
-  GPIOB_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIOB_InitStructure.GPIO_Pin = GPIO_Pin_8;
-  GPIOB_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOB, &GPIOB_InitStructure);
-
-  /* TIM4 used for PWM genration */
-  TIM_TimeBaseStructure.TIM_Prescaler = 0x00; /* TIM4CLK = 72 MHz */
-  TIM_TimeBaseStructure.TIM_Period = 0xFF;   /* PWM frequency : 281.250KHz*/
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-  /* TIM4's Channel3 in PWM1 mode */
-  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = 0x7F;  /* Duty cycle: 50%*/  
-  TIM_OC3Init(TIM4, &TIM_OCInitStructure);
-  TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
-
-  /* TIM2 used for timing, the timing period depends on wav file sample rate */
-  TIM_TimeBaseStructure.TIM_Prescaler = 0x00;    /* TIM2CLK = 72 MHz */
-  TIM_TimeBaseStructure.TIM_Period = TIM2ARRValue;
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
-  /* Output Compare Inactive Mode configuration: Channel1 */
-  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Inactive;
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = 0x0;
-  TIM_OC1Init(TIM2, &TIM_OCInitStructure);
-  TIM_OC1PreloadConfig(TIM2, TIM_OCPreload_Disable);
+//  /* Configure PB.08 as alternate function (TIM4_OC3) */
+//  GPIOB_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//  GPIOB_InitStructure.GPIO_Pin = GPIO_Pin_8;
+//  GPIOB_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//  GPIO_Init(GPIOB, &GPIOB_InitStructure);
+//
+//  /* TIM4 used for PWM genration */
+//  TIM_TimeBaseStructure.TIM_Prescaler = 0x00; /* TIM4CLK = 72 MHz */
+//  TIM_TimeBaseStructure.TIM_Period = 0xFF;   /* PWM frequency : 281.250KHz*/
+//  TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
+//  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+//  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+//  /* TIM4's Channel3 in PWM1 mode */
+//  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+//  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+//  TIM_OCInitStructure.TIM_Pulse = 0x7F;  /* Duty cycle: 50%*/
+//  TIM_OC3Init(TIM4, &TIM_OCInitStructure);
+//  TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
+//
+//  /* TIM2 used for timing, the timing period depends on wav file sample rate */
+//  TIM_TimeBaseStructure.TIM_Prescaler = 0x00;    /* TIM2CLK = 72 MHz */
+//  TIM_TimeBaseStructure.TIM_Period = TIM2ARRValue;
+//  TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
+//  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+//  TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+//  /* Output Compare Inactive Mode configuration: Channel1 */
+//  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Inactive;
+//  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+//  TIM_OCInitStructure.TIM_Pulse = 0x0;
+//  TIM_OC1Init(TIM2, &TIM_OCInitStructure);
+//  TIM_OC1PreloadConfig(TIM2, TIM_OCPreload_Disable);
 }
 
 /*******************************************************************************
