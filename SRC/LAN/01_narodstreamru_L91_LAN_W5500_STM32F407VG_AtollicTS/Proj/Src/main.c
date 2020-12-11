@@ -29,9 +29,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#define	MAIN_CODE_FROM_L91
+#define	DEBUG_READ_ALL_REGS
 //#define	DEBUG_TEST_SPI_AS_23_LESSONS
 //#define	DEBUG_SPI_READ_ANY_REGS
-#define	DEBUG_TEST_SPI_WRITE_AND_READE_FEW//пишем что то и желаем прочитать обратно это
+//#define	DEBUG_TEST_SPI_WRITE_AND_READE_FEW//пишем что то и желаем прочитать обратно это
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -109,10 +111,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-#ifndef	DEBUG_TEST_SPI_AS_23_LESSONS
-//  net_ini();
-
-
+#ifdef	MAIN_CODE_FROM_L91
+  net_ini();
 #endif
 #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
   uint8_t i=0;
@@ -268,16 +268,37 @@ int main(void)
 
  #ifdef	DEBUG_TEST_SPI_AS_23_LESSONS
 
-		for(i=0;i<=255;i+=10)
-		{
-			aTxBuffer[0]=i;
-			HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
-			cs_strob();
-			//HAL_Delay(1);
-		}
- #else
-//		net_poll();
+	for(i=0;i<=255;i+=10)
+	{
+		aTxBuffer[0]=i;
+		HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+		cs_strob();
+		//HAL_Delay(1);
+	}
  #endif
+#endif
+
+#ifdef	DEBUG_READ_ALL_REGS
+	//чтение
+	uint8_t bsb = 0;
+	uint8_t rwb = 0;
+	uint8_t om = 1;
+	uint8_t opcode = (((bsb << 3)|(rwb << 2))|om);//BSB + RWB + OM
+	uint8_t wbuf[] = {adr >> 8, adr, opcode,0xF1};
+	uint8_t rbuf[4];
+
+	SS_SELECT();
+	HAL_SPI_TransmitReceive(&hspi1, wbuf, rbuf, 4, 0xFFFFFFFF);
+	SS_DESELECT();
+	HAL_Delay(100);
+	if(adr > 0x39)
+		adr = 0;
+	else
+		adr++;
+#endif
+
+#ifdef	MAIN_CODE_FROM_L91
+//	net_poll();
 #endif
     /* USER CODE END WHILE */
 

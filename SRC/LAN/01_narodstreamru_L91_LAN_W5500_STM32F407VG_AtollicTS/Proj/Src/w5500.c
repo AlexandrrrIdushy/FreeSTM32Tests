@@ -83,12 +83,12 @@ void w5500_ini(void)
   HAL_Delay(100);
 
   //Configure Net
-//  w5500_writeReg(opcode, SHAR0,macaddr[0]);
-//  w5500_writeReg(opcode, SHAR1,macaddr[1]);
-//  w5500_writeReg(opcode, SHAR2,macaddr[2]);
-//  w5500_writeReg(opcode, SHAR3,macaddr[3]);
-//  w5500_writeReg(opcode, SHAR4,macaddr[4]);
-//  w5500_writeReg(opcode, SHAR5,macaddr[5]);
+  w5500_writeReg(opcode, SHAR0,macaddr[0]);
+  w5500_writeReg(opcode, SHAR1,macaddr[1]);
+  w5500_writeReg(opcode, SHAR2,macaddr[2]);
+  w5500_writeReg(opcode, SHAR3,macaddr[3]);
+  w5500_writeReg(opcode, SHAR4,macaddr[4]);
+  w5500_writeReg(opcode, SHAR5,macaddr[5]);
   w5500_writeReg(opcode, GWR0,ipgate[0]);
   HAL_Delay(100);
   w5500_writeReg(opcode, GWR1,ipgate[1]);
@@ -97,14 +97,14 @@ void w5500_ini(void)
   HAL_Delay(100);
   w5500_writeReg(opcode, GWR3,ipgate[3]);
   HAL_Delay(100);
-//  w5500_writeReg(opcode, SUBR0,ipmask[0]);
-//  w5500_writeReg(opcode, SUBR1,ipmask[1]);
-//  w5500_writeReg(opcode, SUBR2,ipmask[2]);
-//  w5500_writeReg(opcode, SUBR3,ipmask[3]);
-//  w5500_writeReg(opcode, SIPR0,ipaddr[0]);
-//  w5500_writeReg(opcode, SIPR1,ipaddr[1]);
-//  w5500_writeReg(opcode, SIPR2,ipaddr[2]);
-//  w5500_writeReg(opcode, SIPR3,ipaddr[3]);
+  w5500_writeReg(opcode, SUBR0,ipmask[0]);
+  w5500_writeReg(opcode, SUBR1,ipmask[1]);
+  w5500_writeReg(opcode, SUBR2,ipmask[2]);
+  w5500_writeReg(opcode, SUBR3,ipmask[3]);
+  w5500_writeReg(opcode, SIPR0,ipaddr[0]);
+  w5500_writeReg(opcode, SIPR1,ipaddr[1]);
+  w5500_writeReg(opcode, SIPR2,ipaddr[2]);
+  w5500_writeReg(opcode, SIPR3,ipaddr[3]);
 
 //  //Настраиваем сокет 0
 //  opcode = (BSB_S0<<3)|OM_FDM1;
