@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +47,18 @@ SD_HandleTypeDef hsd1;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+uint8_t curBufIdx = 0;
+uint8_t wavBuf[2][WAV_BUF_SIZE];
+uint16_t curBufOffset = 0;
+uint8_t wavReadFlag = 0;
+uint32_t wavDataSize = 0;
+uint32_t curWavIdx = 0;
+uint8_t stopFlag = 0;
 
+FATFS fileSystem;
+FIL audioFile;
+uint32_t readBytes = 0;
+FRESULT res;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
