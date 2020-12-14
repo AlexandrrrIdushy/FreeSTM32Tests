@@ -57,7 +57,11 @@ static void MX_SDMMC1_SD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+FATFS SDFatFs;  /* File system object for SD card logical drive */
 
+FIL MyFile;     /* File object */
+
+char SD_Path[4];  /* SD logical drive path */
 /* USER CODE END 0 */
 
 /**
@@ -91,7 +95,24 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-
+  FRESULT res = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
+	 if(res != FR_OK)
+	    Error_Handler();
+	  else
+	  {
+		  uint8_t arr[] = {0, 1, 2};
+		  uint8_t arrrd[20];
+		  uint8_t* bw;
+		  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
+		  res = f_read(&MyFile, arrrd, 10, bw);
+		  res = f_write(&MyFile, arr, 3, bw);
+//          if(f_open(&MyFile, ".\adr.txt", FA_READ) != FR_OK)
+//                    Error_Handler();
+//            else
+//            {
+//                          f_close(&MyFile);
+//            }
+	  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
