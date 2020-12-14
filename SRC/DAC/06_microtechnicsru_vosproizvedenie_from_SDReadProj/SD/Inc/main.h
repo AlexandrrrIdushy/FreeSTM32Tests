@@ -37,7 +37,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+#define WAV_BUF_SIZE	512
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
