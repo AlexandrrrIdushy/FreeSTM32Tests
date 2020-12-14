@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define	DEBUG_TEST_READ_TEXT_FROM_SD
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -124,63 +124,68 @@ int main(void)
 //  MX_FATFS_Init();
 
   /* USER CODE BEGIN 2 */
-  res = f_mount(&fileSystem, SDPath, 1);
-  uint8_t path[10] = "audio.wav";
-  res = f_open(&audioFile, (char*)path, FA_READ);
-
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  //#1
-  uint8_t* bw;
-  FRESULT res;
-  //#2
-  //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
-  uint16_t dataOffset = 0;
-  res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
-  for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
-  {
-      if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
-          (wavBuf[0][i + 2] == 't') && (wavBuf[0][i + 3] == 'a'))
-      {
-          dataOffset = i + 8;
-          break;
-      }
-  }
-  //#3
-  //«аголовок обнаружен, перемещаем указатель FatFs дл€ работы с файлом на аудио-данные и заодно определ€ем количество байт данных. ƒл€ этого вычитаем из общего размера файла размер заголовка:
-  res = f_lseek(&audioFile, dataOffset);
-  wavDataSize = f_size(&audioFile) - dataOffset;
-  //#3
-//  –еализуем этот механизм и, первым делом, заполн€ем оба буфера данными:
-    res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
-    res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
-    //#5
-//  ѕоскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
-    HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
-    HAL_TIM_Base_Start_IT(&htim6);
-
-
-//  //код проверки чтени€ SD карты
-//  res = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
-//	 if(res != FR_OK)
-//	    Error_Handler();
-//	  else
-//	  {
-//		  uint8_t arr[] = {0, 1, 2};
-//		  uint8_t arrrd[20];
+//  res = f_mount(&fileSystem, SDPath, 1);
+//  uint8_t path[10] = "audio.wav";
+//  res = f_open(&audioFile, (char*)path, FA_READ);
 //
-//		  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
-//		  res = f_read(&MyFile, arrrd, 10, bw);
-//		  res = f_write(&MyFile, arr, 3, bw);
-////          if(f_open(&MyFile, ".\adr.txt", FA_READ) != FR_OK)
-////                    Error_Handler();
-////            else
-////            {
-////                          f_close(&MyFile);
-////            }
-//	  }
+//  /* USER CODE END 2 */
+//
+//  /* Infinite loop */
+//  /* USER CODE BEGIN WHILE */
+//  //#1
+//  uint8_t* bw;
+//  FRESULT res;
+//  //#2
+//  //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
+//  uint16_t dataOffset = 0;
+//  res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+//  for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
+//  {
+//      if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
+//          (wavBuf[0][i + 2] == 't') && (wavBuf[0][i + 3] == 'a'))
+//      {
+//          dataOffset = i + 8;
+//          break;
+//      }
+//  }
+//  //#3
+//  //«аголовок обнаружен, перемещаем указатель FatFs дл€ работы с файлом на аудио-данные и заодно определ€ем количество байт данных. ƒл€ этого вычитаем из общего размера файла размер заголовка:
+//  res = f_lseek(&audioFile, dataOffset);
+//  wavDataSize = f_size(&audioFile) - dataOffset;
+//  //#3
+////  –еализуем этот механизм и, первым делом, заполн€ем оба буфера данными:
+//    res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+//    res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
+//    //#5
+////  ѕоскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
+//    HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+//    HAL_TIM_Base_Start_IT(&htim6);
+
+#ifdef	DEBUG_TEST_READ_TEXT_FROM_SD
+  //код проверки чтени€ SD карты
+    uint8_t* bw;
+    FRESULT res;
+  res = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
+	 if(res != FR_OK)
+	    Error_Handler();
+	  else
+	  {
+		  uint8_t arr[] = {0, 1, 2};
+		  uint8_t arrrd[20];
+
+		  res = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
+		  res = f_read(&MyFile, arrrd, 10, bw);
+		  res = f_write(&MyFile, arr, 3, bw);
+//          if(f_open(&MyFile, ".\adr.txt", FA_READ) != FR_OK)
+//                    Error_Handler();
+//            else
+//            {
+//                          f_close(&MyFile);
+//            }
+	  }
+#endif
+
+
   while (1)
   {
 
@@ -422,45 +427,45 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void TIM6_IRQHandler(void)
-{
-    /* USER CODE BEGIN TIM6_IRQn 0 */
-
-    /* USER CODE END TIM6_IRQn 0 */
-    HAL_TIM_IRQHandler(&htim6);
-    /* USER CODE BEGIN TIM6_IRQn 1 */
-    uint16_t dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
-    dacData /= 16;
-    HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dacData);
-
-    curBufOffset += 2;
-    curWavIdx += 2;
-
-    if (curWavIdx >= wavDataSize)
-    {
-        HAL_TIM_Base_Stop_IT(&htim6);
-        stopFlag = 1;
-    }
-    else
-    {
-        if (curBufOffset == WAV_BUF_SIZE)
-        {
-            curBufOffset = 0;
-
-            if (curBufIdx == 0)
-            {
-                curBufIdx = 1;
-            }
-            else
-            {
-                curBufIdx = 0;
-            }
-
-            wavReadFlag = 1;
-        }
-    }
-    /* USER CODE END TIM6_IRQn 1 */
-}
+//void TIM6_IRQHandler(void)
+//{
+//    /* USER CODE BEGIN TIM6_IRQn 0 */
+//
+//    /* USER CODE END TIM6_IRQn 0 */
+//    HAL_TIM_IRQHandler(&htim6);
+//    /* USER CODE BEGIN TIM6_IRQn 1 */
+//    uint16_t dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
+//    dacData /= 16;
+//    HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dacData);
+//
+//    curBufOffset += 2;
+//    curWavIdx += 2;
+//
+//    if (curWavIdx >= wavDataSize)
+//    {
+//        HAL_TIM_Base_Stop_IT(&htim6);
+//        stopFlag = 1;
+//    }
+//    else
+//    {
+//        if (curBufOffset == WAV_BUF_SIZE)
+//        {
+//            curBufOffset = 0;
+//
+//            if (curBufIdx == 0)
+//            {
+//                curBufIdx = 1;
+//            }
+//            else
+//            {
+//                curBufIdx = 0;
+//            }
+//
+//            wavReadFlag = 1;
+//        }
+//    }
+//    /* USER CODE END TIM6_IRQn 1 */
+//}
 /* USER CODE END 4 */
 
 /**
