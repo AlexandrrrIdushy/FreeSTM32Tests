@@ -21,7 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "fatfs.h"
-
+//#include "stm32l4xx_hal_dac.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
@@ -89,7 +89,7 @@ char SD_Path[4];  /* SD logical drive path */
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -147,7 +147,7 @@ int main(void)
     res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
     //#5
 //  ѕоскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
-    HAL_DAC_Start(&hdac, DAC_CHANNEL_2);
+    HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
     HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
@@ -433,7 +433,7 @@ void TIM6_IRQHandler(void)
     /* USER CODE BEGIN TIM6_IRQn 1 */
     uint16_t dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
     dacData /= 16;
-    HAL_DAC_SetValue(&hdac, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dacData);
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dacData);
 
     curBufOffset += 2;
     curWavIdx += 2;
