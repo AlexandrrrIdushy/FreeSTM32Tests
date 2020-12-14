@@ -21,7 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "fatfs.h"
-//#include "stm32l4xx_hal_dac.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
@@ -89,7 +89,7 @@ char SD_Path[4];  /* SD logical drive path */
   * @brief  The application entry point.
   * @retval int
   */
-int __attribute__((optimize("O0"))) main(void)
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -118,7 +118,6 @@ int __attribute__((optimize("O0"))) main(void)
   MX_FATFS_Init();
   MX_DAC1_Init();
   MX_TIM6_Init();
-
   /* USER CODE BEGIN 2 */
   res = f_mount(&fileSystem, SDPath, 1);
   uint8_t path[10] = "audio.wav";
