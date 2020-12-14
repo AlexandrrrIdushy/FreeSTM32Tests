@@ -423,12 +423,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void TIM6_IRQHandler(void)
+void UserTIM6IRQHandler(void)
 {
     /* USER CODE BEGIN TIM6_IRQn 0 */
 
     /* USER CODE END TIM6_IRQn 0 */
-    HAL_TIM_IRQHandler(&htim6);
+//    HAL_TIM_IRQHandler(&htim6);
     /* USER CODE BEGIN TIM6_IRQn 1 */
     uint16_t dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
     dacData /= 16;
