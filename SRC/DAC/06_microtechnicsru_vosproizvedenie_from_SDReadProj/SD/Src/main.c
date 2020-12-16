@@ -30,6 +30,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_VIEW_FREQ_IRQ
+#define	DEBUG_ANY_MANUAL_SIGNAL
+//#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -83,16 +85,21 @@ FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
 char SD_Path[4];  /* SD logical drive path */
 #endif
+uint16_t _val;
+uint16_t _cnt;
+#define STEP_VAL	1
+#define MAX_VAL		0xFFF
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	_val = 0;
+	int8_t _flag = 0;
   /* USER CODE END 1 */
   
 
@@ -119,14 +126,15 @@ int main(void)
   MX_DAC1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+#ifdef	NORMAL_MODE
   FRESULT res;
   FRESULT resTryMount;
   FRESULT resTryOpenFile;
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
 //  uint8_t path[10] = "audio.wav";
-  uint8_t path[10] = "audis.wav";
-//  uint8_t path[10] = "audil.wav";
+//  uint8_t path[10] = "audis.wav";
+  uint8_t path[10] = "audil.wav";
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
   //#2
   //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
@@ -151,6 +159,7 @@ int main(void)
     res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
     res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
     //#5
+#endif
 //  ѕоскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
     HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
     HAL_TIM_Base_Start_IT(&htim6);
@@ -188,7 +197,35 @@ int main(void)
 
   while (1)
   {
+#ifdef	DEBUG_ANY_MANUAL_SIGNAL
+//	  HAL_Delay(10);
 
+		if(_cnt < 2)
+			_cnt++;
+		else
+			_cnt = 0;
+
+		if(_cnt == 0)
+		{
+			if(_flag == 0)
+			{
+				if(_val < MAX_VAL)
+					_val = _val + STEP_VAL;
+				else
+					_flag = 1;
+
+			}
+			else
+			{
+				if(_val > 0)
+					_val = _val - STEP_VAL;
+				else
+					_flag = 0;
+			}
+
+		}
+#endif
+#ifdef	NORMAL_MODE
 	  if (wavReadFlag == 1)
 	  {
 	      uint8_t readBufIdx = 0;
@@ -207,7 +244,7 @@ int main(void)
 	      res = f_close(&audioFile);
 	      stopFlag = 0;
 	  }
-
+#endif
 
 //	  //# ? дальшейшего кода нет в скачанном исходнике
 ////	  ¬ общем-то по окончанию файла отключаем таймер и выставл€ем флаг stopFlag в 1:
@@ -430,6 +467,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 uint16_t _dacData;
+
 void __attribute__((optimize("O0"))) UserTIM6IRQHandler(void)
 {
 #ifdef	DEBUG_VIEW_FREQ_IRQ
@@ -440,7 +478,13 @@ void __attribute__((optimize("O0"))) UserTIM6IRQHandler(void)
 	asm("nop");
 	asm("nop");
 	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
-#else
+#endif
+#ifdef	DEBUG_ANY_MANUAL_SIGNAL
+
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _val);
+#endif
+#ifdef	NORMAL_MODE
+
     _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
     _dacData /= 16;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
