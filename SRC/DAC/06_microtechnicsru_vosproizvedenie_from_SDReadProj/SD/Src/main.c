@@ -29,7 +29,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+//#define	DEBUG_VIEW_FREQ_IRQ
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -62,7 +62,7 @@ uint8_t stopFlag = 0;
 FATFS fileSystem;
 FIL audioFile;
 uint32_t readBytes = 0;
-FRESULT res;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,13 +119,19 @@ int main(void)
   MX_DAC1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  res = f_mount(&fileSystem, SDPath, 1);
-  uint8_t path[10] = "audio.wav";
-  res = f_open(&audioFile, (char*)path, FA_READ);
+  FRESULT res;
+  FRESULT resTryMount;
+  FRESULT resTryOpenFile;
+  FRESULT resTryReadFile;
+  resTryMount = f_mount(&fileSystem, SDPath, 1);
+//  uint8_t path[10] = "audio.wav";
+  uint8_t path[10] = "audis.wav";
+//  uint8_t path[10] = "audil.wav";
+  resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
   //#2
   //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
   uint16_t dataOffset = 0;
-  res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+  resTryReadFile = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
   for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
   {
       if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
@@ -426,38 +432,47 @@ static void MX_GPIO_Init(void)
 uint16_t _dacData;
 void __attribute__((optimize("O0"))) UserTIM6IRQHandler(void)
 {
+#ifdef	DEBUG_VIEW_FREQ_IRQ
 	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0xFFFF);
-//    _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
-//    _dacData /= 16;
-//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
-//
-//    curBufOffset += 2;
-//    curWavIdx += 2;
-//
-//    if (curWavIdx >= wavDataSize)
-//    {
-//        HAL_TIM_Base_Stop_IT(&htim6);
-//        stopFlag = 1;
-//    }
-//    else
-//    {
-//        if (curBufOffset == WAV_BUF_SIZE)
-//        {
-//            curBufOffset = 0;
-//
-//            if (curBufIdx == 0)
-//            {
-//                curBufIdx = 1;
-//            }
-//            else
-//            {
-//                curBufIdx = 0;
-//            }
-//
-//            wavReadFlag = 1;
-//        }
-//    }
+	asm("nop");
+	asm("nop");
+	asm("nop");
+	asm("nop");
+	asm("nop");
 	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+#else
+    _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
+    _dacData /= 16;
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
+
+    curBufOffset += 2;
+    curWavIdx += 2;
+
+    if (curWavIdx >= wavDataSize)
+    {
+        HAL_TIM_Base_Stop_IT(&htim6);
+        stopFlag = 1;
+    }
+    else
+    {
+        if (curBufOffset == WAV_BUF_SIZE)
+        {
+            curBufOffset = 0;
+
+            if (curBufIdx == 0)
+            {
+                curBufIdx = 1;
+            }
+            else
+            {
+                curBufIdx = 0;
+            }
+
+            wavReadFlag = 1;
+        }
+    }
+
+#endif
 }
 /* USER CODE END 4 */
 
