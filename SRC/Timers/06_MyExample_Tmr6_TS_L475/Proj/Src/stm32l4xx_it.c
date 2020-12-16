@@ -27,7 +27,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-
+int cntT2 = 0;
+int cntT6 = 0;
+int cntT7 = 0;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -202,9 +204,6 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles TIM2 global interrupt.
   */
-int cntT2 = 0;
-int cntT6 = 0;
-int cntT7 = 0;
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
@@ -241,10 +240,9 @@ void TIM7_IRQHandler(void)
   /* USER CODE BEGIN TIM7_IRQn 0 */
 
   /* USER CODE END TIM7_IRQn 0 */
-//  HAL_TIM_IRQHandler(&htim7);
-  cntT7++;
+  HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
-
+  cntT7++;
   /* USER CODE END TIM7_IRQn 1 */
 }
 
