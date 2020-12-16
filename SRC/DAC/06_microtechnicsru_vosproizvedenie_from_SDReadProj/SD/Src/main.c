@@ -387,10 +387,10 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 199;
+  htim6.Init.Prescaler = 99;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 1;
-  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
     Error_Handler();
@@ -423,44 +423,41 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void UserTIM6IRQHandler(void)
+uint16_t _dacData;
+void __attribute__((optimize("O0"))) UserTIM6IRQHandler(void)
 {
-    /* USER CODE BEGIN TIM6_IRQn 0 */
-
-    /* USER CODE END TIM6_IRQn 0 */
-//    HAL_TIM_IRQHandler(&htim6);
-    /* USER CODE BEGIN TIM6_IRQn 1 */
-    uint16_t dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
-    dacData /= 16;
-    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dacData);
-
-    curBufOffset += 2;
-    curWavIdx += 2;
-
-    if (curWavIdx >= wavDataSize)
-    {
-        HAL_TIM_Base_Stop_IT(&htim6);
-        stopFlag = 1;
-    }
-    else
-    {
-        if (curBufOffset == WAV_BUF_SIZE)
-        {
-            curBufOffset = 0;
-
-            if (curBufIdx == 0)
-            {
-                curBufIdx = 1;
-            }
-            else
-            {
-                curBufIdx = 0;
-            }
-
-            wavReadFlag = 1;
-        }
-    }
-    /* USER CODE END TIM6_IRQn 1 */
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0xFFFF);
+//    _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
+//    _dacData /= 16;
+//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
+//
+//    curBufOffset += 2;
+//    curWavIdx += 2;
+//
+//    if (curWavIdx >= wavDataSize)
+//    {
+//        HAL_TIM_Base_Stop_IT(&htim6);
+//        stopFlag = 1;
+//    }
+//    else
+//    {
+//        if (curBufOffset == WAV_BUF_SIZE)
+//        {
+//            curBufOffset = 0;
+//
+//            if (curBufIdx == 0)
+//            {
+//                curBufIdx = 1;
+//            }
+//            else
+//            {
+//                curBufIdx = 0;
+//            }
+//
+//            wavReadFlag = 1;
+//        }
+//    }
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
 }
 /* USER CODE END 4 */
 
