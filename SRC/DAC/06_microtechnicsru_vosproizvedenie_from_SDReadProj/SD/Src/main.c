@@ -29,9 +29,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-//#define	DEBUG_VIEW_FREQ_IRQ
+#define	DEBUG_VIEW_FREQ_IRQ
 //#define	DEBUG_ANY_MANUAL_SIGNAL
-#define	NORMAL_MODE
+//#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -95,7 +95,7 @@ uint16_t _cnt;
   * @brief  The application entry point.
   * @retval int
   */
-int __attribute__((optimize("O0"))) main(void)
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 	_val = 0;
@@ -406,7 +406,7 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 99;
+  htim6.Init.Prescaler = 2500;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 1;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
