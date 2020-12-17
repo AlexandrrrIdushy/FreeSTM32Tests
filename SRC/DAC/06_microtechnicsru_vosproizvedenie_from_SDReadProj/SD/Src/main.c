@@ -30,8 +30,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_VIEW_FREQ_IRQ
-#define	DEBUG_ANY_MANUAL_SIGNAL
-//#define	NORMAL_MODE
+//#define	DEBUG_ANY_MANUAL_SIGNAL
+#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -132,9 +132,9 @@ int __attribute__((optimize("O0"))) main(void)
   FRESULT resTryOpenFile;
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
-//  uint8_t path[10] = "audio.wav";
+  uint8_t path[10] = "audio.wav";
 //  uint8_t path[10] = "audis.wav";
-  uint8_t path[10] = "audil.wav";
+//  uint8_t path[10] = "audil.wav";
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
   //#2
   //Таким образом, находим позицию в буфере, которая соответствует символу ‘d’ и прибавляем к этому значению 8 (4 байта для ‘data’ и 4 байта для размера данных):
@@ -153,8 +153,11 @@ int __attribute__((optimize("O0"))) main(void)
   //#3
   //Заголовок обнаружен, перемещаем указатель FatFs для работы с файлом на аудио-данные и заодно определяем количество байт данных. Для этого вычитаем из общего размера файла размер заголовка:
   res = f_lseek(&audioFile, dataOffset);
-  wavDataSize = f_size(&audioFile) - dataOffset;
+  wavDataSize = f_size(&audioFile) - dataOffset;//[байт] длина полной последовательности аудио данных
   //#3
+  //нужно быстро выводить данные на ЦАП. для этого сделаем буферизацию.
+  //в два буфера wavBuf[0] и wavBuf[1] будем пихать массив данных из файла
+  //когда выводим на ЦАП буфер 1 заполняем буфер 2 и наоборот
 //  Реализуем этот механизм и, первым делом, заполняем оба буфера данными:
     res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
     res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
@@ -200,13 +203,13 @@ int __attribute__((optimize("O0"))) main(void)
 #ifdef	DEBUG_ANY_MANUAL_SIGNAL
 //	  HAL_Delay(10);
 
-		if(_cnt < 2)
-			_cnt++;
-		else
-			_cnt = 0;
-
-		if(_cnt == 0)
-		{
+//		if(_cnt < 2)
+//			_cnt++;
+//		else
+//			_cnt = 0;
+//
+//		if(_cnt == 0)
+//		{
 			if(_flag == 0)
 			{
 				if(_val < MAX_VAL)
@@ -223,17 +226,17 @@ int __attribute__((optimize("O0"))) main(void)
 					_flag = 0;
 			}
 
-		}
+//		}
 #endif
 #ifdef	NORMAL_MODE
 	  if (wavReadFlag == 1)
 	  {
-	      uint8_t readBufIdx = 0;
+//		  все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
 
+		  //если сейчас озвучивается буфер 1 то заполняется буфер 2, и наоборот
+	      uint8_t readBufIdx = 0;
 	      if (curBufIdx == 0)
-	      {
 	          readBufIdx = 1;
-	      }
 	      res = f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
 	      wavReadFlag = 0;
 	  }
@@ -241,38 +244,11 @@ int __attribute__((optimize("O0"))) main(void)
 	  //Кроме того, сразу же в while(1) помещаем код, который отвечает за окончание воспроизведения, когда файл подошел к концу:
 	  if (stopFlag == 1)
 	  {
+		  //просто закрываем файл
 	      res = f_close(&audioFile);
 	      stopFlag = 0;
 	  }
 #endif
-
-//	  //# ? дальшейшего кода нет в скачанном исходнике
-////	  В общем-то по окончанию файла отключаем таймер и выставляем флаг stopFlag в 1:
-//
-//	  if (curWavIdx >= wavDataSize)
-//	  {
-//	      HAL_TIM_Base_Stop_IT(&htim6);
-//	      stopFlag = 1;
-//	  }
-//
-//	  //#
-//	  //Если конец файла еще не достигнут, то проверяем счетчик curBufOffset. Если значение равно 512 (WAV_BUF_SIZE), то буфер подошел к концу, а значит надо изменить номер активного буфера и выставить флаг wavReadFlag:
-//	  if (curBufOffset == WAV_BUF_SIZE)
-//	  {
-//	      curBufOffset = 0;
-//
-//	      if (curBufIdx == 0)
-//	      {
-//	          curBufIdx = 1;
-//	      }
-//	      else
-//	      {
-//	          curBufIdx = 0;
-//	      }
-//
-//	      wavReadFlag = 1;
-//	  }
-
 
     /* USER CODE END WHILE */
 
@@ -489,30 +465,32 @@ void __attribute__((optimize("O0"))) UserTIM6IRQHandler(void)
     _dacData /= 16;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
 
-    curBufOffset += 2;
-    curWavIdx += 2;
+    //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
+    curBufOffset += 2;//номер текущего байта в буфере, этот счетчик, соответственно, будет изменяться от 0 до 512.
+    curWavIdx += 2;//общий счетчик байт wav-файла. Его мы используем, чтобы обнаружить конец трека и остановить воспроизведение.
 
     if (curWavIdx >= wavDataSize)
     {
+    	//все данные озвучены, останавливаем процесс
         HAL_TIM_Base_Stop_IT(&htim6);
         stopFlag = 1;
     }
     else
     {
+    	//#
+    	//Если конец файла еще не достигнут, то проверяем счетчик curBufOffset. Если значение равно 512 (WAV_BUF_SIZE), то буфер подошел к концу, а значит надо изменить номер активного буфера и выставить флаг wavReadFlag:
+
         if (curBufOffset == WAV_BUF_SIZE)
         {
             curBufOffset = 0;
 
+            //смена текущего рабочего буфера из которого нужно озвучивать
             if (curBufIdx == 0)
-            {
                 curBufIdx = 1;
-            }
             else
-            {
                 curBufIdx = 0;
-            }
 
-            wavReadFlag = 1;
+            wavReadFlag = 1;//флаг = "все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
         }
     }
 
