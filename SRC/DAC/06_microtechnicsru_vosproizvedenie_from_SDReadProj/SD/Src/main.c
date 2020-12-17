@@ -29,9 +29,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define	DEBUG_VIEW_FREQ_IRQ
+//#define	DEBUG_VIEW_FREQ_IRQ
 //#define	DEBUG_ANY_MANUAL_SIGNAL
-//#define	NORMAL_MODE
+#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -132,9 +132,9 @@ int main(void)
   FRESULT resTryOpenFile;
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
-  uint8_t path[10] = "audio.wav";
+//  uint8_t path[10] = "audio.wav";
 //  uint8_t path[10] = "audis.wav";
-//  uint8_t path[10] = "audil.wav";
+  uint8_t path[10] = "audil.wav";
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
   //#2
   //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
