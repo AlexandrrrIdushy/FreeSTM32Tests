@@ -43,6 +43,10 @@
 SPI_HandleTypeDef hspi3;
 
 /* USER CODE BEGIN PV */
+#define cs_set() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET)
+#define cs_reset() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET)
+#define cs_strob() cs_reset();cs_set()
+uint8_t aTxBuffer[1]={0};
 
 /* USER CODE END PV */
 
@@ -89,6 +93,15 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
+	cs_set();
+	aTxBuffer[0]=0x01;
+	HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
+	cs_strob();
+	HAL_Delay(100);
+	aTxBuffer[0]=0xFF;
+	HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
+	cs_strob();
+	HAL_Delay(100);
 
   /* USER CODE END 2 */
 
@@ -96,6 +109,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		for(int i=0;i<=255;i++)
+		{
+			aTxBuffer[0]=i;
+			HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
+			cs_strob();
+			//HAL_Delay(1);
+		}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
