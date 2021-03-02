@@ -97,24 +97,25 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int timeout = 8;
   while (1)
   {
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000000);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000280);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000500);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000780);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000999);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000780);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000500);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
 	HAL_DAC_SetValue(&hdac,DAC_CHANNEL_1,DAC_ALIGN_12B_R,0x00000280);
-	HAL_Delay(2);
+	HAL_Delay(timeout);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
