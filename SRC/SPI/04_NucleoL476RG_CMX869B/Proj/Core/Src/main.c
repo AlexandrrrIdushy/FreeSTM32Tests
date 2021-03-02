@@ -106,7 +106,7 @@ int main(void)
   {
 	  cs_set();
 
-	  HAL_SPI_Transmit(&hspi3,(uint8_t*)aTxBuffer, 1, 100);
+	  HAL_SPI_Transmit(&hspi1,(uint8_t*)aTxBuffer, 1, 100);
 	  cs_reset();
 	  HAL_Delay(500);
     /* USER CODE END WHILE */
