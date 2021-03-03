@@ -45,8 +45,8 @@ SPI_HandleTypeDef hspi3;
 /* USER CODE BEGIN PV */
 /* Private variables ———————————————————*/
 //некоторые дефайны для управления ножкой Chip Select
-#define cs_set() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET)
-#define cs_reset() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET)
+#define cs_set() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET)
+#define cs_reset() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET)
 #define cs_strob() cs_reset();cs_set()
 uint8_t aTxBuffer[1]={0};
 /* USER CODE END PV */
@@ -97,11 +97,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	cs_set();
 	aTxBuffer[0]=0x01;
-	HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+	HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
 	cs_strob();
 	HAL_Delay(100);
 	aTxBuffer[0]=0xFF;
-	HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 5000);
+	HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 5000);
 	cs_strob();
 	HAL_Delay(100);
 
@@ -114,7 +114,7 @@ int main(void)
 		for(i=0;i<=255;i++)
 		{
 			aTxBuffer[0]=i;
-			HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 0xFFFFFFFF);
+			HAL_SPI_Transmit (&hspi3, (uint8_t*)aTxBuffer, 1, 0xFFFFFFFF);
 			cs_strob();
 			HAL_Delay(100);
 		}
