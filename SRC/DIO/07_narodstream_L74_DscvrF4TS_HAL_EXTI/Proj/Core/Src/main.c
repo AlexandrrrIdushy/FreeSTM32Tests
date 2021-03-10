@@ -86,7 +86,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,8 +178,22 @@ static void MX_GPIO_Init(void)
 
 }
 
+int dbgCnt;
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
+{
+	if(GPIO_Pin== GPIO_PIN_1)
+	{
+		dbgCnt++;
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
+//		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_SET);
+//		HAL_
+//		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_1, GPIO_PIN_RESET);
+	}
+	else
+		__NOP();
+}
 /* USER CODE END 4 */
 
 /**
