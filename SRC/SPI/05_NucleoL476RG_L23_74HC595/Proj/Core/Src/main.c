@@ -44,8 +44,8 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 //некоторые дефайны для управления ножкой Chip Select
-#define cs_set() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_RESET)
-#define cs_reset() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0, GPIO_PIN_SET)
+#define cs_set() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET)
+#define cs_reset() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET)
 #define cs_strob() cs_reset();cs_set()
 uint8_t aTxBuffer[1]={0};
 
@@ -104,7 +104,8 @@ int main(void)
 	  asm("nop");//
 		for(i=0;i<=255;i++)
 		{
-			aTxBuffer[0]=i;
+//			aTxBuffer[0]=i;
+			aTxBuffer[0]=0xAA;
 			HAL_SPI_Transmit (&hspi1, (uint8_t*)aTxBuffer, 1, 0xFFFFFFFF);
 			cs_strob();
 			HAL_Delay(300);
