@@ -103,12 +103,14 @@ int main(void)
   while (1)
   {
 	  cs_set();
-
+	  aTxBuffer[0] = 0xE5;
 	  HAL_SPI_Transmit(&hspi1,(uint8_t*)aTxBuffer, 1, 100);
+	  HAL_Delay(10);
 	  cs_reset();
-	  HAL_Delay(500);
-	  i++;
-	  aTxBuffer[0] = i;
+	  HAL_Delay(100);
+
+//	  i++;
+//	  aTxBuffer[0] = i;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
