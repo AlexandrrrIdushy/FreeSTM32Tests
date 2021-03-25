@@ -25,7 +25,8 @@
 #define cs_set() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET)
 #define cs_reset() HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET)
 #define cs_strob() cs_reset();cs_set()
-uint8_t aTxBuffer[1]={0};
+uint8_t aTxBuffer[]={0};
+uint8_t aRxBuffer[]={0, 0};
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,7 +93,6 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  aTxBuffer[0] = 0xBB;
   uint8_t i = 0;
 
 //  cs_strob();
@@ -103,9 +103,12 @@ int main(void)
   while (1)
   {
 	  cs_set();
-	  aTxBuffer[0] = 0xE5;
+	  aTxBuffer[0] = 0xE6;
+//	  aTxBuffer[0] = 0x01;
 	  HAL_SPI_Transmit(&hspi1,(uint8_t*)aTxBuffer, 1, 100);
-	  HAL_Delay(10);
+	  HAL_SPI_Receive(&hspi1,(uint8_t*)aRxBuffer, 2, 100);
+	  aRxBuffer[0] = 0;
+//	  HAL_Delay(10);
 	  cs_reset();
 	  HAL_Delay(100);
 
