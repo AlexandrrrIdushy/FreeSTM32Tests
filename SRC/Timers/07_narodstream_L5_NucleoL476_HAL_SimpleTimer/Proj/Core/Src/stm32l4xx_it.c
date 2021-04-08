@@ -206,7 +206,9 @@ void SysTick_Handler(void)
 void TIM1_TRG_COM_TIM17_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 0 */
-	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
+//	HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_2);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
+	HAL_TIM_Base_Stop_IT(&htim17);//остановить пока не дойдем в основном цикле до запуска
   /* USER CODE END TIM1_TRG_COM_TIM17_IRQn 0 */
   HAL_TIM_IRQHandler(&htim17);
   /* USER CODE BEGIN TIM1_TRG_COM_TIM17_IRQn 1 */

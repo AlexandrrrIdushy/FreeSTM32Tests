@@ -93,13 +93,30 @@ int main(void)
   MX_TIM17_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
-  HAL_TIM_Base_Start_IT(&htim17);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  //вар1. x. запускаем таймер для срабатывания однократного  прерывания
+//	  __HAL_TIM_SET_COUNTER(&htim17,0);
+//	  HAL_TIM_Base_Start_IT(&htim17);
+//	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
+//	  HAL_Delay(200);
+
+	  //вар2. w. почти как в gsm.
+		__HAL_TIM_DISABLE(&htim17); //отключить периферию таймера
+		__HAL_TIM_SET_COUNTER(&htim17, 0); //задать значение счетчику таймера
+		__HAL_TIM_CLEAR_FLAG(&htim17, TIM_FLAG_UPDATE); //сбросить UIF Update interrupt flag сбрасывается из ПО
+		__HAL_TIM_SET_AUTORELOAD(&htim17, 65535); //установить значение регистра автоперезагрузки
+		__HAL_TIM_ENABLE_IT(&htim17, TIM_IT_UPDATE); //UIE: Update interrupt enable по идее включает режим ?можно однократно
+		__HAL_TIM_ENABLE(&htim17); //Enable the TIM peripheral включить периферию таймера
+		//
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
+		HAL_Delay(300);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -203,7 +220,7 @@ static void MX_TIM17_Init(void)
 
   /* USER CODE END TIM17_Init 1 */
   htim17.Instance = TIM17;
-  htim17.Init.Prescaler = 10;
+  htim17.Init.Prescaler = 1;
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim17.Init.Period = 65535;
   htim17.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -237,7 +254,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : PD2 */
   GPIO_InitStruct.Pin = GPIO_PIN_2;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
