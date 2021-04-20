@@ -89,7 +89,9 @@ int main(void)
   MX_GPIO_Init();
   MX_WWDG_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
