@@ -132,9 +132,13 @@ int main(void)
   FRESULT resTryOpenFile;
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
-//  uint8_t path[10] = "audio.wav";
-//  uint8_t path[10] = "audis.wav";
-  uint8_t path[10] = "audil.wav";
+//  uint8_t path[] = "audio.wav";//шипение
+  uint8_t path[] = "gardenss.wav";//v
+//  uint8_t path[] = "gandenss22KHz.wav";
+//  uint8_t path[] = "Dubstep.wav";//v
+//  uint8_t path[] = "ClearDay.wav";//v
+//  uint8_t path[] = "Ircastapianos8.wav";//x
+
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
   //#2
   //“аким образом, находим позицию в буфере, котора€ соответствует символу СdТ и прибавл€ем к этому значению 8 (4 байта дл€ СdataТ и 4 байта дл€ размера данных):
@@ -406,7 +410,8 @@ static void MX_TIM6_Init(void)
 
   /* USER CODE END TIM6_Init 1 */
   htim6.Instance = TIM6;
-  htim6.Init.Prescaler = 2500;
+//  htim6.Init.Prescaler = 2500;
+  htim6.Init.Prescaler = 1176;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim6.Init.Period = 1;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
