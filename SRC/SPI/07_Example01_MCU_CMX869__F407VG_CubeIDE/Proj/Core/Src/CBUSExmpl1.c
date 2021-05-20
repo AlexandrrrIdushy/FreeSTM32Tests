@@ -76,6 +76,7 @@ void MyInit()
 // delay. Timer1 is placed in
 // 16-bit timer mode and loaded with 0xB800 to cause a 20ms delay.
 //*******************************************
+//настройка железа
 void initialize_uC()
 {
 //	IE = 0x8C; //interrupts enabled; global IRQ, EX1, T1
@@ -100,6 +101,7 @@ void initialize_uC()
 // CMX868AIRQ flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
+//обработчик прерывания SPI, похоже на нижний уровень spi
 void ex1()//interrupt 2
 {
 	CMX868AIRQ=1;
@@ -117,6 +119,7 @@ void ex1()//interrupt 2
 // sets the pwrupdelay flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
+//видимо обработчик завершения таймера
 void timer1() //interrupt 3
 {
 	pwrupdelay=1;
@@ -138,6 +141,7 @@ void timer1() //interrupt 3
 // the calling routine once the delay is complete.
 // At this point the CMX868A can be loaded as necessary for operation.
 //*******************************************
+//?включение питания модуля
 void initialize_868()
 {
 	generalreset();
@@ -166,18 +170,19 @@ void initialize_868()
 //
 // This function does not return a variable.
 //*******************************************
+//просто пишет байт в модуль. адрес определен ранее. сдвигая в него по одному биту
 void wr_byte(unsigned char byte)
 {
 	unsigned char i;
 	for (i = 8; i != 0; i--)
 	{
 		SCLK = 0;
-		if (byte & 0x80)
-			CDATA = 1;
+		if (byte & 0x80)//в дело пойдет только старший бит
+			CDATA = 1;	//пишем его в сдвиговый регистр
 		else
 			CDATA = 0;
-		byte <<= 1;
-		SCLK = 1;
+		byte <<= 1;		//подтягиваем в позицию старшего бита - следующий
+		SCLK = 1;		//видимо машем генераторной линией
 //fast processors may need a delay here
 	}
 }
@@ -198,6 +203,7 @@ void wr_byte(unsigned char byte)
 // CDATA. CSN is taken high to complete the C-BUS transaction.
 //
 // This function does not return a variable.
+//пишет один байт посредством массива [байт:адрес][байт:данные]
 //*******************************************
 void wr1(unsigned char address, unsigned char databyte)
 {
@@ -229,6 +235,7 @@ void wr1(unsigned char address, unsigned char databyte)
 //
 // This function does not return a variable.
 //*******************************************
+//пишет два байта посредством массива [байт:адрес][байт:данные 1-ый байт][байт:данные 2-ый байт]
 void wr2(unsigned char address, unsigned int dataword)
 {
 	unsigned char temp;
@@ -263,6 +270,7 @@ void wr2(unsigned char address, unsigned int dataword)
 //
 // This function returns the received byte to the calling routine.
 //*******************************************
+//читаем байт все также сдвигом. отку
 unsigned char rd_byte(void)
 {
 	unsigned char byte = 0x00, i;
@@ -298,6 +306,7 @@ unsigned char rd_byte(void)
 //
 // This function returns the received byte to the calling routine.
 //*******************************************
+//читаем байт из произвольного адреса
 unsigned char rd1(unsigned char address)
 {
 	unsigned char rbyte;
@@ -330,21 +339,22 @@ unsigned char rd1(unsigned char address)
 //
 // This function returns the received word (16 bits) to the calling routine.
 //*******************************************
-	unsigned int rd2(unsigned char address)
-	{
-		unsigned int rword=0x0000;
-		CSN=0;
+//читаем два байт по аналогии с вышним
+unsigned int rd2(unsigned char address)
+{
+	unsigned int rword=0x0000;
+	CSN=0;
 //fast processors may need a delay to observe Tcse
-		wr_byte(address);
+	wr_byte(address);
 //fast processors may need a delay to observe Tnxt
 //SCLK=1 at end of wr_byte
-		SCLK=0;//RDATA becomes active here
-		rword = rd_byte();//8 bits returned into 16-bit variable (only least 8 significant bits copied)
-		rword <<= 8;//left-shift bits into most significant position
-		rword |= rd_byte();//append next 8 bits onto existing 16-bit variable
-		CSN=1;
-		return(rword);
-	}
+	SCLK=0;//RDATA becomes active here
+	rword = rd_byte();//8 bits returned into 16-bit variable (only least 8 significant bits copied)
+	rword <<= 8;//left-shift bits into most significant position
+	rword |= rd_byte();//append next 8 bits onto existing 16-bit variable
+	CSN=1;
+	return(rword);
+}
 
 
 
@@ -359,16 +369,13 @@ unsigned char rd1(unsigned char address)
 // The General Reset byte (0x01) is written to the CMX868A.
 // The C-BUS transaction ends when the CSN line is pulled high.
 //*******************************************
-	void generalreset(void) //issues General Reset to chip
-	{
-		CSN = 0;
-//fast processors may need a delay to observe Tcse
-		wr_byte(RESET);
-
-//10
-
-		CSN = 1;
-	}
+//общий сброс, посредством ? обращения к адресу сброса. даже писать ничего потому туда не нужно
+void generalreset(void) //issues General Reset to chip
+{
+	CSN = 0;//fast processors may need a delay to observe Tcse
+	wr_byte(RESET);
+	CSN = 1;
+}
 
 
 
@@ -390,6 +397,7 @@ unsigned char rd1(unsigned char address)
 //
 // No variable is returned to the calling function.
 //***************************************
+//
 	void programtonetx(void)
 	{
 		unsigned char i;
