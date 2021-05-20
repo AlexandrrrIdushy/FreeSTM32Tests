@@ -5,9 +5,7 @@
  *      Author: gravitau
  */
 
-
 //4
-
 //PROJECT: Programmed Tone Tx with CMX868A
 //
 //PROCESSOR: Atmel AT89C2051
@@ -36,20 +34,20 @@ void generalreset(void);
 void wr_byte(unsigned char byte);
 void wr1(unsigned char address, unsigned char databyte);
 void wr2(unsigned char address, unsigned int dataword);
-unsigned char rd_byte (void);
+unsigned char rd_byte(void);
 unsigned char rd1(unsigned char address);
 unsigned int rd2(unsigned char address);
 void initialize_uC(void);
 void initialize_868(void);
 void programtonetx(void);
 //C-BUS to Microcontroller Pin Mapping
-sbit CSN = P1^7;
-sbit CDATA = P1^6;
-sbit SCLK = P1^5;
-sbit RDATA = P1^4;
-sbit IRQ = P3^3; //this uC pin selected because it is an
+sbit CSN = P1 ^ 7;
+sbit CDATA = P1 ^ 6;
+sbit SCLK = P1 ^ 5;
+sbit RDATA = P1 ^ 4;
+sbit IRQ = P3 ^ 3; //this uC pin selected because it is an
 external IRQ pin
-bit pwrupdelay=0, CMX868AIRQ; //flags
+bit pwrupdelay = 0, CMX868AIRQ; //flags
 
 //5
 
@@ -67,13 +65,12 @@ bit pwrupdelay=0, CMX868AIRQ; //flags
 //*******************************************
 void initialize_uC()
 {
-IE=0x8C; //interrupts enabled; global IRQ, EX1, T1
-IT1=1; //EX1 configured as falling-edge triggered
-IRQ
-IRQ=1; //write 1 to EX1 to configure as input
-TMOD=0x10; //Timer1 - 16bit timer mode
-TH1=0xB8; //0xB800=18432counts=20ms delay
-TL1=0x00;
+	IE = 0x8C; //interrupts enabled; global IRQ, EX1, T1
+	IT1 = 1; //EX1 configured as falling-edge triggered
+	IRQ IRQ = 1; //write 1 to EX1 to configure as input
+	TMOD = 0x10; //Timer1 - 16bit timer mode
+	TH1 = 0xB8; //0xB800=18432counts=20ms delay
+	TL1 = 0x00;
 }
 //******************************************
 // FUNCTION: void ex1() interrupt 2
@@ -87,9 +84,10 @@ TL1=0x00;
 // CMX868AIRQ flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
-void ex1() interrupt 2
+void ex1()
+interrupt 2
 {
-CMX868AIRQ=1;
+	CMX868AIRQ=1;
 }
 //******************************************
 // FUNCTION: void timer1() interrupt 3
@@ -101,9 +99,10 @@ CMX868AIRQ=1;
 // sets the pwrupdelay flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
-void timer1() interrupt 3
+void timer1()
+interrupt 3
 {
-pwrupdelay=1;
+	pwrupdelay=1;
 }
 
 //6
@@ -124,11 +123,12 @@ pwrupdelay=1;
 //*******************************************
 void initialize_868()
 {
-generalreset();
-wr2(GENERALCONTROL, POWERUP); //write 1s to Pwrup & Reset bits
-TR1=1; //turn on uC Timer1 for 20ms delay
-while(pwrupdelay!=1); //wait for xtal osc to stabilize
-TR1=0; //turn off uC Timer1
+	generalreset();
+	wr2(GENERALCONTROL, POWERUP); //write 1s to Pwrup & Reset bits
+	TR1 = 1; //turn on uC Timer1 for 20ms delay
+	while (pwrupdelay != 1)
+		; //wait for xtal osc to stabilize
+	TR1 = 0; //turn off uC Timer1
 //CMX868A is now powered up and ready for configuration
 }
 //******************************************
@@ -148,22 +148,21 @@ TR1=0; //turn off uC Timer1
 //*******************************************
 void wr_byte(unsigned char byte)
 {
-unsigned char i;
-for(i=8; i!=0; i--)
-{
-SCLK=0;
-if(byte & 0x80)
-CDATA=1;
-else
-CDATA=0;
-byte <<= 1;
-SCLK=1;
+	unsigned char i;
+	for (i = 8; i != 0; i--)
+	{
+		SCLK = 0;
+		if (byte & 0x80)
+			CDATA = 1;
+		else
+			CDATA = 0;
+		byte <<= 1;
+		SCLK = 1;
 //fast processors may need a delay here
-}
+	}
 }
 
 //7
-
 
 //******************************************
 // FUNCTION: void wr1(unsigned char address, unsigned char databyte)
@@ -182,13 +181,13 @@ SCLK=1;
 //*******************************************
 void wr1(unsigned char address, unsigned char databyte)
 {
-CSN=0;
+	CSN = 0;
 //fast processors may need a delay to observe Tcse
-wr_byte(address);
+	wr_byte(address);
 //fast processors may need a delay to observe Tnxt
-wr_byte(databyte);
+	wr_byte(databyte);
 //fast processors may need a delay to observe Tcsh
-CSN=1;
+	CSN = 1;
 }
 //******************************************
 // FUNCTION: void wr2(unsigned char address, unsigned int dataword)
@@ -209,18 +208,18 @@ CSN=1;
 //*******************************************
 void wr2(unsigned char address, unsigned int dataword)
 {
-unsigned char temp;
-CSN=0;
+	unsigned char temp;
+	CSN = 0;
 //fast processors may need a delay to observe Tcse
-wr_byte(address);
+	wr_byte(address);
 //fast processors may need a delay to observe Tnxt
-temp=dataword; //get LSB
-dataword >>= 8; //shift most significant 8 bits down for MSB
-wr_byte(dataword); //write MSB
+	temp = dataword; //get LSB
+	dataword >>= 8; //shift most significant 8 bits down for MSB
+	wr_byte(dataword); //write MSB
 //fast processors may need a delay to observe Tnxt
-wr_byte(temp); //write LSB
+	wr_byte(temp); //write LSB
 //fast processors may need a delay to observe Tcsh
-CSN=1;
+	CSN = 1;
 }
 
 //8
@@ -243,19 +242,20 @@ CSN=1;
 //*******************************************
 unsigned char rd_byte(void)
 {
-unsigned char byte=0x00, i;
-for(i=8; i != 0; i--)
-{
-byte <<= 1;
-SCLK=1;
-if(RDATA) //append 1 to byte if RDATA=1
-byte |= 0x01;
-else //else, append 0 to byte
-byte &= 0xFE;
-SCLK=0;
+	unsigned char byte = 0x00, i;
+	for (i = 8; i != 0; i--)
+	{
+		byte <<= 1;
+		SCLK = 1;
+		if (RDATA) //append 1 to byte if RDATA=1
+			byte |= 0x01;
+		else
+			//else, append 0 to byte
+			byte &= 0xFE;
+		SCLK = 0;
 //fast processors may need a delay here
-}
-return(byte);
+	}
+	return (byte);
 }
 //******************************************
 // FUNCTION: unsigned char rd1(unsigned char address)
@@ -274,16 +274,15 @@ return(byte);
 //*******************************************
 unsigned char rd1(unsigned char address)
 {
-unsigned char rbyte;
-CSN=0;
+	unsigned char rbyte;
+	CSN = 0;
 //fast processors may need a delay to observe Tcse
-wr_byte(address);
+	wr_byte(address);
 //fast processors may need a delay to observe Tnxt
-rbyte=rd_byte();
+	rbyte = rd_byte();
 //fast processors may need a delay to observe Tcsh
-CSN=1;
-return(rbyte);
-
+	CSN = 1;
+	return (rbyte);
 
 //9
 
@@ -303,25 +302,25 @@ return(rbyte);
 // The C-BUS transaction ends when the CSN line is pulled high.
 //
 // This function returns the received word (16 bits) to the calling
-routine.
+	routine.
 //*******************************************
-unsigned int rd2(unsigned char address)
-{
-unsigned int rword=0x0000;
-CSN=0;
+	unsigned int rd2(unsigned char address)
+	{
+		unsigned int rword=0x0000;
+		CSN=0;
 //fast processors may need a delay to observe Tcse
-wr_byte(address);
+		wr_byte(address);
 //fast processors may need a delay to observe Tnxt
 //SCLK=1 at end of wr_byte
-SCLK=0; //RDATA becomes active here
-rword = rd_byte(); //8 bits returned into 16-bit variable (only least
-8 significant bits copied)
-rword <<= 8; //left-shift bits into most significant position
-rword |= rd_byte(); //append next 8 bits onto existing 16-bit
-variable
-CSN=1;
-return(rword);
-}
+		SCLK=0;//RDATA becomes active here
+		rword = rd_byte();//8 bits returned into 16-bit variable (only least
+		8 significant bits copied)
+		rword <<= 8;//left-shift bits into most significant position
+		rword |= rd_byte();//append next 8 bits onto existing 16-bit
+		variable
+		CSN=1;
+		return(rword);
+	}
 //******************************************
 // FUNCTION: void generalreset(void)
 //
@@ -333,21 +332,21 @@ return(rword);
 // The General Reset byte (0x01) is written to the CMX868A.
 // The C-BUS transaction ends when the CSN line is pulled high.
 //*******************************************
-void generalreset(void) //issues General Reset to chip
-{
-CSN=0;
+	void generalreset(void) //issues General Reset to chip
+	{
+		CSN = 0;
 //fast processors may need a delay to observe Tcse
-wr_byte(RESET);
+		wr_byte(RESET);
 
 //10
 
-CSN=1;
-}
+		CSN = 1;
+	}
 //**************************************
 // FUNCTION: void programtonetx(void)
 //
 // PURPOSE: Write to the Programming Register to configure user-defined Tx
-tones.
+	tones.
 //
 // DESCRIPTION: The function does not take in a variable from the calling
 // routine. Variables are declared, including an 17-member int array that
@@ -362,32 +361,33 @@ tones.
 //
 // No variable is returned to the calling function.
 //***************************************
-void programtonetx(void)
-{
-unsigned char i;
-unsigned int pgmtonetxwords[17]={0x8000, //Increment pointer
-0x12AC, 0x24A2, 0x0000, 0x0000, //Tone pair A (one tone),
-1400Hz @ 0.5Vrms
-0x1556, 0x24A2, 0x0000, 0x0000, //Tone pair B (one tone),
-1600Hz @ 0.5Vrms
-0x1EAC, 0x24A2, 0x0000, 0x0000, //Tone pair C (one tone),
-2300Hz @ 0.5Vrms
-0x2157, 0x24A2, 0x0000, 0x0000}; //Tone pair D (one tone),
-2500Hz @ 0.5Vrms
-CMX868AIRQ=0;
-rd2(STATUS); //read Status register to clear
-any IRQs
-for(i=0; i<17; i++) //17 writes required to program
-all Tx tones
-{
-wr2(PRGREG, pgmtonetxwords[i]);
-while(CMX868AIRQ!=1); //wait for IRQ, Pgm Flag is only IRQ
-that can happen here
-CMX868AIRQ=0; //reset IRQ flag bit
-rd2(STATUS); //read Status register to enable next
-IRQ
-}
-}
+	void programtonetx(void)
+	{
+		unsigned char i;
+		unsigned int pgmtonetxwords[17]=
+		{	0x8000, //Increment pointer
+			0x12AC, 0x24A2, 0x0000, 0x0000,//Tone pair A (one tone),
+			1400Hz @ 0.5Vrms
+			0x1556, 0x24A2, 0x0000, 0x0000,//Tone pair B (one tone),
+			1600Hz @ 0.5Vrms
+			0x1EAC, 0x24A2, 0x0000, 0x0000,//Tone pair C (one tone),
+			2300Hz @ 0.5Vrms
+			0x2157, 0x24A2, 0x0000, 0x0000}; //Tone pair D (one tone),
+		2500Hz @ 0.5Vrms
+		CMX868AIRQ=0;
+		rd2(STATUS);//read Status register to clear
+		any IRQs
+		for(i=0; i<17; i++)//17 writes required to program
+		all Tx tones
+		{
+			wr2(PRGREG, pgmtonetxwords[i]);
+			while(CMX868AIRQ!=1); //wait for IRQ, Pgm Flag is only IRQ
+			that can happen here
+			CMX868AIRQ=0;//reset IRQ flag bit
+			rd2(STATUS);//read Status register to enable next
+			IRQ
+		}
+	}
 //******************************************
 // FUNCTION: void main()
 //
@@ -402,16 +402,18 @@ IRQ
 
 //11
 
-
 //*******************************************
-void main()
-{
-unsigned int status=0;
-initialize_uC();
-initialize_868();
-wr2(GENERALCONTROL, 0x1550); //11.0592MHz xtal, normal pwr, IRQ
-enabled, Pgm Flag IRQ enabled
-programtonetx();
-wr2(TXMODE, 0x1E0F); //Tx tone pair TD, 0dB attenuation.
-while(1);
-}
+	void main()
+	{
+		unsigned int status = 0;
+		initialize_uC();
+		initialize_868();
+		wr2(GENERALCONTROL, 0x1550); //11.0592MHz xtal, normal pwr, IRQ
+		enabled, Pgm
+		Flag IRQ
+		enabled
+		programtonetx();
+		wr2(TXMODE, 0x1E0F); //Tx tone pair TD, 0dB attenuation.
+		while (1)
+			;
+	}
