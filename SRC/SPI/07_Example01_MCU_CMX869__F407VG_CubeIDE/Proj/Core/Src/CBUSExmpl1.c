@@ -16,7 +16,7 @@
 // Microcontroller & CMX868A use separate 11.0592MHz xtals
 //
 // Code occupies 670 bytes of program memory.
-#include <REG2051.H>
+//#include <REG2051.H>
 //CMX868A Register Definitions
 #define RESET 0x01
 #define GENERALCONTROL 0xE0
@@ -41,15 +41,28 @@ void initialize_uC(void);
 void initialize_868(void);
 void programtonetx(void);
 //C-BUS to Microcontroller Pin Mapping
-sbit CSN = P1 ^ 7;
-sbit CDATA = P1 ^ 6;
-sbit SCLK = P1 ^ 5;
-sbit RDATA = P1 ^ 4;
-sbit IRQ = P3 ^ 3; //this uC pin selected because it is an
-external IRQ pin
-bit pwrupdelay = 0, CMX868AIRQ; //flags
+int P1 = 0;
+int P3 = 0;
+int CSN;
+int CDATA;
+int SCLK;
+int RDATA;
+int IRQ; //this uC pin selected because it is an external IRQ pin;
+int pwrupdelay = 0, CMX868AIRQ; //flags
 
-//5
+int TR1;
+
+
+void MyInit()
+{
+	CSN = P1 ^ 7;
+	CDATA = P1 ^ 6;
+	SCLK = P1 ^ 5;
+	RDATA = P1 ^ 4;
+	IRQ = P3 ^ 3; //this uC pin selected because it is an
+}
+
+
 
 //******************************************
 // FUNCTION: void initialize_uC()
@@ -65,13 +78,16 @@ bit pwrupdelay = 0, CMX868AIRQ; //flags
 //*******************************************
 void initialize_uC()
 {
-	IE = 0x8C; //interrupts enabled; global IRQ, EX1, T1
-	IT1 = 1; //EX1 configured as falling-edge triggered
-	IRQ IRQ = 1; //write 1 to EX1 to configure as input
-	TMOD = 0x10; //Timer1 - 16bit timer mode
-	TH1 = 0xB8; //0xB800=18432counts=20ms delay
-	TL1 = 0x00;
+//	IE = 0x8C; //interrupts enabled; global IRQ, EX1, T1
+//	IT1 = 1; //EX1 configured as falling-edge triggered
+//	IRQ IRQ = 1; //write 1 to EX1 to configure as input
+//	TMOD = 0x10; //Timer1 - 16bit timer mode
+//	TH1 = 0xB8; //0xB800=18432counts=20ms delay
+//	TL1 = 0x00;
 }
+
+
+
 //******************************************
 // FUNCTION: void ex1() interrupt 2
 //
@@ -84,11 +100,13 @@ void initialize_uC()
 // CMX868AIRQ flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
-void ex1()
-interrupt 2
+void ex1()//interrupt 2
 {
 	CMX868AIRQ=1;
 }
+
+
+
 //******************************************
 // FUNCTION: void timer1() interrupt 3
 //
@@ -99,13 +117,12 @@ interrupt 2
 // sets the pwrupdelay flag to 1.
 // Control then reverts to the previously running function.
 //*******************************************
-void timer1()
-interrupt 3
+void timer1() //interrupt 3
 {
 	pwrupdelay=1;
 }
 
-//6
+
 
 //******************************************
 // FUNCTION: void initialize_868()
@@ -131,6 +148,9 @@ void initialize_868()
 	TR1 = 0; //turn off uC Timer1
 //CMX868A is now powered up and ready for configuration
 }
+
+
+
 //******************************************
 // FUNCTION: void wr_byte(unsigned char byte)
 //
@@ -162,7 +182,7 @@ void wr_byte(unsigned char byte)
 	}
 }
 
-//7
+
 
 //******************************************
 // FUNCTION: void wr1(unsigned char address, unsigned char databyte)
@@ -189,6 +209,9 @@ void wr1(unsigned char address, unsigned char databyte)
 //fast processors may need a delay to observe Tcsh
 	CSN = 1;
 }
+
+
+
 //******************************************
 // FUNCTION: void wr2(unsigned char address, unsigned int dataword)
 //
@@ -222,7 +245,7 @@ void wr2(unsigned char address, unsigned int dataword)
 	CSN = 1;
 }
 
-//8
+
 
 //******************************************
 // FUNCTION: unsigned char rd_byte(void)
@@ -257,6 +280,9 @@ unsigned char rd_byte(void)
 	}
 	return (byte);
 }
+
+
+
 //******************************************
 // FUNCTION: unsigned char rd1(unsigned char address)
 //
@@ -283,8 +309,9 @@ unsigned char rd1(unsigned char address)
 //fast processors may need a delay to observe Tcsh
 	CSN = 1;
 	return (rbyte);
+}
 
-//9
+
 
 //******************************************
 // FUNCTION: unsigned int rd2(unsigned char address)
@@ -301,8 +328,7 @@ unsigned char rd1(unsigned char address)
 // form the 16-bit word.
 // The C-BUS transaction ends when the CSN line is pulled high.
 //
-// This function returns the received word (16 bits) to the calling
-	routine.
+// This function returns the received word (16 bits) to the calling routine.
 //*******************************************
 	unsigned int rd2(unsigned char address)
 	{
@@ -313,14 +339,15 @@ unsigned char rd1(unsigned char address)
 //fast processors may need a delay to observe Tnxt
 //SCLK=1 at end of wr_byte
 		SCLK=0;//RDATA becomes active here
-		rword = rd_byte();//8 bits returned into 16-bit variable (only least
-		8 significant bits copied)
+		rword = rd_byte();//8 bits returned into 16-bit variable (only least 8 significant bits copied)
 		rword <<= 8;//left-shift bits into most significant position
-		rword |= rd_byte();//append next 8 bits onto existing 16-bit
-		variable
+		rword |= rd_byte();//append next 8 bits onto existing 16-bit variable
 		CSN=1;
 		return(rword);
 	}
+
+
+
 //******************************************
 // FUNCTION: void generalreset(void)
 //
@@ -342,11 +369,13 @@ unsigned char rd1(unsigned char address)
 
 		CSN = 1;
 	}
+
+
+
 //**************************************
 // FUNCTION: void programtonetx(void)
 //
-// PURPOSE: Write to the Programming Register to configure user-defined Tx
-	tones.
+// PURPOSE: Write to the Programming Register to configure user-defined Tx tones.
 //
 // DESCRIPTION: The function does not take in a variable from the calling
 // routine. Variables are declared, including an 17-member int array that
@@ -366,28 +395,22 @@ unsigned char rd1(unsigned char address)
 		unsigned char i;
 		unsigned int pgmtonetxwords[17]=
 		{	0x8000, //Increment pointer
-			0x12AC, 0x24A2, 0x0000, 0x0000,//Tone pair A (one tone),
-			1400Hz @ 0.5Vrms
-			0x1556, 0x24A2, 0x0000, 0x0000,//Tone pair B (one tone),
-			1600Hz @ 0.5Vrms
-			0x1EAC, 0x24A2, 0x0000, 0x0000,//Tone pair C (one tone),
-			2300Hz @ 0.5Vrms
-			0x2157, 0x24A2, 0x0000, 0x0000}; //Tone pair D (one tone),
-		2500Hz @ 0.5Vrms
+			 0x12AC, 0x24A2, 0x0000, 0x0000, //Tone pair A (one tone), 1400Hz @ 0.5Vrms
+			0x1556, 0x24A2, 0x0000, 0x0000,//Tone pair B (one tone), 1600Hz @ 0.5Vrms
+			0x1EAC, 0x24A2, 0x0000, 0x0000,//Tone pair C (one tone), 2300Hz @ 0.5Vrms
+			0x2157, 0x24A2, 0x0000, 0x0000}; //Tone pair D (one tone), 2500Hz @ 0.5Vrms
 		CMX868AIRQ=0;
-		rd2(STATUS);//read Status register to clear
-		any IRQs
-		for(i=0; i<17; i++)//17 writes required to program
-		all Tx tones
+		rd2(STATUS);//read Status register to clear any IRQs
+		for(i=0; i<17; i++)//17 writes required to program all Tx tones
 		{
 			wr2(PRGREG, pgmtonetxwords[i]);
-			while(CMX868AIRQ!=1); //wait for IRQ, Pgm Flag is only IRQ
-			that can happen here
-			CMX868AIRQ=0;//reset IRQ flag bit
-			rd2(STATUS);//read Status register to enable next
-			IRQ
+			while(CMX868AIRQ!=1); //wait for IRQ, Pgm Flag is only IRQ that can happen here
+			CMX868AIRQ=0;//reset IRQ flag bit rd2(STATUS);//read Status register to enable next IRQ
 		}
 	}
+
+
+
 //******************************************
 // FUNCTION: void main()
 //
@@ -399,21 +422,15 @@ unsigned char rd1(unsigned char address)
 // Register is loaded for programmed tone tx. Next, the Tx Mode Register
 // is configured for programmed tone
 // Tx, and the program then enters an infinite loop.
-
-//11
-
 //*******************************************
-	void main()
-	{
-		unsigned int status = 0;
-		initialize_uC();
-		initialize_868();
-		wr2(GENERALCONTROL, 0x1550); //11.0592MHz xtal, normal pwr, IRQ
-		enabled, Pgm
-		Flag IRQ
-		enabled
-		programtonetx();
-		wr2(TXMODE, 0x1E0F); //Tx tone pair TD, 0dB attenuation.
-		while (1)
-			;
-	}
+	//ПЕРЕНЕСУ В МАЙН
+//	void main()
+//	{
+//		unsigned int status = 0;
+//		initialize_uC();
+//		initialize_868();
+//		wr2(GENERALCONTROL, 0x1550); //11.0592MHz xtal, normal pwr, IRQ enabled, Pgm Flag IRQ enabled
+//		programtonetx();
+//		wr2(TXMODE, 0x1E0F); //Tx tone pair TD, 0dB attenuation.
+//		while (1);
+//	}
