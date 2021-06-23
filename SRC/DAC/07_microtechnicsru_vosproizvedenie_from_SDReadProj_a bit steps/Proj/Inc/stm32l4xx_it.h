@@ -59,7 +59,7 @@ void SysTick_Handler(void);
 void TIM2_IRQHandler(void);
 void TIM6_DAC_IRQHandler(void);
 /* USER CODE BEGIN EFP */
-
+extern void UserTIM2IRQHandler(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

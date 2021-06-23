@@ -24,16 +24,19 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+//#define	DEBUG_VIEW_FREQ_IRQ
+#define	DEBUG_ANY_MANUAL_SIGNAL
+//#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//#define	DEBUG_TEST_READ_TEXT_FROM_SD
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,6 +52,18 @@ SD_HandleTypeDef hsd1;
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
+/* Private variables ---------------------------------------------------------*/
+uint8_t curBufIdx = 0;
+uint8_t wavBuf[2][WAV_BUF_SIZE];
+uint16_t curBufOffset = 0;
+uint8_t wavReadFlag = 0;
+uint32_t wavDataSize = 0;
+uint32_t curWavIdx = 0;
+uint8_t stopFlag = 0;
+
+FATFS fileSystem;
+FIL audioFile;
+uint32_t readBytes = 0;
 
 /* USER CODE END PV */
 
@@ -64,22 +79,26 @@ static void MX_DAC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#ifdef	DEBUG_TEST_READ_TEXT_FROM_SD
 FATFS SDFatFs;  /* File system object for SD card logical drive */
-
 FIL MyFile;     /* File object */
-
 char SD_Path[4];  /* SD logical drive path */
-
+#endif
+uint16_t _val;
+uint16_t _cnt;
+#define STEP_VAL	1
+#define MAX_VAL		0xFFF
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	_val = 0;
+	int8_t _flag = 0;
   /* USER CODE END 1 */
   
 
@@ -106,7 +125,62 @@ int main(void)
   MX_TIM2_Init();
   MX_DAC1_Init();
   /* USER CODE BEGIN 2 */
-  FRESULT res = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
+#ifdef	NORMAL_MODE
+  FRESULT res;
+  FRESULT resTryMount;
+  FRESULT resTryOpenFile;
+  FRESULT resTryReadFile;
+  resTryMount = f_mount(&fileSystem, SDPath, 1);
+//  uint8_t path[] = "audio.wav";//шипение
+//  uint8_t path[] = "gardenss.wav";//v
+//  uint8_t path[] = "gandenss22KHz.wav";
+//  uint8_t path[] = "Dubstep.wav";//v
+  uint8_t path[] = "ClearDay.wav";//v
+//  uint8_t path[] = "Ircastapianos8.wav";//x
+
+  resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
+  //#2
+  //Таким образом, находим позицию в буфере, которая соответствует символу ‘d’ и прибавляем к этому значению 8 (4 байта для ‘data’ и 4 байта для размера данных):
+  uint16_t dataOffset = 0;
+  resTryReadFile = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+  for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
+  {
+      if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
+          (wavBuf[0][i + 2] == 't') && (wavBuf[0][i + 3] == 'a'))
+      {
+          dataOffset = i + 8;
+          break;
+      }
+  }
+
+  //#3
+  //Заголовок обнаружен, перемещаем указатель FatFs для работы с файлом на аудио-данные и заодно определяем количество байт данных. Для этого вычитаем из общего размера файла размер заголовка:
+  res = f_lseek(&audioFile, dataOffset);
+  wavDataSize = f_size(&audioFile) - dataOffset;//[байт] длина полной последовательности аудио данных
+  //#3
+  //нужно быстро выводить данные на ЦАП. для этого сделаем буферизацию.
+  //в два буфера wavBuf[0] и wavBuf[1] будем пихать массив данных из файла
+  //когда выводим на ЦАП буфер 1 заполняем буфер 2 и наоборот
+//  Реализуем этот механизм и, первым делом, заполняем оба буфера данными:
+    res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+    res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
+    //#5
+#endif
+//  Поскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
+    HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
+    HAL_TIM_Base_Start_IT(&htim2);
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+
+
+
+#ifdef	DEBUG_TEST_READ_TEXT_FROM_SD
+  //код проверки чтения SD карты
+    uint8_t* bw;
+    FRESULT res;
+  res = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
 	 if(res != FR_OK)
 	    Error_Handler();
 	  else
@@ -118,6 +192,7 @@ int main(void)
 		  res = f_read(&MyFile, arrrd, 10, bw);
 		  res = f_write(&MyFile, arr, 3, bw);
 	  }
+#endif
 
   /* USER CODE END 2 */
 
@@ -125,6 +200,56 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+#ifdef	DEBUG_ANY_MANUAL_SIGNAL
+//	  HAL_Delay(10);
+
+//		if(_cnt < 2)
+//			_cnt++;
+//		else
+//			_cnt = 0;
+//
+//		if(_cnt == 0)
+//		{
+			if(_flag == 0)
+			{
+				if(_val < MAX_VAL)
+					_val = _val + STEP_VAL;
+				else
+					_flag = 1;
+
+			}
+			else
+			{
+				if(_val > 0)
+					_val = _val - STEP_VAL;
+				else
+					_flag = 0;
+			}
+
+//		}
+#endif
+#ifdef	NORMAL_MODE
+	  if (wavReadFlag == 1)
+	  {
+//		  все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
+
+		  //если сейчас озвучивается буфер 1 то заполняется буфер 2, и наоборот
+	      uint8_t readBufIdx = 0;
+	      if (curBufIdx == 0)
+	          readBufIdx = 1;
+	      res = f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
+	      wavReadFlag = 0;
+	  }
+	  //#
+	  //Кроме того, сразу же в while(1) помещаем код, который отвечает за окончание воспроизведения, когда файл подошел к концу:
+	  if (stopFlag == 1)
+	  {
+		  //просто закрываем файл
+	      res = f_close(&audioFile);
+	      stopFlag = 0;
+	  }
+#endif
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -323,7 +448,60 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+uint16_t _dacData;
 
+void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
+{
+#ifdef	DEBUG_VIEW_FREQ_IRQ
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0xFFFF);
+	asm("nop");
+	asm("nop");
+	asm("nop");
+	asm("nop");
+	asm("nop");
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, 0);
+#endif
+#ifdef	DEBUG_ANY_MANUAL_SIGNAL
+
+	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _val);
+#endif
+#ifdef	NORMAL_MODE
+
+    _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
+    _dacData /= 16;
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
+
+    //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
+    curBufOffset += 2;//номер текущего байта в буфере, этот счетчик, соответственно, будет изменяться от 0 до 512.
+    curWavIdx += 2;//общий счетчик байт wav-файла. Его мы используем, чтобы обнаружить конец трека и остановить воспроизведение.
+
+    if (curWavIdx >= wavDataSize)
+    {
+    	//все данные озвучены, останавливаем процесс
+        HAL_TIM_Base_Stop_IT(&htim2);
+        stopFlag = 1;
+    }
+    else
+    {
+    	//#
+    	//Если конец файла еще не достигнут, то проверяем счетчик curBufOffset. Если значение равно 512 (WAV_BUF_SIZE), то буфер подошел к концу, а значит надо изменить номер активного буфера и выставить флаг wavReadFlag:
+
+        if (curBufOffset == WAV_BUF_SIZE)
+        {
+            curBufOffset = 0;
+
+            //смена текущего рабочего буфера из которого нужно озвучивать
+            if (curBufIdx == 0)
+                curBufIdx = 1;
+            else
+                curBufIdx = 0;
+
+            wavReadFlag = 1;//флаг = "все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
+        }
+    }
+
+#endif
+}
 /* USER CODE END 4 */
 
 /**
