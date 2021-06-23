@@ -43,6 +43,7 @@ NVIC.PriorityGroup=NVIC_PRIORITYGROUP_4
 NVIC.SVCall_IRQn=true\:0\:0\:false\:false\:true\:false\:false
 NVIC.SysTick_IRQn=true\:0\:0\:false\:false\:true\:false\:true
 NVIC.TIM2_IRQn=true\:0\:0\:false\:false\:true\:true\:true
+NVIC.TIM6_DAC_IRQn=true\:0\:0\:false\:false\:true\:true\:true
 NVIC.UsageFault_IRQn=true\:0\:0\:false\:false\:true\:false\:false
 PA5.Signal=COMP_DAC12_group
 PC10.GPIOParameters=GPIO_PuPd
