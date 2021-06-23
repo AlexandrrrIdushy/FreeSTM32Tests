@@ -29,14 +29,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+//#define	DEBUG_TEST_READ_TEXT_FROM_SD
 //#define	DEBUG_VIEW_FREQ_IRQ
 //#define	DEBUG_ANY_MANUAL_SIGNAL
-//#define	NORMAL_MODE
+#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define	DEBUG_TEST_READ_TEXT_FROM_SD
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -132,10 +133,10 @@ int __attribute__((optimize("O0"))) main(void)
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
 //  uint8_t path[] = "audio.wav";//шипение
-//  uint8_t path[] = "gardenss.wav";//v
+  uint8_t path[] = "gardenss.wav";//v
 //  uint8_t path[] = "gandenss22KHz.wav";
 //  uint8_t path[] = "Dubstep.wav";//v
-  uint8_t path[] = "ClearDay.wav";//v
+//  uint8_t path[] = "ClearDay.wav";//v
 //  uint8_t path[] = "Ircastapianos8.wav";//x
 
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
