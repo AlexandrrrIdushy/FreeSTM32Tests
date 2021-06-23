@@ -30,13 +30,13 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 //#define	DEBUG_VIEW_FREQ_IRQ
-#define	DEBUG_ANY_MANUAL_SIGNAL
+//#define	DEBUG_ANY_MANUAL_SIGNAL
 //#define	NORMAL_MODE
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define	DEBUG_TEST_READ_TEXT_FROM_SD
+#define	DEBUG_TEST_READ_TEXT_FROM_SD
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
