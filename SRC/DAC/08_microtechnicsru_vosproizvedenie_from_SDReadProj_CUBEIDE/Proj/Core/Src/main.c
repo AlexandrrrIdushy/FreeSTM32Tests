@@ -57,14 +57,46 @@ static void MX_SDMMC1_SD_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+char SD_Path[4];  /* SD logical drive path */
+FIL MyAudioFile;
+FRESULT res_mount;
+FRESULT res_open_txt;
+FRESULT res_read_txt;
+FRESULT res_write_txt;
+FRESULT res_open_audio;
+void __attribute__((optimize("O0"))) TestSpeedReadSD()
+{
+	  res_mount = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
+		 if(res_mount != FR_OK)
+		    Error_Handler();
+		  else
+		  {
+			  //текст
+			  uint8_t arr[] = {0, 1, 2};
+			  uint8_t arrrd[20];
+			  uint8_t* bw;
+			  res_open_txt = f_open(&MyFile, "adr.txt", FA_READ|FA_WRITE);
+			  res_read_txt = f_read(&MyFile, arrrd, 10, bw);
+			  res_write_txt = f_write(&MyFile, arr, 3, bw);
 
+			  //звук
+//			  uint8_t path[] = "ClearDay.wav";
+			  uint8_t path[] = "audio.wav";
+			  res_open_audio = f_open(&MyAudioFile, (char*)path, FA_READ);
+
+
+			  asm("nop");
+		  }
+}
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+int __attribute__((optimize("O0"))) main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -91,7 +123,7 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
-
+  TestSpeedReadSD();
   /* USER CODE END 2 */
 
   /* Infinite loop */
