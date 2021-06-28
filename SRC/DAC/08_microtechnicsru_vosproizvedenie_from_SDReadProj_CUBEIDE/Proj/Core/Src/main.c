@@ -68,11 +68,17 @@ FRESULT res_write_txt;
 FRESULT res_open_audio;
 void __attribute__((optimize("O0"))) TestSpeedReadSD()
 {
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 	  res_mount = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
 		 if(res_mount != FR_OK)
+		 {
 		    Error_Handler();
+
+		 }
+
 		  else
 		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 			  //текст
 			  uint8_t arr[] = {0, 1, 2};
 			  uint8_t arrrd[20];
@@ -96,7 +102,7 @@ void __attribute__((optimize("O0"))) TestSpeedReadSD()
   * @brief  The application entry point.
   * @retval int
   */
-int __attribute__((optimize("O0"))) main(void)
+int main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -233,10 +239,22 @@ static void MX_SDMMC1_SD_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8|GPIO_PIN_15, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : PA8 PA15 */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
