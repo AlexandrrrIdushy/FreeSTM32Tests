@@ -133,10 +133,10 @@ int main(void)
   FRESULT resTryReadFile;
   resTryMount = f_mount(&fileSystem, SDPath, 1);
 //  uint8_t path[] = "audio.wav";//шипение
-  uint8_t path[] = "gardenss.wav";//v
+//  uint8_t path[] = "gardenss.wav";//v
 //  uint8_t path[] = "gandenss22KHz.wav";
 //  uint8_t path[] = "Dubstep.wav";//v
-//  uint8_t path[] = "ClearDay.wav";//v
+  uint8_t path[] = "ClearDay.wav";//v
 //  uint8_t path[] = "Ircastapianos8.wav";//x
 
   resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
@@ -414,7 +414,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 1000;
+  htim2.Init.Prescaler = 700;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -477,7 +477,9 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
 
     _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
     _dacData /= 16;
+    _dacData -= 250;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
 
     //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
     curBufOffset += 2;//номер текущего байта в буфере, этот счетчик, соответственно, будет изменяться от 0 до 512.
