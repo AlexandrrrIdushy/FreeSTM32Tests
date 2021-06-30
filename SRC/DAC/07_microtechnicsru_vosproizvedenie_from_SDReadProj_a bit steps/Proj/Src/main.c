@@ -167,6 +167,8 @@ void AudioFileRead()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	int ctnRead = 0;
+	int whichFile = 0;
 	_val = 0;
 	int8_t _flag = 0;
 	AudioFileInit();
@@ -197,7 +199,7 @@ int main(void)
   MX_DAC1_Init();
   /* USER CODE BEGIN 2 */
   AudioFileMount();
-  AudioFileOpen(path[1], 0);
+  AudioFileOpen(path[0], 0);
   AudioFileRead();
 //  ѕоскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
     HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
@@ -279,6 +281,20 @@ int main(void)
 	          readBufIdx = 1;
 	      f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
 	      wavReadFlag = 0;
+	      if(ctnRead > 3000)
+	      {
+	    	  ctnRead = 0;
+	    	  stopFlag = 1;
+	    	  if(whichFile == 0)
+	    		  whichFile = 1;
+	    	  else
+	    		  whichFile = 0;
+	    	  AudioFileOpen(path[whichFile], 0);
+	    	  AudioFileRead();
+
+	      }
+	      else
+	    	  ctnRead++;
 	  }
 	  //#
 	  // роме того, сразу же в while(1) помещаем код, который отвечает за окончание воспроизведени€, когда файл подошел к концу:
