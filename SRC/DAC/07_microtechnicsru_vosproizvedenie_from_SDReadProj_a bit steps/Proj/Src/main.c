@@ -90,51 +90,64 @@ uint16_t _cnt;
 #define STEP_VAL	1
 #define MAX_VAL		0xFFF
 
+FRESULT res;
+FRESULT resTryMount;
+FRESULT resTryOpenFile;
+FRESULT resTryReadFile;
+uint8_t readBufIdx = 0;
 
-void AudioInit()
+void AudioFileMount()
 {
 #ifdef	NORMAL_MODE
-  FRESULT res;
-  FRESULT resTryMount;
-  FRESULT resTryOpenFile;
-  FRESULT resTryReadFile;
+
   resTryMount = f_mount(&fileSystem, SDPath, 1);
-//  uint8_t path[] = "audio.wav";//шипение
-//  uint8_t path[] = "gardenss.wav";//v
-//  uint8_t path[] = "gandenss22KHz.wav";
-//  uint8_t path[] = "Dubstep.wav";//v
-  uint8_t path[] = "ClearDay.wav";//v
-//  uint8_t path[] = "Ircastapianos8.wav";//x
-
-  resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
-  //#2
-  //Таким образом, находим позицию в буфере, которая соответствует символу ‘d’ и прибавляем к этому значению 8 (4 байта для ‘data’ и 4 байта для размера данных):
-  uint16_t dataOffset = 0;
-  resTryReadFile = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
-  for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
-  {
-      if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
-          (wavBuf[0][i + 2] == 't') && (wavBuf[0][i + 3] == 'a'))
-      {
-          dataOffset = i + 8;
-          break;
-      }
-  }
-
-  //#3
-  //Заголовок обнаружен, перемещаем указатель FatFs для работы с файлом на аудио-данные и заодно определяем количество байт данных. Для этого вычитаем из общего размера файла размер заголовка:
-  res = f_lseek(&audioFile, dataOffset);
-  wavDataSize = f_size(&audioFile) - dataOffset;//[байт] длина полной последовательности аудио данных
-  //#3
-  //нужно быстро выводить данные на ЦАП. для этого сделаем буферизацию.
-  //в два буфера wavBuf[0] и wavBuf[1] будем пихать массив данных из файла
-  //когда выводим на ЦАП буфер 1 заполняем буфер 2 и наоборот
-//  Реализуем этот механизм и, первым делом, заполняем оба буфера данными:
-    res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
-    res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
-    //#5
 #endif
 }
+
+
+void AudioFileOpen()
+{
+	//  uint8_t path[] = "audio.wav";//шипение
+	//  uint8_t path[] = "gardenss.wav";//v
+	//  uint8_t path[] = "gandenss22KHz.wav";
+	//  uint8_t path[] = "Dubstep.wav";//v
+	  uint8_t path[] = "ClearDay.wav";//v
+	//  uint8_t path[] = "Ircastapianos8.wav";//x
+
+	  resTryOpenFile = f_open(&audioFile, (char*)path, FA_READ);
+
+}
+
+void AudioFileRead()
+{
+	  //#2
+	  //Таким образом, находим позицию в буфере, которая соответствует символу ‘d’ и прибавляем к этому значению 8 (4 байта для ‘data’ и 4 байта для размера данных):
+	  uint16_t dataOffset = 0;
+	  resTryReadFile = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+	  for (uint16_t i = 0; i < (WAV_BUF_SIZE - 3); i++)
+	  {
+	      if ((wavBuf[0][i] == 'd') && (wavBuf[0][i + 1] == 'a') &&
+	          (wavBuf[0][i + 2] == 't') && (wavBuf[0][i + 3] == 'a'))
+	      {
+	          dataOffset = i + 8;
+	          break;
+	      }
+	  }
+
+	  //#3
+	  //Заголовок обнаружен, перемещаем указатель FatFs для работы с файлом на аудио-данные и заодно определяем количество байт данных. Для этого вычитаем из общего размера файла размер заголовка:
+	  res = f_lseek(&audioFile, dataOffset);
+	  wavDataSize = f_size(&audioFile) - dataOffset;//[байт] длина полной последовательности аудио данных
+	  //#3
+	  //нужно быстро выводить данные на ЦАП. для этого сделаем буферизацию.
+	  //в два буфера wavBuf[0] и wavBuf[1] будем пихать массив данных из файла
+	  //когда выводим на ЦАП буфер 1 заполняем буфер 2 и наоборот
+	//  Реализуем этот механизм и, первым делом, заполняем оба буфера данными:
+	    res = f_read(&audioFile, wavBuf[0], WAV_BUF_SIZE, &readBytes);
+	    res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -172,7 +185,9 @@ int main(void)
   MX_TIM2_Init();
   MX_DAC1_Init();
   /* USER CODE BEGIN 2 */
-  AudioInit();
+  AudioFileMount();
+  AudioFileOpen();
+  AudioFileRead();
 //  Поскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
     HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
     HAL_TIM_Base_Start_IT(&htim2);
@@ -241,7 +256,7 @@ int main(void)
 //		  все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
 
 		  //если сейчас озвучивается буфер 1 то заполняется буфер 2, и наоборот
-	      uint8_t readBufIdx = 0;
+
 	      if (curBufIdx == 0)
 	          readBufIdx = 1;
 	      f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
@@ -253,9 +268,11 @@ int main(void)
 	  {
 		  //просто закрываем файл
 //	      res = f_close(&audioFile);
-//	      stopFlag = 0;
 
-	      AudioInit();
+	      stopFlag = 0;
+	      curWavIdx = 0;
+	      readBufIdx = 0;
+	      AudioFileRead();
 	  }
 #endif
 
@@ -487,7 +504,7 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
     _dacData /= 16;
     _dacData -= 250;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
-    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
+//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
 //    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
 
     //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
