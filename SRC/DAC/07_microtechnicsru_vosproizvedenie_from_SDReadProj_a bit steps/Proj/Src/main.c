@@ -89,43 +89,10 @@ uint16_t _val;
 uint16_t _cnt;
 #define STEP_VAL	1
 #define MAX_VAL		0xFFF
-/* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
+
+void AudioInit()
 {
-  /* USER CODE BEGIN 1 */
-	_val = 0;
-	int8_t _flag = 0;
-  /* USER CODE END 1 */
-  
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_SDMMC1_SD_Init();
-  MX_FATFS_Init();
-  MX_TIM2_Init();
-  MX_DAC1_Init();
-  /* USER CODE BEGIN 2 */
 #ifdef	NORMAL_MODE
   FRESULT res;
   FRESULT resTryMount;
@@ -167,6 +134,45 @@ int main(void)
     res = f_read(&audioFile, wavBuf[1], WAV_BUF_SIZE, &readBytes);
     //#5
 #endif
+}
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+	_val = 0;
+	int8_t _flag = 0;
+  /* USER CODE END 1 */
+
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_SDMMC1_SD_Init();
+  MX_FATFS_Init();
+  MX_TIM2_Init();
+  MX_DAC1_Init();
+  /* USER CODE BEGIN 2 */
+  AudioInit();
 //  Поскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
     HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
     HAL_TIM_Base_Start_IT(&htim2);
@@ -238,7 +244,7 @@ int main(void)
 	      uint8_t readBufIdx = 0;
 	      if (curBufIdx == 0)
 	          readBufIdx = 1;
-	      res = f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
+	      f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
 	      wavReadFlag = 0;
 	  }
 	  //#
@@ -246,8 +252,10 @@ int main(void)
 	  if (stopFlag == 1)
 	  {
 		  //просто закрываем файл
-	      res = f_close(&audioFile);
-	      stopFlag = 0;
+//	      res = f_close(&audioFile);
+//	      stopFlag = 0;
+
+	      AudioInit();
 	  }
 #endif
 
@@ -479,7 +487,8 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
     _dacData /= 16;
     _dacData -= 250;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
-    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
+//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
 
     //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
     curBufOffset += 2;//номер текущего байта в буфере, этот счетчик, соответственно, будет изменяться от 0 до 512.

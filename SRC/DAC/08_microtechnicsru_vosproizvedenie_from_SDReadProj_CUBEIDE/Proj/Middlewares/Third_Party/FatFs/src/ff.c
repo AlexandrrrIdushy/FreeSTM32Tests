@@ -22,6 +22,8 @@
 #include "diskio.h"		/* Declarations of device I/O functions */
 
 
+//static FRESULT find_volume (const TCHAR**, FATFS**, BYTE);
+
 /*--------------------------------------------------------------------------
 
    Module Private Definitions
@@ -2990,7 +2992,7 @@ BYTE check_fs (	/* 0:FAT, 1:exFAT, 2:Valid BS but not FAT, 3:Not a BS, 4:Disk er
 /*-----------------------------------------------------------------------*/
 
 static
-FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
+FRESULT __attribute__((optimize("O0"))) find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	const TCHAR** path,	/* Pointer to pointer to the path name (drive number) */
 	FATFS** rfs,		/* Pointer to pointer to the found file system object */
 	BYTE mode			/* !=0: Check write protection for write access */
@@ -3257,7 +3259,7 @@ FRESULT validate (	/* Returns FR_OK or FR_INVALID_OBJECT */
 /* Mount/Unmount a Logical Drive                                         */
 /*-----------------------------------------------------------------------*/
 
-FRESULT f_mount (
+FRESULT __attribute__((optimize("O0"))) f_mount (
 	FATFS* fs,			/* Pointer to the file system object (NULL:unmount)*/
 	const TCHAR* path,	/* Logical drive number to be mounted/unmounted */
 	BYTE opt			/* Mode option 0:Do not mount (delayed mount), 1:Mount immediately */

@@ -72,13 +72,14 @@ void __attribute__((optimize("O0"))) TestSpeedReadSD()
 	  res_mount = f_mount(&SDFatFs, (TCHAR const*)SD_Path, 1);
 		 if(res_mount != FR_OK)
 		 {
+			 HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
 		    Error_Handler();
 
 		 }
 
 		  else
 		  {
-			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET);
+
 			  //текст
 			  uint8_t arr[] = {0, 1, 2};
 			  uint8_t arrrd[20];
@@ -129,6 +130,7 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(5000);
   TestSpeedReadSD();
   /* USER CODE END 2 */
 
