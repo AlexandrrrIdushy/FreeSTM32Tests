@@ -33,6 +33,7 @@
 //#define	DEBUG_VIEW_FREQ_IRQ
 //#define	DEBUG_ANY_MANUAL_SIGNAL
 #define	NORMAL_MODE
+#define	START_SIMCOM
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -160,7 +161,7 @@ int main(void)
 	_val = 0;
 	int8_t _flag = 0;
   /* USER CODE END 1 */
-
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -189,13 +190,20 @@ int main(void)
   AudioFileOpen();
   AudioFileRead();
 //  Поскольку данные готовы, спокойно включаем DAC и TIM6 на генерацию прерываний:
+    HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
     HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
     HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+#ifdef    START_SIMCOM
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+    HAL_Delay(600);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+    HAL_Delay(1100);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+#endif
 
 
 #ifdef	DEBUG_TEST_READ_TEXT_FROM_SD
@@ -472,11 +480,23 @@ static void MX_TIM2_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PB1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -503,8 +523,8 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
     _dacData = (((wavBuf[curBufIdx][curBufOffset + 1] << 8) | wavBuf[curBufIdx][curBufOffset]) + 32767);
     _dacData /= 16;
     _dacData -= 250;
-    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
-//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
+//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
+    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
 //    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
 
     //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
