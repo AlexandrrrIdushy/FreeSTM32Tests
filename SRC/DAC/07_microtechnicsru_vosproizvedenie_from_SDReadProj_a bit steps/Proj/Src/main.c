@@ -457,7 +457,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 1000;
+  htim2.Init.Prescaler = 700;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -545,7 +545,7 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
     if (curWavIdx >= wavDataSize)
     {
     	//все данные озвучены, останавливаем процесс
-        HAL_TIM_Base_Stop_IT(&htim2);
+//        HAL_TIM_Base_Stop_IT(&htim2);
         stopFlag = 1;
     }
     else
