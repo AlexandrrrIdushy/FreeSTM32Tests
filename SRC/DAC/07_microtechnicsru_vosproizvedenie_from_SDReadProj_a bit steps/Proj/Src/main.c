@@ -256,7 +256,7 @@ int main(void)
 //		  все данные из буфера озвучены. буфер полошел к концу. его нужно обновить"
 
 		  //если сейчас озвучивается буфер 1 то заполняется буфер 2, и наоборот
-
+		  readBufIdx = 0;
 	      if (curBufIdx == 0)
 	          readBufIdx = 1;
 	      f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
