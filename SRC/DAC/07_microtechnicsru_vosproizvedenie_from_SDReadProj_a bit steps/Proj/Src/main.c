@@ -34,6 +34,7 @@
 //#define	DEBUG_ANY_MANUAL_SIGNAL
 #define	NORMAL_MODE
 #define	START_SIMCOM
+//#define	SWITCH_FILES
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -100,7 +101,11 @@ uint8_t readBufIdx = 0;
 
 //uint8_t path[][] = {"gardenss.wav", "ClearDay.wav"};
 //  uint8_t path[] = "audio.wav";//шипение
-uint8_t pathG[] = "gardenss.wav";//v
+
+uint8_t pathG[] = "War.wav";
+//uint8_t pathG[] = "Avaria.wav";
+//uint8_t pathG[] = "Avaria 1.wav";
+//uint8_t pathG[] = "gardenss.wav";//v
 //  uint8_t path[] = "Dubstep.wav";//v
 uint8_t pathC[] = "ClearDay.wav";//v
 uint8_t* path[2];
@@ -281,6 +286,7 @@ int main(void)
 	          readBufIdx = 1;
 	      f_read(&audioFile, wavBuf[readBufIdx], WAV_BUF_SIZE, &readBytes);
 	      wavReadFlag = 0;
+#ifdef	SWITCH_FILES
 	      if(ctnRead > 3000)
 	      {
 	    	  ctnRead = 0;
@@ -295,6 +301,7 @@ int main(void)
 	      }
 	      else
 	    	  ctnRead++;
+#endif
 	  }
 	  //#
 	  //Кроме того, сразу же в while(1) помещаем код, который отвечает за окончание воспроизведения, когда файл подошел к концу:
@@ -473,7 +480,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 700;
+  htim2.Init.Prescaler = 2300;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -552,7 +559,7 @@ void __attribute__((optimize("O0"))) UserTIM2IRQHandler(void)
     _dacData /= 10;
     HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, _dacData);
 //    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, _dacData);
-    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
+//    HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, (4095 - _dacData));
 
     //на каждом такте используем забираем и озвучиваем 2 байта из массива аудио данных
     curBufOffset += 2;//номер текущего байта в буфере, этот счетчик, соответственно, будет изменяться от 0 до 512.
