@@ -54,7 +54,7 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t my_arr[] = {0x11, 0x22, 0x33, 0x44, 0x55};
 /* USER CODE END 0 */
 
 /**
@@ -94,7 +94,17 @@ int main(void)
   while (1)
   {
 	  asm("nop");
-	  HAL_Delay(500);
+	  my_arr[0] = 0xFA;
+	  //после запуска под отладкой визу в stutil начиная с адреса 0x8001430, такие значения
+	  //080000E1	080000B9	44332211	00000055
+
+	  //попробуем их прочитать
+	  uint32_t adr4Try = 0x8001440;
+	  uint32_t value1 = *(__IO uint32_t*) adr4Try;//обращаемся по адресу, затем кастим результат под указатель на 4 байта и разыменовываем чтобы получить значение
+//	  uint32_t value2 = *(__IO uint32_t*) (adr4Try + 4);
+//	  uint32_t value3 = *(__IO uint32_t*) (adr4Try + 8);
+//	  uint32_t value4 = *(__IO uint32_t*) (adr4Try + 12);
+	  asm("nop");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
