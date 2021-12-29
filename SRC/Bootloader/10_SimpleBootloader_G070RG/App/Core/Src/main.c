@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdint.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +54,40 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+//SD_CardInfo SDCard;
+typedef  void (*pFunction)(void);
+uint8_t readBuffer[512];
+uint32_t programBytesToRead;
+uint32_t programBytesCounter;
+uint32_t currentAddress;
+//UINT readBytes;
+uint32_t jumpAddress;
+pFunction Jump_To_Application;
+//FRESULT result;
 
+// -
+//int FlashArray[100] __attribute__((at(0x5000)));
+
+// -
+//#pragma location = 0x20017BFF
+//__no_init  uint8_t my_arr[1024];
+
+#pragma location = 0x20000900
+uint8_t my_arr[] = {0x11, 0x22, 0x33, 0x44, 0x55};
+//uint8_t my_arr2[] = "sidr";
+
+
+//
+//// Bootloader key configuration
+//#define BOOTLOADER_KEY_START_ADDRESS                             (uint32_t)0x08009800
+//#define BOOTLOADER_KEY_PAGE_NUMBER                               19
+//#define BOOTLOADER_KEY_VALUE                                     0xAAAA5555
+//// Flash configuration
+////#define MAIN_PROGRAM_START_ADDRESS                               (uint32_t)0x0800A000
+//#define MAIN_PROGRAM_START_ADDRESS                               (uint32_t)0x08000800
+//#define MAIN_PROGRAM_PAGE_NUMBER                                 20
+//#define NUM_OF_PAGES                                             256
+//#define FLASH_PAGE_SIZE                                          2048
 /* USER CODE END 0 */
 
 /**
@@ -86,18 +119,28 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+//  uint32_t jumpAddress;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  my_arr[0] = 0xFA;
 	  asm("nop");
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	  HAL_Delay(500);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-	  HAL_Delay(500);
+
+
+//	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+//	  HAL_Delay(500);
+//	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+//	  HAL_Delay(500);
+
+//		__disable_irq();
+////		NVIC_SetVectorTable(NVIC_VectTab_FLASH, MAIN_PROGRAM_START_ADDRESS);
+//		jumpAddress = *(__IO uint32_t*) (MAIN_PROGRAM_START_ADDRESS + 4);
+//		Jump_To_Application = (pFunction) jumpAddress;
+//		__set_MSP(*(__IO uint32_t*) MAIN_PROGRAM_START_ADDRESS);
+//		Jump_To_Application();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
