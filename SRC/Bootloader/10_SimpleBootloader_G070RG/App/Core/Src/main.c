@@ -99,11 +99,11 @@ int main(void)
 	  //080000E1	080000B9	44332211	00000055
 
 	  //попробуем их прочитать
-	  uint32_t adr4Try = 0x8001440;
-	  uint32_t value1 = *(__IO uint32_t*) adr4Try;//обращаемся по адресу, затем кастим результат под указатель на 4 байта и разыменовываем чтобы получить значение
-//	  uint32_t value2 = *(__IO uint32_t*) (adr4Try + 4);
-//	  uint32_t value3 = *(__IO uint32_t*) (adr4Try + 8);
-//	  uint32_t value4 = *(__IO uint32_t*) (adr4Try + 12);
+	  uint32_t adr4Try = 0x8001450;
+	  uint32_t* pointer = (uint32_t*)adr4Try;
+	  pointer++;
+	  pointer++;
+	  pointer++;
 	  asm("nop");
     /* USER CODE END WHILE */
 
