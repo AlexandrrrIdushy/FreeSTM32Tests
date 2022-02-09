@@ -93,18 +93,30 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  asm("nop");
-	  my_arr[0] = 0xFA;
-	  //после запуска под отладкой визу в stutil начиная с адреса 0x8001430, такие значения
-	  //080000E1	080000B9	44332211	00000055
 
-	  //попробуем их прочитать
-	  uint32_t adr4Try = 0x8001450;
-	  uint32_t* pointer = (uint32_t*)adr4Try;
-	  pointer++;
-	  pointer++;
-	  pointer++;
-	  asm("nop");
+
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+//	  for(int i = 0; i< 0xFFFFFF; i++)
+//		  {asm("nop");}
+	  HAL_Delay(500);
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+//	  for(int i = 0; i< 0xFFFFFF; i++)
+//		  {asm("nop");}
+	  HAL_Delay(500);
+//	  asm("nop");
+//	  my_arr[0] = 0xFA;
+//	  //после запуска под отладкой внизу в stutil начиная с адреса 0x8001430, такие значения
+//	  //080000E1	080000B9	44332211	00000055
+//
+//	  //попробуем их прочитать
+//	  uint32_t adr4Try = 0x8001450;
+//	  uint32_t* pointer = (uint32_t*)adr4Try;
+//	  pointer++;
+//	  pointer++;
+//	  pointer++;
+//	  asm("nop");
+//
+//	  int var __attribute__((at(0x40001000)));
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
