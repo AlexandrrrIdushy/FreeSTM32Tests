@@ -98,9 +98,16 @@ int main(void)
 //	  HAL_Delay(500);
 //	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-//	  for(int i = 0; i< 0xFFFFFF; i++)
+	  for(int i = 0; i< 0xFFFF; i++)
 //		  asm("nop");
-//	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	  asm("nop");
+	  asm("nop");
+	  asm("nop");
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	  for(int i = 0; i< 0xFFFF; i++)
+	  asm("nop");
+	  asm("nop");
+	  asm("nop");
 //	  for(int i = 0; i< 0xFFFFFF; i++)
 //		  asm("nop");
 //	  HAL_Delay(500);
