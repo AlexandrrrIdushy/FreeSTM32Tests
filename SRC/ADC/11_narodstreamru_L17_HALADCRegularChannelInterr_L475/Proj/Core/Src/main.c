@@ -66,7 +66,7 @@ static void MX_ADC1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	HAL_ADC_Start_IT(&hadc1);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -232,7 +232,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef*  hadc)
+{
+	asm("nop");
+}
 /* USER CODE END 4 */
 
 /**
